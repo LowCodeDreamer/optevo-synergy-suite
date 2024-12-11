@@ -19,7 +19,6 @@ const Index = () => {
         navigate("/dashboard");
       }
       
-      // Handle authentication events
       if (event === "SIGNED_OUT") {
         toast({
           title: "Signed out",
@@ -79,35 +78,27 @@ const Index = () => {
               },
             },
           }}
-          viewOptions={{
-            signIn: {
-              emailRedirectTo: `${window.location.origin}/dashboard`,
-              onError: (error) => {
-                toast({
-                  title: "Invalid credentials",
-                  description: "Please check your email and password and try again.",
-                  variant: "destructive",
-                });
-              },
-            },
-            signUp: {
-              emailRedirectTo: `${window.location.origin}/dashboard`,
-              onError: (error) => {
-                if (error.message.includes("User already registered")) {
-                  toast({
-                    title: "Account exists",
-                    description: "This email is already registered. Please try logging in instead.",
-                    variant: "destructive",
-                  });
-                } else {
-                  toast({
-                    title: "Sign up error",
-                    description: error.message,
-                    variant: "destructive",
-                  });
-                }
-              },
-            },
+          redirectTo={`${window.location.origin}/dashboard`}
+          onError={(error) => {
+            if (error.message.includes("User already registered")) {
+              toast({
+                title: "Account exists",
+                description: "This email is already registered. Please try logging in instead.",
+                variant: "destructive",
+              });
+            } else if (error.message.includes("Invalid login credentials")) {
+              toast({
+                title: "Invalid credentials",
+                description: "Please check your email and password and try again.",
+                variant: "destructive",
+              });
+            } else {
+              toast({
+                title: "Error",
+                description: error.message,
+                variant: "destructive",
+              });
+            }
           }}
         />
       </Card>
