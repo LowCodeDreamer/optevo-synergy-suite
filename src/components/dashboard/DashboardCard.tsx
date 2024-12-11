@@ -9,7 +9,7 @@ interface DashboardCardProps {
 
 export const DashboardCard = ({ title, children, className }: DashboardCardProps) => {
   return (
-    <Card className={cn("shadow-lg bg-card text-card-foreground", className)}>
+    <Card className={cn("shadow-lg bg-card text-card-foreground dark:bg-slate-800/50 dark:backdrop-blur-sm dark:border-slate-700", className)}>
       <CardHeader>
         <CardTitle className="text-lg font-semibold">{title}</CardTitle>
       </CardHeader>
