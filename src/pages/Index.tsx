@@ -2,6 +2,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
 import { AIAssistant } from "@/components/dashboard/AIAssistant";
 import { BarChart, Users, BrainCircuit, TrendingUp } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const Index = () => {
   const stats = [
