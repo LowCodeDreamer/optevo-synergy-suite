@@ -4,7 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
+import { AuthChangeEvent } from "@supabase/supabase-js";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -13,19 +14,18 @@ const Index = () => {
   useEffect(() => {
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
+    } = supabase.auth.onAuthStateChange((event: AuthChangeEvent, session) => {
       if (session) {
         navigate("/dashboard");
       }
       
-      // Handle authentication events and errors
-      if (event === 'USER_DELETED') {
+      // Handle authentication events
+      if (event === "SIGNED_OUT") {
         toast({
-          title: "Account deleted",
-          description: "Your account has been successfully deleted.",
-          variant: "destructive",
+          title: "Signed out",
+          description: "You have been successfully signed out.",
         });
-      } else if (event === 'PASSWORD_RECOVERY') {
+      } else if (event === "PASSWORD_RECOVERY") {
         toast({
           title: "Password recovery",
           description: "Check your email for password reset instructions.",
@@ -56,28 +56,49 @@ const Index = () => {
             }
           }}
           providers={[]}
-          onError={(error) => {
-            // Handle authentication errors from the Auth UI component
-            const errorMessage = error.message;
-            if (errorMessage.includes("User already registered")) {
-              toast({
-                title: "Account exists",
-                description: "This email is already registered. Please try logging in instead.",
-                variant: "destructive",
-              });
-            } else if (errorMessage.includes("Invalid login credentials")) {
-              toast({
-                title: "Invalid credentials",
-                description: "Please check your email and password and try again.",
-                variant: "destructive",
-              });
-            } else {
-              toast({
-                title: "Authentication error",
-                description: errorMessage,
-                variant: "destructive",
-              });
-            }
+          view="sign_in"
+          showLinks={true}
+          localization={{
+            variables: {
+              sign_in: {
+                email_label: "Email",
+                password_label: "Password",
+              },
+              sign_up: {
+                email_label: "Email",
+                password_label: "Password",
+              },
+            },
+          }}
+          viewOptions={{
+            signIn: {
+              emailRedirectTo: `${window.location.origin}/dashboard`,
+              onError: (error) => {
+                toast({
+                  title: "Invalid credentials",
+                  description: "Please check your email and password and try again.",
+                  variant: "destructive",
+                });
+              },
+            },
+            signUp: {
+              emailRedirectTo: `${window.location.origin}/dashboard`,
+              onError: (error) => {
+                if (error.message.includes("User already registered")) {
+                  toast({
+                    title: "Account exists",
+                    description: "This email is already registered. Please try logging in instead.",
+                    variant: "destructive",
+                  });
+                } else {
+                  toast({
+                    title: "Sign up error",
+                    description: error.message,
+                    variant: "destructive",
+                  });
+                }
+              },
+            },
           }}
         />
       </Card>
