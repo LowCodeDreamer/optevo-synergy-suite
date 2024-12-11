@@ -64,8 +64,7 @@ const Index = () => {
             },
           }}
           providers={[]}
-          view="sign_in"
-          showLinks={true}
+          redirectTo={`${window.location.origin}/dashboard`}
           localization={{
             variables: {
               sign_in: {
@@ -77,28 +76,6 @@ const Index = () => {
                 password_label: "Password",
               },
             },
-          }}
-          redirectTo={`${window.location.origin}/dashboard`}
-          onError={(error) => {
-            if (error.message.includes("User already registered")) {
-              toast({
-                title: "Account exists",
-                description: "This email is already registered. Please try logging in instead.",
-                variant: "destructive",
-              });
-            } else if (error.message.includes("Invalid login credentials")) {
-              toast({
-                title: "Invalid credentials",
-                description: "Please check your email and password and try again.",
-                variant: "destructive",
-              });
-            } else {
-              toast({
-                title: "Error",
-                description: error.message,
-                variant: "destructive",
-              });
-            }
           }}
         />
       </Card>
