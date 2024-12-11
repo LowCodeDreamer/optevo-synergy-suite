@@ -51,9 +51,18 @@ const Index = () => {
                 colors: {
                   brand: 'rgb(147 51 234)',
                   brandAccent: 'rgb(126 34 206)',
-                }
-              }
-            }
+                  inputBackground: 'transparent',
+                  inputText: 'inherit',
+                },
+              },
+            },
+            style: {
+              input: {
+                backgroundColor: 'var(--background)',
+                color: 'var(--foreground)',
+                borderColor: 'var(--border)',
+              },
+            },
           }}
           providers={[]}
           view="sign_in"
