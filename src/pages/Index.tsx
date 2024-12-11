@@ -11,41 +11,27 @@ const Index = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check current session
-    supabase.auth.onAuthStateChange((event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
       if (session) {
         navigate("/dashboard");
       }
-    });
-
-    // Handle auth errors
-    const handleAuthError = (error: Error) => {
-      const errorMessage = error.message;
-      if (errorMessage.includes("User already registered")) {
+      
+      // Handle authentication events and errors
+      if (event === 'USER_DELETED') {
         toast({
-          title: "Account exists",
-          description: "This email is already registered. Please try logging in instead.",
+          title: "Account deleted",
+          description: "Your account has been successfully deleted.",
           variant: "destructive",
         });
-      } else if (errorMessage.includes("Invalid login credentials")) {
+      } else if (event === 'PASSWORD_RECOVERY') {
         toast({
-          title: "Invalid credentials",
-          description: "Please check your email and password and try again.",
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Authentication error",
-          description: errorMessage,
-          variant: "destructive",
+          title: "Password recovery",
+          description: "Check your email for password reset instructions.",
         });
       }
-    };
-
-    // Subscribe to auth events
-    const {
-      data: { subscription },
-    } = supabase.auth.onError(handleAuthError);
+    });
 
     return () => {
       subscription.unsubscribe();
@@ -70,6 +56,29 @@ const Index = () => {
             }
           }}
           providers={[]}
+          onError={(error) => {
+            // Handle authentication errors from the Auth UI component
+            const errorMessage = error.message;
+            if (errorMessage.includes("User already registered")) {
+              toast({
+                title: "Account exists",
+                description: "This email is already registered. Please try logging in instead.",
+                variant: "destructive",
+              });
+            } else if (errorMessage.includes("Invalid login credentials")) {
+              toast({
+                title: "Invalid credentials",
+                description: "Please check your email and password and try again.",
+                variant: "destructive",
+              });
+            } else {
+              toast({
+                title: "Authentication error",
+                description: errorMessage,
+                variant: "destructive",
+              });
+            }
+          }}
         />
       </Card>
     </div>
