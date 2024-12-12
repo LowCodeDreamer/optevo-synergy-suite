@@ -10,6 +10,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ListPlus } from "lucide-react";
 
 export const ProspectTasks = ({ prospectId }: { prospectId: string }) => {
   const { data: tasks } = useQuery({
@@ -54,6 +56,12 @@ export const ProspectTasks = ({ prospectId }: { prospectId: string }) => {
 
   return (
     <div className="space-y-4">
+      <div className="flex justify-end">
+        <Button className="gap-2">
+          <ListPlus className="h-4 w-4" />
+          New Task
+        </Button>
+      </div>
       <Table>
         <TableHeader>
           <TableRow>
