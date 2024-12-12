@@ -62,7 +62,7 @@ export const UserSelect = ({
           <CommandInput placeholder="Search users..." />
           <CommandEmpty>No user found.</CommandEmpty>
           <CommandGroup>
-            {users.map((user) => (
+            {(users || []).map((user) => (
               <CommandItem
                 key={user.id}
                 value={user.username || user.id}
