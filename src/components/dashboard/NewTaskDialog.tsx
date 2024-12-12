@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Dialog,
@@ -7,8 +7,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -56,59 +54,49 @@ export const NewTaskDialog = ({
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Fetch users for assignment
-  const { data: users } = useQuery({
+  const { data: users, isLoading: isLoadingUsers } = useQuery({
     queryKey: ["users"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, username");
+        .select("*")
+        .order("username");
       if (error) throw error;
-      return data;
+      return data || [];
     },
   });
 
-  const handleSubmit = async () => {
-    if (!title.trim()) return;
-
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsSubmitting(true);
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
 
-    const { error } = await supabase.from("prospect_tasks").insert([
-      {
+    try {
+      const { error } = await supabase.from("prospect_tasks").insert({
         prospect_id: prospectId,
         title,
-        description: description || null,
+        description,
         priority,
-        due_date: dueDate?.toISOString() || null,
-        status: "pending",
-        created_by: user?.id,
-        assigned_to: assignedTo || null,
-      },
-    ]);
+        due_date: dueDate,
+        assigned_to: assignedTo,
+      });
 
-    setIsSubmitting(false);
+      if (error) throw error;
 
-    if (error) {
+      toast({
+        title: "Success",
+        description: "Task created successfully",
+      });
+
+      queryClient.invalidateQueries({ queryKey: ["prospect-tasks"] });
+      onClose();
+    } catch (error) {
       toast({
         title: "Error",
         description: "Failed to create task",
         variant: "destructive",
       });
-    } else {
-      toast({
-        title: "Success",
-        description: "Task created successfully",
-      });
-      queryClient.invalidateQueries({ queryKey: ["prospect-tasks", prospectId] });
-      setTitle("");
-      setDescription("");
-      setPriority("medium");
-      setDueDate(undefined);
-      setAssignedTo(undefined);
-      onClose();
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -118,79 +106,95 @@ export const NewTaskDialog = ({
         <DialogHeader>
           <DialogTitle>New Task</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4 py-4">
-          <Input
-            placeholder="Task title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-          <Textarea
-            placeholder="Task description (optional)"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-          <Select value={priority} onValueChange={setPriority}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select priority" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="low">Low</SelectItem>
-              <SelectItem value="medium">Medium</SelectItem>
-              <SelectItem value="high">High</SelectItem>
-            </SelectContent>
-          </Select>
-          <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                role="combobox"
-                aria-expanded={open}
-                className="w-full justify-between"
-              >
-                {assignedTo
-                  ? users?.find((user) => user.id === assignedTo)?.username || "Select user"
-                  : "Assign to user"}
-                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-full p-0">
-              <Command>
-                <CommandInput placeholder="Search users..." />
-                <CommandEmpty>No user found.</CommandEmpty>
-                <CommandGroup>
-                  {users?.map((user) => (
-                    <CommandItem
-                      key={user.id}
-                      value={user.username || user.id}
-                      onSelect={() => {
-                        setAssignedTo(user.id);
-                        setOpen(false);
-                      }}
-                    >
-                      <Check
-                        className={cn(
-                          "mr-2 h-4 w-4",
-                          assignedTo === user.id ? "opacity-100" : "opacity-0"
-                        )}
-                      />
-                      {user.username || "Unnamed User"}
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              </Command>
-            </PopoverContent>
-          </Popover>
-          <DatePickerField
-            value={dueDate}
-            onChange={setDueDate}
-            placeholder="Pick a due date"
-          />
-        </div>
-        <DialogFooter 
-          isSubmitting={isSubmitting} 
-          onClose={onClose} 
-          onSubmit={handleSubmit}
-        />
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-4">
+            <input
+              type="text"
+              placeholder="Task title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="w-full px-3 py-2 border rounded-md"
+              required
+            />
+            <textarea
+              placeholder="Description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="w-full px-3 py-2 border rounded-md"
+              rows={3}
+            />
+            <Select value={priority} onValueChange={setPriority}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select priority" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="low">Low</SelectItem>
+                <SelectItem value="medium">Medium</SelectItem>
+                <SelectItem value="high">High</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Popover open={open} onOpenChange={setOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={open}
+                  className="w-full justify-between"
+                >
+                  {assignedTo && users
+                    ? users.find((user) => user.id === assignedTo)?.username || "Unnamed User"
+                    : "Assign to user"}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                <Command>
+                  <CommandInput placeholder="Search users..." />
+                  <CommandEmpty>No user found.</CommandEmpty>
+                  {users && users.length > 0 && (
+                    <CommandGroup>
+                      {users.map((user) => (
+                        <CommandItem
+                          key={user.id}
+                          value={user.username || user.id}
+                          onSelect={() => {
+                            setAssignedTo(user.id);
+                            setOpen(false);
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              assignedTo === user.id ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          {user.username || "Unnamed User"}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  )}
+                </Command>
+              </PopoverContent>
+            </Popover>
+
+            <DatePickerField
+              value={dueDate}
+              onChange={setDueDate}
+              placeholder="Select due date"
+            />
+          </div>
+
+          <DialogFooter>
+            <Button
+              type="submit"
+              disabled={isSubmitting || !title}
+            >
+              Create Task
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );
