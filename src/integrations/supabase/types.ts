@@ -43,6 +43,7 @@ export type Database = {
           fit_score: number | null
           fit_summary: string | null
           id: string
+          linkedin_url: string | null
           meeting_scheduled: boolean | null
           potential_services: string | null
           reviewed_at: string | null
@@ -62,6 +63,7 @@ export type Database = {
           fit_score?: number | null
           fit_summary?: string | null
           id?: string
+          linkedin_url?: string | null
           meeting_scheduled?: boolean | null
           potential_services?: string | null
           reviewed_at?: string | null
@@ -81,6 +83,7 @@ export type Database = {
           fit_score?: number | null
           fit_summary?: string | null
           id?: string
+          linkedin_url?: string | null
           meeting_scheduled?: boolean | null
           potential_services?: string | null
           reviewed_at?: string | null
