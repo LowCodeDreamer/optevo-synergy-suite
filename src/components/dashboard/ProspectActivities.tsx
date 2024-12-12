@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Calendar, Mail, MessageSquare, Phone, CalendarPlus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,8 +12,10 @@ import {
 } from "@/components/ui/table";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
+import { NewActivityDialog } from "./NewActivityDialog";
 
 export const ProspectActivities = ({ prospectId }: { prospectId: string }) => {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { data: activities } = useQuery({
     queryKey: ["prospect-activities", prospectId],
     queryFn: async () => {
@@ -45,7 +48,7 @@ export const ProspectActivities = ({ prospectId }: { prospectId: string }) => {
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
-        <Button className="gap-2">
+        <Button className="gap-2" onClick={() => setIsDialogOpen(true)}>
           <CalendarPlus className="h-4 w-4" />
           New Activity
         </Button>
@@ -79,6 +82,12 @@ export const ProspectActivities = ({ prospectId }: { prospectId: string }) => {
           ))}
         </TableBody>
       </Table>
+
+      <NewActivityDialog
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        prospectId={prospectId}
+      />
     </div>
   );
 };

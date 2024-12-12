@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
@@ -12,8 +13,10 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ListPlus } from "lucide-react";
+import { NewTaskDialog } from "./NewTaskDialog";
 
 export const ProspectTasks = ({ prospectId }: { prospectId: string }) => {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { data: tasks } = useQuery({
     queryKey: ["prospect-tasks", prospectId],
     queryFn: async () => {
@@ -57,7 +60,7 @@ export const ProspectTasks = ({ prospectId }: { prospectId: string }) => {
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
-        <Button className="gap-2">
+        <Button className="gap-2" onClick={() => setIsDialogOpen(true)}>
           <ListPlus className="h-4 w-4" />
           New Task
         </Button>
@@ -86,14 +89,18 @@ export const ProspectTasks = ({ prospectId }: { prospectId: string }) => {
                 )}
               </TableCell>
               <TableCell>
-                <Badge variant={getStatusColor(task.status)}>
-                  {task.status}
-                </Badge>
+                <Badge variant={getStatusColor(task.status)}>{task.status}</Badge>
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
+
+      <NewTaskDialog
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        prospectId={prospectId}
+      />
     </div>
   );
 };
