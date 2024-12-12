@@ -76,7 +76,11 @@ export const NewNoteDialog = ({
             className="min-h-[200px]"
           />
         </div>
-        <DialogFooter isSubmitting={isSubmitting} onClose={onClose} />
+        <DialogFooter 
+          isSubmitting={isSubmitting} 
+          onClose={onClose} 
+          onSubmit={handleSubmit}
+        />
       </DialogContent>
     </Dialog>
   );

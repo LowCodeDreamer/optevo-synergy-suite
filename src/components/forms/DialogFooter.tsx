@@ -4,12 +4,14 @@ import { Button } from "@/components/ui/button";
 interface DialogFooterProps {
   isSubmitting: boolean;
   onClose: () => void;
+  onSubmit: () => void;
   submitText?: string;
 }
 
 export const DialogFooter = ({
   isSubmitting,
   onClose,
+  onSubmit,
   submitText = "Create",
 }: DialogFooterProps) => {
   return (
@@ -17,7 +19,7 @@ export const DialogFooter = ({
       <Button variant="outline" onClick={onClose}>
         Cancel
       </Button>
-      <Button disabled={isSubmitting}>
+      <Button onClick={onSubmit} disabled={isSubmitting}>
         {isSubmitting ? "Creating..." : submitText}
       </Button>
     </BaseDialogFooter>
