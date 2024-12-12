@@ -28,10 +28,10 @@ export const Sidebar = () => {
 
   return (
     <div className={cn(
-      "h-screen bg-primary p-4 transition-all duration-300",
-      isCollapsed ? "w-20" : "w-64"
+      "fixed left-0 top-0 h-screen bg-primary transition-all duration-300 z-50",
+      isCollapsed ? "w-16" : "w-64"
     )}>
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex justify-between items-center p-4 mb-8">
         {!isCollapsed && (
           <h1 className="text-white text-xl font-bold">Optevo</h1>
         )}
@@ -45,12 +45,15 @@ export const Sidebar = () => {
         </Button>
       </div>
 
-      <nav className="space-y-2">
+      <nav className="space-y-2 px-2">
         {menuItems.map((item) => (
           <Button
             key={item.label}
             variant="ghost"
-            className="flex items-center w-full space-x-2 text-white/80 hover:text-white hover:bg-primary-foreground/10 rounded-lg p-3 transition-colors justify-start"
+            className={cn(
+              "flex items-center w-full space-x-2 text-white/80 hover:text-white hover:bg-primary-foreground/10 rounded-lg p-3 transition-colors justify-start",
+              isCollapsed && "justify-center px-0"
+            )}
             onClick={() => navigate(item.href)}
           >
             <item.icon size={24} />
