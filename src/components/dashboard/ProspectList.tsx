@@ -80,6 +80,7 @@ export const ProspectList = () => {
         <TableHeader>
           <TableRow>
             <TableHead>Company</TableHead>
+            <TableHead>Contact</TableHead>
             <TableHead>Fit Score</TableHead>
             <TableHead>Potential Services</TableHead>
             <TableHead>Status</TableHead>
@@ -89,7 +90,19 @@ export const ProspectList = () => {
         <TableBody>
           {prospects?.map((prospect) => (
             <TableRow key={prospect.id}>
-              <TableCell className="font-medium">{prospect.company_name}</TableCell>
+              <TableCell className="font-medium">
+                <div>
+                  <div>{prospect.company_name}</div>
+                  <div className="text-sm text-muted-foreground">{prospect.website}</div>
+                </div>
+              </TableCell>
+              <TableCell>
+                <div className="space-y-1">
+                  <div className="font-medium">{prospect.contact_name}</div>
+                  <div className="text-sm text-muted-foreground">{prospect.contact_email}</div>
+                  <div className="text-sm text-muted-foreground">{prospect.contact_phone}</div>
+                </div>
+              </TableCell>
               <TableCell>{prospect.fit_score}/100</TableCell>
               <TableCell>{prospect.potential_services}</TableCell>
               <TableCell>{prospect.status}</TableCell>
