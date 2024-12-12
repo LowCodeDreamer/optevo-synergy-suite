@@ -7,15 +7,19 @@ import {
   BarChart, 
   Settings,
   Menu,
-  X
+  X,
+  List
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useNavigate } from 'react-router-dom';
 
 export const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const navigate = useNavigate();
 
   const menuItems = [
-    { icon: LayoutDashboard, label: "Dashboard", href: "/" },
+    { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
+    { icon: List, label: "Prospects", href: "/prospects" },
     { icon: BrainCircuit, label: "AI Assistant", href: "/assistant" },
     { icon: Users, label: "Team", href: "/team" },
     { icon: BarChart, label: "Analytics", href: "/analytics" },
@@ -43,14 +47,15 @@ export const Sidebar = () => {
 
       <nav className="space-y-2">
         {menuItems.map((item) => (
-          <a
+          <Button
             key={item.label}
-            href={item.href}
-            className="flex items-center space-x-2 text-white/80 hover:text-white hover:bg-primary-foreground/10 rounded-lg p-3 transition-colors"
+            variant="ghost"
+            className="flex items-center w-full space-x-2 text-white/80 hover:text-white hover:bg-primary-foreground/10 rounded-lg p-3 transition-colors justify-start"
+            onClick={() => navigate(item.href)}
           >
             <item.icon size={24} />
             {!isCollapsed && <span>{item.label}</span>}
-          </a>
+          </Button>
         ))}
       </nav>
     </div>
