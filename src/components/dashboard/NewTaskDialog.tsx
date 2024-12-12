@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Dialog,
@@ -35,9 +35,22 @@ export const NewTaskDialog = ({
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState<string>("medium");
   const [dueDate, setDueDate] = useState<Date>();
+  const [assignedTo, setAssignedTo] = useState<string>();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Fetch users for assignment
+  const { data: users } = useQuery({
+    queryKey: ["users"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, username");
+      if (error) throw error;
+      return data;
+    },
+  });
 
   const handleSubmit = async () => {
     if (!title.trim()) return;
@@ -56,6 +69,7 @@ export const NewTaskDialog = ({
         due_date: dueDate?.toISOString() || null,
         status: "pending",
         created_by: user?.id,
+        assigned_to: assignedTo || null,
       },
     ]);
 
@@ -77,6 +91,7 @@ export const NewTaskDialog = ({
       setDescription("");
       setPriority("medium");
       setDueDate(undefined);
+      setAssignedTo(undefined);
       onClose();
     }
   };
@@ -108,13 +123,29 @@ export const NewTaskDialog = ({
               <SelectItem value="high">High</SelectItem>
             </SelectContent>
           </Select>
+          <Select value={assignedTo} onValueChange={setAssignedTo}>
+            <SelectTrigger>
+              <SelectValue placeholder="Assign to user" />
+            </SelectTrigger>
+            <SelectContent>
+              {users?.map((user) => (
+                <SelectItem key={user.id} value={user.id}>
+                  {user.username || user.id}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <DatePickerField
             value={dueDate}
             onChange={setDueDate}
             placeholder="Pick a due date"
           />
         </div>
-        <DialogFooter isSubmitting={isSubmitting} onClose={onClose} />
+        <DialogFooter 
+          isSubmitting={isSubmitting} 
+          onClose={onClose} 
+          onSubmit={handleSubmit}
+        />
       </DialogContent>
     </Dialog>
   );

@@ -30,8 +30,13 @@ export const DatePickerField = ({
           {value ? format(value, "PPP") : placeholder}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
-        <Calendar mode="single" selected={value} onSelect={onChange} initialFocus />
+      <PopoverContent className="w-auto p-0 z-50" align="start">
+        <Calendar 
+          mode="single" 
+          selected={value} 
+          onSelect={onChange} 
+          initialFocus 
+        />
       </PopoverContent>
     </Popover>
   );

@@ -116,7 +116,11 @@ export const NewActivityDialog = ({
             placeholder="Schedule date"
           />
         </div>
-        <DialogFooter isSubmitting={isSubmitting} onClose={onClose} />
+        <DialogFooter 
+          isSubmitting={isSubmitting} 
+          onClose={onClose} 
+          onSubmit={handleSubmit}
+        />
       </DialogContent>
     </Dialog>
   );
