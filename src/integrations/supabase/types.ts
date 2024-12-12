@@ -137,6 +137,7 @@ export type Database = {
           id: string
           priority: string | null
           prospect_id: string
+          reminder_at: string | null
           status: string | null
           title: string
           updated_at: string | null
@@ -151,6 +152,7 @@ export type Database = {
           id?: string
           priority?: string | null
           prospect_id: string
+          reminder_at?: string | null
           status?: string | null
           title: string
           updated_at?: string | null
@@ -165,6 +167,7 @@ export type Database = {
           id?: string
           priority?: string | null
           prospect_id?: string
+          reminder_at?: string | null
           status?: string | null
           title?: string
           updated_at?: string | null

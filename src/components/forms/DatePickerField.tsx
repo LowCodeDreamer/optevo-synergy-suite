@@ -17,37 +17,35 @@ export const DatePickerField = ({
   placeholder = "Pick a date",
 }: DatePickerFieldProps) => {
   return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          className={cn(
-            "w-full justify-start text-left font-normal",
-            !value && "text-muted-foreground"
-          )}
+    <div className="relative">
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            className={cn(
+              "w-full justify-start text-left font-normal",
+              !value && "text-muted-foreground"
+            )}
+          >
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            {value ? format(value, "PPP") : placeholder}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent 
+          className="w-auto p-0" 
+          align="start"
+          sideOffset={4}
         >
-          <CalendarIcon className="mr-2 h-4 w-4" />
-          {value ? format(value, "PPP") : placeholder}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent 
-        className="w-auto p-0" 
-        align="start"
-        sideOffset={4}
-        style={{ 
-          zIndex: 100,
-          position: 'relative',
-          backgroundColor: 'var(--background)',
-          boxShadow: 'var(--shadow)'
-        }}
-      >
-        <Calendar 
-          mode="single" 
-          selected={value} 
-          onSelect={onChange} 
-          initialFocus 
-        />
-      </PopoverContent>
-    </Popover>
+          <div className="bg-popover rounded-md border shadow-md">
+            <Calendar 
+              mode="single" 
+              selected={value} 
+              onSelect={onChange} 
+              initialFocus 
+            />
+          </div>
+        </PopoverContent>
+      </Popover>
+    </div>
   );
 };

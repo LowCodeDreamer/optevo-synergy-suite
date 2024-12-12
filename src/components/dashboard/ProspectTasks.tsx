@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ListPlus } from "lucide-react";
+import { ListPlus, Bell } from "lucide-react";
 import { NewTaskDialog } from "./NewTaskDialog";
 
 export const ProspectTasks = ({ prospectId }: { prospectId: string }) => {
@@ -22,7 +22,7 @@ export const ProspectTasks = ({ prospectId }: { prospectId: string }) => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("prospect_tasks")
-        .select("*")
+        .select("*, profiles(username)")
         .eq("prospect_id", prospectId)
         .order("due_date", { ascending: true });
 
@@ -72,6 +72,8 @@ export const ProspectTasks = ({ prospectId }: { prospectId: string }) => {
             <TableHead>Due Date</TableHead>
             <TableHead>Priority</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Assigned To</TableHead>
+            <TableHead>Reminder</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -89,7 +91,20 @@ export const ProspectTasks = ({ prospectId }: { prospectId: string }) => {
                 )}
               </TableCell>
               <TableCell>
-                <Badge variant={getStatusColor(task.status)}>{task.status}</Badge>
+                <Badge variant={getStatusColor(task.status || "pending")}>
+                  {task.status || "pending"}
+                </Badge>
+              </TableCell>
+              <TableCell>
+                {task.profiles?.username || "Unassigned"}
+              </TableCell>
+              <TableCell>
+                {task.reminder_at && (
+                  <div className="flex items-center gap-2">
+                    <Bell className="h-4 w-4" />
+                    {format(new Date(task.reminder_at), "MMM d, yyyy")}
+                  </div>
+                )}
               </TableCell>
             </TableRow>
           ))}

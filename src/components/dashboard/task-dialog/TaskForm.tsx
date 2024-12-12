@@ -19,10 +19,13 @@ interface TaskFormProps {
   setPriority: (value: string) => void;
   dueDate?: Date;
   setDueDate: (date?: Date) => void;
+  reminderDate?: Date;
+  setReminderDate: (date?: Date) => void;
   assignedTo?: string;
   setAssignedTo: (value: string) => void;
   users: any[];
   isLoadingUsers: boolean;
+  currentUserId?: string;
 }
 
 export const TaskForm = ({
@@ -34,10 +37,13 @@ export const TaskForm = ({
   setPriority,
   dueDate,
   setDueDate,
+  reminderDate,
+  setReminderDate,
   assignedTo,
   setAssignedTo,
   users,
   isLoadingUsers,
+  currentUserId,
 }: TaskFormProps) => {
   return (
     <div className="space-y-4">
@@ -70,7 +76,7 @@ export const TaskForm = ({
       <UserSelect
         users={users}
         isLoading={isLoadingUsers}
-        value={assignedTo}
+        value={assignedTo || currentUserId}
         onChange={setAssignedTo}
       />
 
@@ -78,6 +84,12 @@ export const TaskForm = ({
         value={dueDate}
         onChange={setDueDate}
         placeholder="Select due date"
+      />
+
+      <DatePickerField
+        value={reminderDate}
+        onChange={setReminderDate}
+        placeholder="Set reminder (optional)"
       />
     </div>
   );

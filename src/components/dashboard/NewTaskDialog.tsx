@@ -26,10 +26,19 @@ export const NewTaskDialog = ({
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState<string>("medium");
   const [dueDate, setDueDate] = useState<Date>();
+  const [reminderDate, setReminderDate] = useState<Date>();
   const [assignedTo, setAssignedTo] = useState<string>();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  const { data: currentUser } = useQuery({
+    queryKey: ["current-user"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      return user;
+    },
+  });
 
   const { data: users, isLoading: isLoadingUsers } = useQuery({
     queryKey: ["users"],
@@ -54,7 +63,9 @@ export const NewTaskDialog = ({
         description: description || null,
         priority,
         due_date: dueDate?.toISOString() || null,
-        assigned_to: assignedTo,
+        reminder_at: reminderDate?.toISOString() || null,
+        assigned_to: assignedTo || currentUser?.id || null,
+        created_by: currentUser?.id,
       });
 
       if (error) throw error;
@@ -79,7 +90,7 @@ export const NewTaskDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>New Task</DialogTitle>
         </DialogHeader>
@@ -93,10 +104,13 @@ export const NewTaskDialog = ({
           setPriority={setPriority}
           dueDate={dueDate}
           setDueDate={setDueDate}
+          reminderDate={reminderDate}
+          setReminderDate={setReminderDate}
           assignedTo={assignedTo}
           setAssignedTo={setAssignedTo}
           users={users || []}
           isLoadingUsers={isLoadingUsers}
+          currentUserId={currentUser?.id}
         />
 
         <DialogFooter
