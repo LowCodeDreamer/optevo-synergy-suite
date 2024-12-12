@@ -22,7 +22,11 @@ export const ProspectTasks = ({ prospectId }: { prospectId: string }) => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("prospect_tasks")
-        .select("*, profiles(username)")
+        .select(`
+          *,
+          assignee:profiles!prospect_tasks_assigned_to_fkey(username),
+          creator:profiles!prospect_tasks_created_by_fkey(username)
+        `)
         .eq("prospect_id", prospectId)
         .order("due_date", { ascending: true });
 
@@ -96,7 +100,7 @@ export const ProspectTasks = ({ prospectId }: { prospectId: string }) => {
                 </Badge>
               </TableCell>
               <TableCell>
-                {task.profiles?.username || "Unassigned"}
+                {task.assignee?.username || "Unassigned"}
               </TableCell>
               <TableCell>
                 {task.reminder_at && (

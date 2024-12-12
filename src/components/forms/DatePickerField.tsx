@@ -32,18 +32,16 @@ export const DatePickerField = ({
           </Button>
         </PopoverTrigger>
         <PopoverContent 
-          className="w-auto p-0" 
+          className="w-auto p-0 z-50" 
           align="start"
           sideOffset={4}
         >
-          <div className="bg-popover rounded-md border shadow-md">
-            <Calendar 
-              mode="single" 
-              selected={value} 
-              onSelect={onChange} 
-              initialFocus 
-            />
-          </div>
+          <Calendar 
+            mode="single" 
+            selected={value} 
+            onSelect={onChange} 
+            initialFocus 
+          />
         </PopoverContent>
       </Popover>
     </div>

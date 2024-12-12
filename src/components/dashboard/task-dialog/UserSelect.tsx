@@ -21,13 +21,13 @@ interface User {
 }
 
 interface UserSelectProps {
-  users: User[] | undefined;
+  users: User[];
   isLoading: boolean;
   value?: string;
   onChange: (value: string) => void;
 }
 
-export const UserSelect = ({ users, isLoading, value, onChange }: UserSelectProps) => {
+export const UserSelect = ({ users = [], isLoading, value, onChange }: UserSelectProps) => {
   const [open, setOpen] = useState(false);
 
   if (isLoading) {
@@ -49,9 +49,7 @@ export const UserSelect = ({ users, isLoading, value, onChange }: UserSelectProp
           aria-expanded={open}
           className="w-full justify-between"
         >
-          {value && users
-            ? selectedUser?.username || "Unnamed User"
-            : "Assign to user"}
+          {selectedUser?.username || "Assign to user"}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -59,28 +57,26 @@ export const UserSelect = ({ users, isLoading, value, onChange }: UserSelectProp
         <Command>
           <CommandInput placeholder="Search users..." />
           <CommandEmpty>No user found.</CommandEmpty>
-          {users && users.length > 0 && (
-            <CommandGroup>
-              {users.map((user) => (
-                <CommandItem
-                  key={user.id}
-                  value={user.username || user.id}
-                  onSelect={() => {
-                    onChange(user.id);
-                    setOpen(false);
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      value === user.id ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  {user.username || "Unnamed User"}
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          )}
+          <CommandGroup>
+            {users.map((user) => (
+              <CommandItem
+                key={user.id}
+                value={user.username || user.id}
+                onSelect={() => {
+                  onChange(user.id);
+                  setOpen(false);
+                }}
+              >
+                <Check
+                  className={cn(
+                    "mr-2 h-4 w-4",
+                    value === user.id ? "opacity-100" : "opacity-0"
+                  )}
+                />
+                {user.username || "Unnamed User"}
+              </CommandItem>
+            ))}
+          </CommandGroup>
         </Command>
       </PopoverContent>
     </Popover>
