@@ -34,7 +34,10 @@ export const UserSelect = ({
   onChange 
 }: UserSelectProps) => {
   const [open, setOpen] = useState(false);
-  const selectedUser = users.find((user) => user.id === value);
+  
+  // Ensure we have a valid array of users
+  const safeUsers = Array.isArray(users) ? users : [];
+  const selectedUser = safeUsers.find((user) => user.id === value);
 
   if (isLoading) {
     return (
@@ -62,7 +65,7 @@ export const UserSelect = ({
           <CommandInput placeholder="Search users..." />
           <CommandEmpty>No user found.</CommandEmpty>
           <CommandGroup>
-            {(users || []).map((user) => (
+            {safeUsers.map((user) => (
               <CommandItem
                 key={user.id}
                 value={user.username || user.id}
