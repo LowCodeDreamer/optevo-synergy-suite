@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -9,13 +8,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Check, X, Mail, Calendar } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { ProspectCompany } from "./ProspectCompany";
+import { ProspectContact } from "./ProspectContact";
+import { ProspectActions } from "./ProspectActions";
 
 export const ProspectList = () => {
   const { toast } = useToast();
-  const [selectedProspect, setSelectedProspect] = useState<string | null>(null);
 
   const { data: prospects, isLoading } = useQuery({
     queryKey: ["prospects"],
@@ -90,55 +89,32 @@ export const ProspectList = () => {
         <TableBody>
           {prospects?.map((prospect) => (
             <TableRow key={prospect.id}>
-              <TableCell className="font-medium">
-                <div>
-                  <div>{prospect.company_name}</div>
-                  <div className="text-sm text-muted-foreground">{prospect.website}</div>
-                </div>
+              <TableCell>
+                <ProspectCompany
+                  name={prospect.company_name}
+                  website={prospect.website}
+                />
               </TableCell>
               <TableCell>
-                <div className="space-y-1">
-                  <div className="font-medium">{prospect.contact_name}</div>
-                  <div className="text-sm text-muted-foreground">{prospect.contact_email}</div>
-                  <div className="text-sm text-muted-foreground">{prospect.contact_phone}</div>
-                </div>
+                <ProspectContact
+                  name={prospect.contact_name}
+                  email={prospect.contact_email}
+                  phone={prospect.contact_phone}
+                  linkedinUrl={prospect.linkedin_url}
+                />
               </TableCell>
               <TableCell>{prospect.fit_score}/100</TableCell>
               <TableCell>{prospect.potential_services}</TableCell>
               <TableCell>{prospect.status}</TableCell>
               <TableCell>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => handleApprove(prospect.id)}
-                    disabled={prospect.status !== "pending"}
-                  >
-                    <Check className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => handleReject(prospect.id)}
-                    disabled={prospect.status !== "pending"}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    disabled={prospect.status !== "approved" || prospect.email_sent}
-                  >
-                    <Mail className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    disabled={!prospect.email_sent || prospect.meeting_scheduled}
-                  >
-                    <Calendar className="h-4 w-4" />
-                  </Button>
-                </div>
+                <ProspectActions
+                  id={prospect.id}
+                  status={prospect.status}
+                  emailSent={prospect.email_sent}
+                  meetingScheduled={prospect.meeting_scheduled}
+                  onApprove={handleApprove}
+                  onReject={handleReject}
+                />
               </TableCell>
             </TableRow>
           ))}
