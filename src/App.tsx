@@ -8,6 +8,7 @@ import { StrictMode } from "react";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Prospects from "./pages/Prospects";
+import { Sidebar } from "./components/layout/Sidebar";
 
 const queryClient = new QueryClient();
 
@@ -19,11 +20,16 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/prospects" element={<Prospects />} />
-            </Routes>
+            <div className="flex">
+              <Sidebar />
+              <main className="flex-1 ml-16">
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/prospects" element={<Prospects />} />
+                </Routes>
+              </main>
+            </div>
           </BrowserRouter>
         </TooltipProvider>
       </ThemeProvider>
