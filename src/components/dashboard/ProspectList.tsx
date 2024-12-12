@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Table,
@@ -12,9 +13,12 @@ import { useToast } from "@/components/ui/use-toast";
 import { ProspectCompany } from "./ProspectCompany";
 import { ProspectContact } from "./ProspectContact";
 import { ProspectActions } from "./ProspectActions";
+import { ProspectCard } from "./ProspectCard";
+import { Tables } from "@/integrations/supabase/types";
 
 export const ProspectList = () => {
   const { toast } = useToast();
+  const [selectedProspect, setSelectedProspect] = useState<Tables<"prospects"> | null>(null);
 
   const { data: prospects, isLoading } = useQuery({
     queryKey: ["prospects"],
@@ -88,7 +92,11 @@ export const ProspectList = () => {
         </TableHeader>
         <TableBody>
           {prospects?.map((prospect) => (
-            <TableRow key={prospect.id}>
+            <TableRow
+              key={prospect.id}
+              className="cursor-pointer hover:bg-muted/50"
+              onClick={() => setSelectedProspect(prospect)}
+            >
               <TableCell>
                 <ProspectCompany
                   name={prospect.company_name}
@@ -106,7 +114,7 @@ export const ProspectList = () => {
               <TableCell>{prospect.fit_score}/100</TableCell>
               <TableCell>{prospect.potential_services}</TableCell>
               <TableCell>{prospect.status}</TableCell>
-              <TableCell>
+              <TableCell onClick={(e) => e.stopPropagation()}>
                 <ProspectActions
                   id={prospect.id}
                   status={prospect.status}
@@ -120,6 +128,14 @@ export const ProspectList = () => {
           ))}
         </TableBody>
       </Table>
+
+      <ProspectCard
+        prospect={selectedProspect}
+        isOpen={!!selectedProspect}
+        onClose={() => setSelectedProspect(null)}
+        onApprove={handleApprove}
+        onReject={handleReject}
+      />
     </div>
   );
 };

@@ -32,6 +32,9 @@ export type Database = {
       }
       prospects: {
         Row: {
+          ai_fit_analysis: string | null
+          ai_intro: string | null
+          ai_next_steps: string | null
           company_name: string
           contact_email: string | null
           contact_name: string | null
@@ -52,6 +55,9 @@ export type Database = {
           website: string | null
         }
         Insert: {
+          ai_fit_analysis?: string | null
+          ai_intro?: string | null
+          ai_next_steps?: string | null
           company_name: string
           contact_email?: string | null
           contact_name?: string | null
@@ -72,6 +78,9 @@ export type Database = {
           website?: string | null
         }
         Update: {
+          ai_fit_analysis?: string | null
+          ai_intro?: string | null
+          ai_next_steps?: string | null
           company_name?: string
           contact_email?: string | null
           contact_name?: string | null
