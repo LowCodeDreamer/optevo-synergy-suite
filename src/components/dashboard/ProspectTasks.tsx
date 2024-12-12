@@ -31,9 +31,9 @@ export const ProspectTasks = ({ prospectId }: { prospectId: string }) => {
       case "high":
         return "destructive";
       case "medium":
-        return "warning";
-      case "low":
         return "secondary";
+      case "low":
+        return "outline";
       default:
         return "secondary";
     }
@@ -42,13 +42,13 @@ export const ProspectTasks = ({ prospectId }: { prospectId: string }) => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "completed":
-        return "success";
+        return "default";
       case "in_progress":
-        return "warning";
+        return "secondary";
       case "cancelled":
         return "destructive";
       default:
-        return "secondary";
+        return "outline";
     }
   };
 
