@@ -30,7 +30,12 @@ export const DatePickerField = ({
           {value ? format(value, "PPP") : placeholder}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0 z-50" align="start">
+      <PopoverContent 
+        className="w-auto p-0" 
+        align="start"
+        sideOffset={4}
+        style={{ zIndex: 100 }}
+      >
         <Calendar 
           mode="single" 
           selected={value} 

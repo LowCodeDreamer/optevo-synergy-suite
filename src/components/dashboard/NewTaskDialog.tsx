@@ -16,9 +16,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { Check, ChevronsUpDown } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { DialogFooter } from "@/components/forms/DialogFooter";
 import { DatePickerField } from "@/components/forms/DatePickerField";
+import { cn } from "@/lib/utils";
 
 interface NewTaskDialogProps {
   isOpen: boolean;
@@ -36,6 +51,7 @@ export const NewTaskDialog = ({
   const [priority, setPriority] = useState<string>("medium");
   const [dueDate, setDueDate] = useState<Date>();
   const [assignedTo, setAssignedTo] = useState<string>();
+  const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -123,18 +139,47 @@ export const NewTaskDialog = ({
               <SelectItem value="high">High</SelectItem>
             </SelectContent>
           </Select>
-          <Select value={assignedTo} onValueChange={setAssignedTo}>
-            <SelectTrigger>
-              <SelectValue placeholder="Assign to user" />
-            </SelectTrigger>
-            <SelectContent>
-              {users?.map((user) => (
-                <SelectItem key={user.id} value={user.id}>
-                  {user.username || user.id}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                role="combobox"
+                aria-expanded={open}
+                className="w-full justify-between"
+              >
+                {assignedTo
+                  ? users?.find((user) => user.id === assignedTo)?.username || "Select user"
+                  : "Assign to user"}
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-full p-0">
+              <Command>
+                <CommandInput placeholder="Search users..." />
+                <CommandEmpty>No user found.</CommandEmpty>
+                <CommandGroup>
+                  {users?.map((user) => (
+                    <CommandItem
+                      key={user.id}
+                      value={user.username || user.id}
+                      onSelect={() => {
+                        setAssignedTo(user.id);
+                        setOpen(false);
+                      }}
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          assignedTo === user.id ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      {user.username || "Unnamed User"}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </Command>
+            </PopoverContent>
+          </Popover>
           <DatePickerField
             value={dueDate}
             onChange={setDueDate}
