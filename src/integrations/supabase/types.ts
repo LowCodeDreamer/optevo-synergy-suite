@@ -30,6 +30,65 @@ export type Database = {
         }
         Relationships: []
       }
+      prospects: {
+        Row: {
+          company_name: string
+          created_at: string
+          description: string | null
+          draft_email: string | null
+          email_sent: boolean | null
+          fit_score: number | null
+          fit_summary: string | null
+          id: string
+          meeting_scheduled: boolean | null
+          potential_services: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string | null
+          website: string | null
+        }
+        Insert: {
+          company_name: string
+          created_at?: string
+          description?: string | null
+          draft_email?: string | null
+          email_sent?: boolean | null
+          fit_score?: number | null
+          fit_summary?: string | null
+          id?: string
+          meeting_scheduled?: boolean | null
+          potential_services?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          website?: string | null
+        }
+        Update: {
+          company_name?: string
+          created_at?: string
+          description?: string | null
+          draft_email?: string | null
+          email_sent?: boolean | null
+          fit_score?: number | null
+          fit_summary?: string | null
+          id?: string
+          meeting_scheduled?: boolean | null
+          potential_services?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prospects_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
