@@ -6,9 +6,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -19,11 +17,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { DialogFooter } from "@/components/forms/DialogFooter";
+import { DatePickerField } from "@/components/forms/DatePickerField";
 
 interface NewActivityDialogProps {
   isOpen: boolean;
@@ -115,37 +110,13 @@ export const NewActivityDialog = ({
               <SelectItem value="text">Text</SelectItem>
             </SelectContent>
           </Select>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  "w-full justify-start text-left font-normal",
-                  !scheduledDate && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {scheduledDate ? format(scheduledDate, "PPP") : "Schedule date"}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={scheduledDate}
-                onSelect={setScheduledDate}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
+          <DatePickerField
+            value={scheduledDate}
+            onChange={setScheduledDate}
+            placeholder="Schedule date"
+          />
         </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button onClick={handleSubmit} disabled={isSubmitting}>
-            {isSubmitting ? "Creating..." : "Create Activity"}
-          </Button>
-        </DialogFooter>
+        <DialogFooter isSubmitting={isSubmitting} onClose={onClose} />
       </DialogContent>
     </Dialog>
   );

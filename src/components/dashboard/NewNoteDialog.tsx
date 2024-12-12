@@ -6,11 +6,10 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
+import { DialogFooter } from "@/components/forms/DialogFooter";
 
 interface NewNoteDialogProps {
   isOpen: boolean;
@@ -77,14 +76,7 @@ export const NewNoteDialog = ({
             className="min-h-[200px]"
           />
         </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button onClick={handleSubmit} disabled={isSubmitting}>
-            {isSubmitting ? "Creating..." : "Create Note"}
-          </Button>
-        </DialogFooter>
+        <DialogFooter isSubmitting={isSubmitting} onClose={onClose} />
       </DialogContent>
     </Dialog>
   );

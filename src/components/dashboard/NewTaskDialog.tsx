@@ -6,9 +6,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -19,11 +17,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { DialogFooter } from "@/components/forms/DialogFooter";
+import { DatePickerField } from "@/components/forms/DatePickerField";
 
 interface NewTaskDialogProps {
   isOpen: boolean;
@@ -113,37 +108,13 @@ export const NewTaskDialog = ({
               <SelectItem value="high">High</SelectItem>
             </SelectContent>
           </Select>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  "w-full justify-start text-left font-normal",
-                  !dueDate && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {dueDate ? format(dueDate, "PPP") : "Pick a due date"}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={dueDate}
-                onSelect={setDueDate}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
+          <DatePickerField
+            value={dueDate}
+            onChange={setDueDate}
+            placeholder="Pick a due date"
+          />
         </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button onClick={handleSubmit} disabled={isSubmitting}>
-            {isSubmitting ? "Creating..." : "Create Task"}
-          </Button>
-        </DialogFooter>
+        <DialogFooter isSubmitting={isSubmitting} onClose={onClose} />
       </DialogContent>
     </Dialog>
   );
