@@ -48,6 +48,10 @@ export const NewTaskDialog = ({
     if (!title.trim()) return;
 
     setIsSubmitting(true);
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     const { error } = await supabase.from("prospect_tasks").insert([
       {
         prospect_id: prospectId,
@@ -56,6 +60,7 @@ export const NewTaskDialog = ({
         priority,
         due_date: dueDate?.toISOString() || null,
         status: "pending",
+        created_by: user?.id,
       },
     ]);
 
@@ -121,7 +126,7 @@ export const NewTaskDialog = ({
                 {dueDate ? format(dueDate, "PPP") : "Pick a due date"}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0">
+            <PopoverContent className="w-auto p-0" align="start">
               <Calendar
                 mode="single"
                 selected={dueDate}

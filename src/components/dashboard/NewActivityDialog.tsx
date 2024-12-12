@@ -48,6 +48,10 @@ export const NewActivityDialog = ({
     if (!title.trim()) return;
 
     setIsSubmitting(true);
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     const { error } = await supabase.from("prospect_activities").insert([
       {
         prospect_id: prospectId,
@@ -55,6 +59,7 @@ export const NewActivityDialog = ({
         description: description || null,
         type,
         scheduled_at: scheduledDate?.toISOString() || null,
+        created_by: user?.id,
       },
     ]);
 
@@ -123,7 +128,7 @@ export const NewActivityDialog = ({
                 {scheduledDate ? format(scheduledDate, "PPP") : "Schedule date"}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0">
+            <PopoverContent className="w-auto p-0" align="start">
               <Calendar
                 mode="single"
                 selected={scheduledDate}

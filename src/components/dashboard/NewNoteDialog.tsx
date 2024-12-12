@@ -32,9 +32,17 @@ export const NewNoteDialog = ({
     if (!content.trim()) return;
 
     setIsSubmitting(true);
-    const { error } = await supabase
-      .from("prospect_notes")
-      .insert([{ prospect_id: prospectId, content }]);
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    const { error } = await supabase.from("prospect_notes").insert([
+      {
+        prospect_id: prospectId,
+        content,
+        created_by: user?.id,
+      },
+    ]);
 
     setIsSubmitting(false);
 

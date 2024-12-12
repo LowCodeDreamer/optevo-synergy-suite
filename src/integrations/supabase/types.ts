@@ -41,6 +41,7 @@ export type Database = {
           scheduled_at: string | null
           title: string
           type: string
+          updated_at: string | null
         }
         Insert: {
           completed_at?: string | null
@@ -52,6 +53,7 @@ export type Database = {
           scheduled_at?: string | null
           title: string
           type: string
+          updated_at?: string | null
         }
         Update: {
           completed_at?: string | null
@@ -63,6 +65,7 @@ export type Database = {
           scheduled_at?: string | null
           title?: string
           type?: string
+          updated_at?: string | null
         }
         Relationships: [
           {
@@ -136,6 +139,7 @@ export type Database = {
           prospect_id: string
           status: string | null
           title: string
+          updated_at: string | null
         }
         Insert: {
           assigned_to?: string | null
@@ -149,6 +153,7 @@ export type Database = {
           prospect_id: string
           status?: string | null
           title: string
+          updated_at?: string | null
         }
         Update: {
           assigned_to?: string | null
@@ -162,6 +167,7 @@ export type Database = {
           prospect_id?: string
           status?: string | null
           title?: string
+          updated_at?: string | null
         }
         Relationships: [
           {
