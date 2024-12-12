@@ -34,7 +34,12 @@ export const DatePickerField = ({
         className="w-auto p-0" 
         align="start"
         sideOffset={4}
-        style={{ zIndex: 100 }}
+        style={{ 
+          zIndex: 100,
+          position: 'relative',
+          backgroundColor: 'var(--background)',
+          boxShadow: 'var(--shadow)'
+        }}
       >
         <Calendar 
           mode="single" 
