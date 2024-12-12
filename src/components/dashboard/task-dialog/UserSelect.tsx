@@ -27,8 +27,14 @@ interface UserSelectProps {
   onChange: (value: string) => void;
 }
 
-export const UserSelect = ({ users = [], isLoading, value, onChange }: UserSelectProps) => {
+export const UserSelect = ({ 
+  users = [], 
+  isLoading, 
+  value, 
+  onChange 
+}: UserSelectProps) => {
   const [open, setOpen] = useState(false);
+  const selectedUser = users.find((user) => user.id === value);
 
   if (isLoading) {
     return (
@@ -37,8 +43,6 @@ export const UserSelect = ({ users = [], isLoading, value, onChange }: UserSelec
       </Button>
     );
   }
-
-  const selectedUser = users?.find((user) => user.id === value);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
