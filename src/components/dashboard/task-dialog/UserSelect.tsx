@@ -7,6 +7,7 @@ import {
   CommandGroup,
   CommandInput,
   CommandItem,
+  CommandList,
 } from "@/components/ui/command";
 import {
   Popover,
@@ -63,27 +64,29 @@ export const UserSelect = ({
       <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
         <Command>
           <CommandInput placeholder="Search users..." />
-          <CommandEmpty>No user found.</CommandEmpty>
-          <CommandGroup>
-            {safeUsers.map((user) => (
-              <CommandItem
-                key={user.id}
-                value={user.username || user.id}
-                onSelect={() => {
-                  onChange(user.id);
-                  setOpen(false);
-                }}
-              >
-                <Check
-                  className={cn(
-                    "mr-2 h-4 w-4",
-                    value === user.id ? "opacity-100" : "opacity-0"
-                  )}
-                />
-                {user.username || "Unnamed User"}
-              </CommandItem>
-            ))}
-          </CommandGroup>
+          <CommandList>
+            <CommandEmpty>No user found.</CommandEmpty>
+            <CommandGroup>
+              {safeUsers.map((user) => (
+                <CommandItem
+                  key={user.id}
+                  value={user.username || user.id}
+                  onSelect={() => {
+                    onChange(user.id);
+                    setOpen(false);
+                  }}
+                >
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      value === user.id ? "opacity-100" : "opacity-0"
+                    )}
+                  />
+                  {user.username || "Unnamed User"}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
         </Command>
       </PopoverContent>
     </Popover>
