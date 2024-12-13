@@ -1,6 +1,7 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Tables } from "@/integrations/supabase/types";
-import { Building2, Users, Target, FolderGit2 } from "lucide-react";
+import { Building2, Users, Target, FolderGit2, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface OrganizationOverviewProps {
   organization: Tables<"organizations"> & {
@@ -11,6 +12,35 @@ interface OrganizationOverviewProps {
 }
 
 export const OrganizationOverview = ({ organization }: OrganizationOverviewProps) => {
+  const navigate = useNavigate();
+  
+  const primaryContact = organization.contacts.find(contact => contact.is_primary);
+
+  const handleContactsClick = () => {
+    if (organization.contacts.length === 1) {
+      // Navigate to single contact view when implemented
+      return;
+    }
+    // Navigate to filtered contacts list when implemented
+    navigate(`/contacts?organization=${organization.id}`);
+  };
+
+  const handleOpportunitiesClick = () => {
+    if (organization.opportunities.length === 1) {
+      // Navigate to single opportunity view when implemented
+      return;
+    }
+    navigate(`/opportunities?organization=${organization.id}`);
+  };
+
+  const handleProjectsClick = () => {
+    if (organization.projects.length === 1) {
+      navigate(`/projects/${organization.projects[0].id}`);
+      return;
+    }
+    navigate(`/projects?organization=${organization.id}`);
+  };
+
   return (
     <div className="space-y-4">
       <Card>
@@ -25,36 +55,48 @@ export const OrganizationOverview = ({ organization }: OrganizationOverviewProps
               {organization.description}
             </p>
           )}
+          {primaryContact && (
+            <div className="mt-4 flex items-center text-sm text-muted-foreground">
+              <User className="h-4 w-4 mr-2" />
+              <span>
+                Primary Contact: {primaryContact.first_name} {primaryContact.last_name}
+                {primaryContact.position && ` - ${primaryContact.position}`}
+              </span>
+            </div>
+          )}
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="cursor-pointer hover:bg-accent/50 transition-colors" onClick={handleContactsClick}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Contacts</CardTitle>
           <Users className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{organization.contacts.length}</div>
+          <p className="text-xs text-muted-foreground mt-1">Click to view all contacts</p>
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="cursor-pointer hover:bg-accent/50 transition-colors" onClick={handleOpportunitiesClick}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Opportunities</CardTitle>
           <Target className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{organization.opportunities.length}</div>
+          <p className="text-xs text-muted-foreground mt-1">Click to view all opportunities</p>
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="cursor-pointer hover:bg-accent/50 transition-colors" onClick={handleProjectsClick}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Projects</CardTitle>
           <FolderGit2 className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{organization.projects.length}</div>
+          <p className="text-xs text-muted-foreground mt-1">Click to view all projects</p>
         </CardContent>
       </Card>
     </div>
