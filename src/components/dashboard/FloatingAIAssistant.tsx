@@ -11,7 +11,13 @@ import {
   ListFilter,
   Mail,
   Calendar,
-  ArrowUpDown
+  ArrowUpDown,
+  Building2,
+  Users,
+  Target,
+  Filter,
+  Mail,
+  Calendar
 } from "lucide-react";
 import {
   Sheet,
@@ -24,23 +30,23 @@ import {
 const SUGGESTED_PROMPTS = [
   {
     icon: <ListFilter className="h-4 w-4" />,
-    text: "Show me the top 10 prospects by fit score",
-    action: "filter-top-prospects"
+    text: "Show me organizations by industry",
+    action: "filter-by-industry"
   },
   {
     icon: <ArrowUpDown className="h-4 w-4" />,
-    text: "Sort prospects by last contact date",
-    action: "sort-by-contact"
+    text: "Sort organizations by recent activity",
+    action: "sort-by-activity"
   },
   {
-    icon: <Mail className="h-4 w-4" />,
-    text: "Create an email campaign for selected prospects",
-    action: "create-campaign"
+    icon: <Target className="h-4 w-4" />,
+    text: "Find organizations with open opportunities",
+    action: "find-opportunities"
   },
   {
-    icon: <Calendar className="h-4 w-4" />,
-    text: "Schedule follow-ups for pending prospects",
-    action: "schedule-followups"
+    icon: <Users className="h-4 w-4" />,
+    text: "Show organizations without primary contacts",
+    action: "missing-contacts"
   }
 ];
 
@@ -50,7 +56,7 @@ export const FloatingAIAssistant = () => {
   const [messages, setMessages] = useState([
     {
       type: "system",
-      content: "Hello! I'm your AI assistant. How can I help you with your prospects today?"
+      content: "Hello! I'm your AI assistant. How can I help you manage your organizations today?"
     }
   ]);
 
@@ -154,7 +160,7 @@ export const FloatingAIAssistant = () => {
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask me anything about your prospects..."
+              placeholder="Ask me anything about your organizations..."
               className="flex-1"
             />
             <Button type="submit" size="icon">

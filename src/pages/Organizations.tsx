@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
 import { Building2, Loader2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { FloatingAIAssistant } from "@/components/dashboard/FloatingAIAssistant";
 
 const Organizations = () => {
   const navigate = useNavigate();
@@ -81,6 +82,8 @@ const Organizations = () => {
           </TableBody>
         </Table>
       </DashboardCard>
+
+      <FloatingAIAssistant />
     </div>
   );
 };
