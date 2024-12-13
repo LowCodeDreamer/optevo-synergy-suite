@@ -13,7 +13,8 @@ import {
   ArrowUpDown,
   Building2,
   Users,
-  Target
+  Target,
+  X
 } from "lucide-react";
 import {
   Sheet,
