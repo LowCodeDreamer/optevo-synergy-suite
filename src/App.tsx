@@ -11,6 +11,7 @@ import Prospects from "./pages/Prospects";
 import Organizations from "./pages/Organizations";
 import Projects from "./pages/Projects";
 import OrganizationDetails from "./pages/OrganizationDetails";
+import ProjectDetails from "./pages/ProjectDetails";
 import { Sidebar } from "./components/layout/Sidebar";
 
 const queryClient = new QueryClient();
@@ -33,6 +34,7 @@ const App = () => (
                   <Route path="/organizations" element={<Organizations />} />
                   <Route path="/organizations/:id" element={<OrganizationDetails />} />
                   <Route path="/projects" element={<Projects />} />
+                  <Route path="/projects/:id" element={<ProjectDetails />} />
                 </Routes>
               </main>
             </div>
