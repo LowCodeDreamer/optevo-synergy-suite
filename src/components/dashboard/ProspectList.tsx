@@ -20,7 +20,7 @@ export const ProspectList = () => {
   const { toast } = useToast();
   const [selectedProspect, setSelectedProspect] = useState<Tables<"prospects"> | null>(null);
 
-  const { data: prospects, isLoading } = useQuery({
+  const { data: prospects, refetch } = useQuery({
     queryKey: ["prospects"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -34,22 +34,85 @@ export const ProspectList = () => {
   });
 
   const handleApprove = async (id: string) => {
-    const { error } = await supabase
+    // Start a transaction by using the REST API
+    const { data: prospect, error: prospectError } = await supabase
+      .from("prospects")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (prospectError) {
+      toast({
+        title: "Error",
+        description: "Failed to fetch prospect details",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Create organization
+    const { data: organization, error: orgError } = await supabase
+      .from("organizations")
+      .insert({
+        prospect_id: prospect.id,
+        name: prospect.company_name,
+        website: prospect.website,
+        description: prospect.description,
+        status: 'lead',
+      })
+      .select()
+      .single();
+
+    if (orgError) {
+      toast({
+        title: "Error",
+        description: "Failed to create organization",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Create contact if contact information exists
+    if (prospect.contact_name || prospect.contact_email || prospect.contact_phone) {
+      const { error: contactError } = await supabase
+        .from("contacts")
+        .insert({
+          organization_id: organization.id,
+          first_name: prospect.contact_name?.split(' ')[0],
+          last_name: prospect.contact_name?.split(' ').slice(1).join(' '),
+          email: prospect.contact_email,
+          phone: prospect.contact_phone,
+          linkedin_url: prospect.linkedin_url,
+          is_primary: true,
+        });
+
+      if (contactError) {
+        toast({
+          title: "Warning",
+          description: "Organization created but failed to create contact",
+          variant: "destructive",
+        });
+      }
+    }
+
+    // Update prospect status
+    const { error: updateError } = await supabase
       .from("prospects")
       .update({ status: "approved" })
       .eq("id", id);
 
-    if (error) {
+    if (updateError) {
       toast({
-        title: "Error",
-        description: "Failed to approve prospect",
+        title: "Warning",
+        description: "Organization created but failed to update prospect status",
         variant: "destructive",
       });
     } else {
       toast({
         title: "Success",
-        description: "Prospect approved successfully",
+        description: "Prospect approved and organization created successfully",
       });
+      refetch();
     }
   };
 
@@ -70,10 +133,11 @@ export const ProspectList = () => {
         title: "Success",
         description: "Prospect rejected successfully",
       });
+      refetch();
     }
   };
 
-  if (isLoading) {
+  if (!prospects) {
     return <div>Loading prospects...</div>;
   }
 
@@ -91,7 +155,7 @@ export const ProspectList = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {prospects?.map((prospect) => (
+          {prospects.map((prospect) => (
             <TableRow
               key={prospect.id}
               className="cursor-pointer hover:bg-muted/50"
