@@ -18,7 +18,7 @@ const Projects = () => {
         .select(`
           *,
           organizations (name),
-          manager:manager_id (
+          manager:profiles!projects_manager_id_fkey (
             username,
             avatar_url
           )

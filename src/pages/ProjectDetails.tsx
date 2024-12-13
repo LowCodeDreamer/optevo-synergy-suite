@@ -21,13 +21,13 @@ const ProjectDetails = () => {
         .from("projects")
         .select(`
           *,
-          organization:organizations(id, name),
-          primary_contact:contacts(id, first_name, last_name, email),
-          manager:profiles(id, username),
+          organization:organizations!projects_organization_id_fkey(*),
+          primary_contact:contacts!projects_primary_contact_id_fkey(*),
+          manager:profiles!projects_manager_id_fkey(*),
           team_members(
             id,
             role,
-            profile:profiles(id, username)
+            profile:profiles!team_members_profile_id_fkey(*)
           )
         `)
         .eq("id", id)
