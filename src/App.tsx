@@ -8,6 +8,7 @@ import { StrictMode } from "react";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Prospects from "./pages/Prospects";
+import OrganizationDetails from "./pages/OrganizationDetails";
 import { Sidebar } from "./components/layout/Sidebar";
 
 const queryClient = new QueryClient();
@@ -27,7 +28,7 @@ const App = () => (
                   <Route path="/" element={<Index />} />
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/prospects" element={<Prospects />} />
-                  <Route path="/organizations/:id" element={<div>Organization Details (TODO)</div>} />
+                  <Route path="/organizations/:id" element={<OrganizationDetails />} />
                 </Routes>
               </main>
             </div>
