@@ -20,6 +20,15 @@ interface Project {
     username: string | null;
     avatar_url: string | null;
   } | null;
+  budget: number | null;
+  created_at: string;
+  created_by: string | null;
+  description: string | null;
+  manager_id: string | null;
+  opportunity_id: string | null;
+  organization_id: string;
+  primary_contact_id: string | null;
+  updated_at: string;
 }
 
 const Projects = () => {
@@ -31,7 +40,7 @@ const Projects = () => {
         .select(`
           *,
           organizations (name),
-          manager: manager_id (
+          manager:manager_id (
             username,
             avatar_url
           )
@@ -39,7 +48,7 @@ const Projects = () => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data as Project[];
+      return data as unknown as Project[];
     },
   });
 
