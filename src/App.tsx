@@ -8,6 +8,8 @@ import { StrictMode } from "react";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Prospects from "./pages/Prospects";
+import Organizations from "./pages/Organizations";
+import Projects from "./pages/Projects";
 import OrganizationDetails from "./pages/OrganizationDetails";
 import { Sidebar } from "./components/layout/Sidebar";
 
@@ -28,9 +30,9 @@ const App = () => (
                   <Route path="/" element={<Index />} />
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/prospects" element={<Prospects />} />
-                  <Route path="/organizations" element={<div>Organizations List</div>} />
+                  <Route path="/organizations" element={<Organizations />} />
                   <Route path="/organizations/:id" element={<OrganizationDetails />} />
-                  <Route path="/projects" element={<div>Projects List</div>} />
+                  <Route path="/projects" element={<Projects />} />
                 </Routes>
               </main>
             </div>
