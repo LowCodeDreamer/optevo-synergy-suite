@@ -243,6 +243,66 @@ export type Database = {
         }
         Relationships: []
       }
+      project_ai_suggestions: {
+        Row: {
+          context: string | null
+          created_at: string | null
+          current_value: Json | null
+          id: string
+          project_id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["ai_suggestion_status"] | null
+          suggested_value: Json | null
+          suggestion_type: string
+          thread_message_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          context?: string | null
+          created_at?: string | null
+          current_value?: Json | null
+          id?: string
+          project_id: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["ai_suggestion_status"] | null
+          suggested_value?: Json | null
+          suggestion_type: string
+          thread_message_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          context?: string | null
+          created_at?: string | null
+          current_value?: Json | null
+          id?: string
+          project_id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["ai_suggestion_status"] | null
+          suggested_value?: Json | null
+          suggestion_type?: string
+          thread_message_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_ai_suggestions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_ai_suggestions_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       projects: {
         Row: {
           budget: number | null
@@ -688,6 +748,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      ai_suggestion_status: "pending" | "approved" | "rejected"
       entity_lifecycle_stage:
         | "lead"
         | "qualified"

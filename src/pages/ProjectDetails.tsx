@@ -4,8 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProjectThread } from "@/components/project/ProjectThread";
 import { ProjectOverview } from "@/components/project/ProjectOverview";
 import { ProjectAIAssistant } from "@/components/project/ProjectAIAssistant";
+import { SuggestionsQueue } from "@/components/project/suggestions/SuggestionsQueue";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2 } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const ProjectDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -77,8 +79,19 @@ const ProjectDetails = () => {
           <ProjectThread project={project} />
         </div>
         <div className="space-y-6">
-          <ProjectOverview project={project} />
-          <ProjectAIAssistant project={project} />
+          <Tabs defaultValue="overview">
+            <TabsList className="w-full">
+              <TabsTrigger value="overview" className="flex-1">Overview</TabsTrigger>
+              <TabsTrigger value="suggestions" className="flex-1">Suggestions</TabsTrigger>
+            </TabsList>
+            <TabsContent value="overview" className="space-y-6">
+              <ProjectOverview project={project} />
+              <ProjectAIAssistant project={project} />
+            </TabsContent>
+            <TabsContent value="suggestions">
+              <SuggestionsQueue projectId={project.id} />
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>
