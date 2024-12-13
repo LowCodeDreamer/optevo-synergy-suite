@@ -7,21 +7,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { DialogFooter } from "@/components/forms/DialogFooter";
-import { DatePickerField } from "@/components/forms/DatePickerField";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Database } from "@/integrations/supabase/types";
-
-type ProcessStatus = Database["public"]["Enums"]["process_status"];
+import { ProjectForm } from "./project/ProjectForm";
+import { ProcessStatus } from "@/types/process";
 
 interface NewProjectDialogProps {
   isOpen: boolean;
@@ -94,46 +83,20 @@ export const NewProjectDialog = ({
         <DialogHeader>
           <DialogTitle>New Project</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4 py-4">
-          <Input
-            placeholder="Project name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <Textarea
-            placeholder="Description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-          <Select value={status} onValueChange={(value: ProcessStatus) => setStatus(value)}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="draft">Draft</SelectItem>
-              <SelectItem value="in_progress">In Progress</SelectItem>
-              <SelectItem value="on_hold">On Hold</SelectItem>
-              <SelectItem value="completed">Completed</SelectItem>
-              <SelectItem value="cancelled">Cancelled</SelectItem>
-            </SelectContent>
-          </Select>
-          <Input
-            type="number"
-            placeholder="Budget"
-            value={budget}
-            onChange={(e) => setBudget(e.target.value)}
-          />
-          <DatePickerField
-            value={startDate}
-            onChange={setStartDate}
-            placeholder="Start date"
-          />
-          <DatePickerField
-            value={endDate}
-            onChange={setEndDate}
-            placeholder="End date"
-          />
-        </div>
+        <ProjectForm
+          name={name}
+          setName={setName}
+          description={description}
+          setDescription={setDescription}
+          status={status}
+          setStatus={setStatus}
+          budget={budget}
+          setBudget={setBudget}
+          startDate={startDate}
+          setStartDate={setStartDate}
+          endDate={endDate}
+          setEndDate={setEndDate}
+        />
         <DialogFooter 
           isSubmitting={isSubmitting} 
           onClose={onClose} 
