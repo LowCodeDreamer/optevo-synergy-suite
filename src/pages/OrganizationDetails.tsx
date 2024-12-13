@@ -15,7 +15,7 @@ const OrganizationDetails = () => {
     queryFn: async () => {
       if (!id) throw new Error("No organization ID provided");
 
-      const { data, error } = await supabase
+      const { data: organizations, error } = await supabase
         .from("organizations")
         .select(`
           *,
@@ -23,19 +23,18 @@ const OrganizationDetails = () => {
           opportunities (*),
           projects (*)
         `)
-        .eq("id", id)
-        .single();
+        .eq("id", id);
 
       if (error) {
         console.error("Error fetching organization:", error);
         throw error;
       }
 
-      if (!data) {
+      if (!organizations || organizations.length === 0) {
         throw new Error("Organization not found");
       }
 
-      return data;
+      return organizations[0];
     },
   });
 

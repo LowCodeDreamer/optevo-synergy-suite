@@ -19,6 +19,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Database } from "@/integrations/supabase/types";
+
+type ProcessStatus = Database["public"]["Enums"]["process_status"];
 
 interface NewProjectDialogProps {
   isOpen: boolean;
@@ -33,7 +36,7 @@ export const NewProjectDialog = ({
 }: NewProjectDialogProps) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [status, setStatus] = useState("draft");
+  const [status, setStatus] = useState<ProcessStatus>("draft");
   const [budget, setBudget] = useState("");
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
@@ -49,19 +52,17 @@ export const NewProjectDialog = ({
       data: { user },
     } = await supabase.auth.getUser();
 
-    const { error } = await supabase.from("projects").insert([
-      {
-        organization_id: organizationId,
-        name,
-        description: description || null,
-        status,
-        budget: budget ? parseFloat(budget) : null,
-        start_date: startDate?.toISOString() || null,
-        end_date: endDate?.toISOString() || null,
-        created_by: user?.id,
-        manager_id: user?.id,
-      },
-    ]);
+    const { error } = await supabase.from("projects").insert({
+      organization_id: organizationId,
+      name,
+      description: description || null,
+      status,
+      budget: budget ? parseFloat(budget) : null,
+      start_date: startDate?.toISOString() || null,
+      end_date: endDate?.toISOString() || null,
+      created_by: user?.id,
+      manager_id: user?.id,
+    });
 
     setIsSubmitting(false);
 
@@ -104,16 +105,15 @@ export const NewProjectDialog = ({
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
-          <Select value={status} onValueChange={setStatus}>
+          <Select value={status} onValueChange={(value: ProcessStatus) => setStatus(value)}>
             <SelectTrigger>
               <SelectValue placeholder="Select status" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="draft">Draft</SelectItem>
-              <SelectItem value="planning">Planning</SelectItem>
               <SelectItem value="in_progress">In Progress</SelectItem>
-              <SelectItem value="completed">Completed</SelectItem>
               <SelectItem value="on_hold">On Hold</SelectItem>
+              <SelectItem value="completed">Completed</SelectItem>
               <SelectItem value="cancelled">Cancelled</SelectItem>
             </SelectContent>
           </Select>
