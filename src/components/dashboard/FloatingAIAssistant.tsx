@@ -23,7 +23,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 
 const SUGGESTED_PROMPTS = [
   {
@@ -85,25 +84,13 @@ export const FloatingAIAssistant = () => {
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-        <HoverCard>
-          <HoverCardTrigger asChild>
-            <Button
-              className="fixed bottom-6 right-6 h-12 w-12 rounded-full shadow-lg"
-              size="icon"
-            >
-              <BrainCircuit className="h-6 w-6" />
-            </Button>
-          </HoverCardTrigger>
-          <HoverCardContent className="w-80" side="left" align="end">
-            <div className="space-y-2">
-              <h4 className="text-sm font-semibold">Project Co-pilot</h4>
-              <p className="text-sm text-muted-foreground">
-                Your personal AI assistant for project insights, analysis, and recommendations. 
-                Chat privately with the co-pilot to get help with your project tasks.
-              </p>
-            </div>
-          </HoverCardContent>
-        </HoverCard>
+        <Button
+          className="fixed bottom-6 right-6 h-12 w-12 rounded-full shadow-lg"
+          size="icon"
+          onClick={() => setIsOpen(true)}
+        >
+          <BrainCircuit className="h-6 w-6" />
+        </Button>
       </SheetTrigger>
       <SheetContent className="w-[400px] sm:w-[540px] flex flex-col h-full">
         <SheetHeader className="border-b pb-4">
