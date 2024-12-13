@@ -3,7 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ProjectThread } from "@/components/project/ProjectThread";
 import { ProjectOverview } from "@/components/project/ProjectOverview";
-import { FloatingAIAssistant } from "@/components/dashboard/FloatingAIAssistant";
+import { ProjectDocuments } from "@/components/project/ProjectDocuments";
+import { ProjectMilestones } from "@/components/project/ProjectMilestones";
+import { ProjectAIAssistant } from "@/components/project/ProjectAIAssistant";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -73,14 +75,41 @@ const ProjectDetails = () => {
   return (
     <div className="container mx-auto p-6">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-          <ProjectThread project={project} />
+        <div className="lg:col-span-2">
+          <Tabs defaultValue="overview" className="space-y-4">
+            <TabsList className="grid grid-cols-4 lg:grid-cols-5">
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="documents">Documents</TabsTrigger>
+              <TabsTrigger value="milestones">Milestones</TabsTrigger>
+              <TabsTrigger value="thread">Team Chat</TabsTrigger>
+              <TabsTrigger value="ai" className="hidden lg:block">AI Assistant</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="overview">
+              <ProjectOverview project={project} />
+            </TabsContent>
+
+            <TabsContent value="documents">
+              <ProjectDocuments project={project} />
+            </TabsContent>
+
+            <TabsContent value="milestones">
+              <ProjectMilestones project={project} />
+            </TabsContent>
+
+            <TabsContent value="thread">
+              <ProjectThread project={project} />
+            </TabsContent>
+
+            <TabsContent value="ai">
+              <ProjectAIAssistant project={project} />
+            </TabsContent>
+          </Tabs>
         </div>
-        <div>
-          <ProjectOverview project={project} />
+        <div className="hidden lg:block">
+          <ProjectAIAssistant project={project} />
         </div>
       </div>
-      <FloatingAIAssistant />
     </div>
   );
 };
