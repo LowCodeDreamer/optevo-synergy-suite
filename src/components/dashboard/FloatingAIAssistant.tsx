@@ -14,10 +14,7 @@ import {
   ArrowUpDown,
   Building2,
   Users,
-  Target,
-  Filter,
-  Mail,
-  Calendar
+  Target
 } from "lucide-react";
 import {
   Sheet,
