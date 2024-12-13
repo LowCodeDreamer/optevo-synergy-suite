@@ -1,30 +1,14 @@
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { 
-  LayoutDashboard, 
-  BrainCircuit,
-  Users, 
-  BarChart, 
-  Settings,
-  Menu,
-  X,
-  List
-} from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNavigate } from 'react-router-dom';
+import { menuItems } from './sidebar/SidebarItems';
+import { SidebarButton } from './sidebar/SidebarButton';
 
 export const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const navigate = useNavigate();
-
-  const menuItems = [
-    { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
-    { icon: List, label: "Prospects", href: "/prospects" },
-    { icon: BrainCircuit, label: "AI Assistant", href: "/assistant" },
-    { icon: Users, label: "Team", href: "/team" },
-    { icon: BarChart, label: "Analytics", href: "/analytics" },
-    { icon: Settings, label: "Settings", href: "/settings" },
-  ];
 
   return (
     <div className={cn(
@@ -47,18 +31,14 @@ export const Sidebar = () => {
 
       <nav className="space-y-2 px-2">
         {menuItems.map((item) => (
-          <Button
+          <SidebarButton
             key={item.label}
-            variant="ghost"
-            className={cn(
-              "flex items-center w-full space-x-2 text-white/80 hover:text-white hover:bg-primary-foreground/10 rounded-lg p-3 transition-colors justify-start",
-              isCollapsed && "justify-center px-0"
-            )}
+            icon={item.icon}
+            label={item.label}
+            href={item.href}
+            isCollapsed={isCollapsed}
             onClick={() => navigate(item.href)}
-          >
-            <item.icon size={24} />
-            {!isCollapsed && <span>{item.label}</span>}
-          </Button>
+          />
         ))}
       </nav>
     </div>
