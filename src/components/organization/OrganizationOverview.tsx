@@ -1,12 +1,12 @@
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Tables } from "@/integrations/supabase/types";
-import { Building2, Users, Target, FolderGit2, User, Plus } from "lucide-react";
+import { Users, Target, FolderGit2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { NewContactDialog } from "./NewContactDialog";
 import { NewOpportunityDialog } from "./NewOpportunityDialog";
 import { NewProjectDialog } from "./NewProjectDialog";
+import { OrganizationCard } from "./overview/OrganizationCard";
+import { MetricCard } from "./overview/MetricCard";
 
 interface OrganizationOverviewProps {
   organization: Tables<"organizations"> & {
@@ -21,15 +21,12 @@ export const OrganizationOverview = ({ organization }: OrganizationOverviewProps
   const [isNewContactOpen, setIsNewContactOpen] = useState(false);
   const [isNewOpportunityOpen, setIsNewOpportunityOpen] = useState(false);
   const [isNewProjectOpen, setIsNewProjectOpen] = useState(false);
-  
-  const primaryContact = organization.contacts.find(contact => contact.is_primary);
 
   const handleContactsClick = () => {
     if (organization.contacts.length === 1) {
       // Navigate to single contact view when implemented
       return;
     }
-    // Navigate to filtered contacts list when implemented
     navigate(`/contacts?organization=${organization.id}`);
   };
 
@@ -51,104 +48,31 @@ export const OrganizationOverview = ({ organization }: OrganizationOverviewProps
 
   return (
     <div className="space-y-4">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Organization</CardTitle>
-          <Building2 className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{organization.name}</div>
-          {organization.description && (
-            <p className="text-xs text-muted-foreground mt-1">
-              {organization.description}
-            </p>
-          )}
-          {primaryContact && (
-            <div className="mt-4 flex items-center text-sm text-muted-foreground">
-              <User className="h-4 w-4 mr-2" />
-              <span>
-                Primary Contact: {primaryContact.first_name} {primaryContact.last_name}
-                {primaryContact.position && ` - ${primaryContact.position}`}
-              </span>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <OrganizationCard organization={organization} />
 
-      <Card className="cursor-pointer hover:bg-accent/50 transition-colors" onClick={handleContactsClick}>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <div className="flex items-center gap-2">
-            <CardTitle className="text-sm font-medium">Contacts</CardTitle>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="h-8 w-8" 
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsNewContactOpen(true);
-              }}
-            >
-              <Plus className="h-4 w-4" />
-              <span className="sr-only">Add new contact</span>
-            </Button>
-          </div>
-          <Users className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{organization.contacts.length}</div>
-          <p className="text-xs text-muted-foreground mt-1">Click to view all contacts</p>
-        </CardContent>
-      </Card>
+      <MetricCard
+        title="Contacts"
+        count={organization.contacts.length}
+        icon={Users}
+        onClick={handleContactsClick}
+        onAdd={() => setIsNewContactOpen(true)}
+      />
 
-      <Card className="cursor-pointer hover:bg-accent/50 transition-colors" onClick={handleOpportunitiesClick}>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <div className="flex items-center gap-2">
-            <CardTitle className="text-sm font-medium">Opportunities</CardTitle>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="h-8 w-8" 
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsNewOpportunityOpen(true);
-              }}
-            >
-              <Plus className="h-4 w-4" />
-              <span className="sr-only">Add new opportunity</span>
-            </Button>
-          </div>
-          <Target className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{organization.opportunities.length}</div>
-          <p className="text-xs text-muted-foreground mt-1">Click to view all opportunities</p>
-        </CardContent>
-      </Card>
+      <MetricCard
+        title="Opportunities"
+        count={organization.opportunities.length}
+        icon={Target}
+        onClick={handleOpportunitiesClick}
+        onAdd={() => setIsNewOpportunityOpen(true)}
+      />
 
-      <Card className="cursor-pointer hover:bg-accent/50 transition-colors" onClick={handleProjectsClick}>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <div className="flex items-center gap-2">
-            <CardTitle className="text-sm font-medium">Projects</CardTitle>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="h-8 w-8" 
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsNewProjectOpen(true);
-              }}
-            >
-              <Plus className="h-4 w-4" />
-              <span className="sr-only">Add new project</span>
-            </Button>
-          </div>
-          <FolderGit2 className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{organization.projects.length}</div>
-          <p className="text-xs text-muted-foreground mt-1">Click to view all projects</p>
-        </CardContent>
-      </Card>
+      <MetricCard
+        title="Projects"
+        count={organization.projects.length}
+        icon={FolderGit2}
+        onClick={handleProjectsClick}
+        onAdd={() => setIsNewProjectOpen(true)}
+      />
 
       <NewContactDialog
         isOpen={isNewContactOpen}
