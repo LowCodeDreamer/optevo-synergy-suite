@@ -3,6 +3,10 @@ import { Tables } from "@/integrations/supabase/types";
 import { Building2, Users, Target, FolderGit2, User, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { NewContactDialog } from "./NewContactDialog";
+import { NewOpportunityDialog } from "./NewOpportunityDialog";
+import { NewProjectDialog } from "./NewProjectDialog";
 
 interface OrganizationOverviewProps {
   organization: Tables<"organizations"> & {
@@ -14,6 +18,9 @@ interface OrganizationOverviewProps {
 
 export const OrganizationOverview = ({ organization }: OrganizationOverviewProps) => {
   const navigate = useNavigate();
+  const [isNewContactOpen, setIsNewContactOpen] = useState(false);
+  const [isNewOpportunityOpen, setIsNewOpportunityOpen] = useState(false);
+  const [isNewProjectOpen, setIsNewProjectOpen] = useState(false);
   
   const primaryContact = organization.contacts.find(contact => contact.is_primary);
 
@@ -72,10 +79,15 @@ export const OrganizationOverview = ({ organization }: OrganizationOverviewProps
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <div className="flex items-center gap-2">
             <CardTitle className="text-sm font-medium">Contacts</CardTitle>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => {
-              e.stopPropagation();
-              // TODO: Open new contact dialog
-            }}>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-8 w-8" 
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsNewContactOpen(true);
+              }}
+            >
               <Plus className="h-4 w-4" />
               <span className="sr-only">Add new contact</span>
             </Button>
@@ -92,10 +104,15 @@ export const OrganizationOverview = ({ organization }: OrganizationOverviewProps
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <div className="flex items-center gap-2">
             <CardTitle className="text-sm font-medium">Opportunities</CardTitle>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => {
-              e.stopPropagation();
-              // TODO: Open new opportunity dialog
-            }}>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-8 w-8" 
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsNewOpportunityOpen(true);
+              }}
+            >
               <Plus className="h-4 w-4" />
               <span className="sr-only">Add new opportunity</span>
             </Button>
@@ -112,10 +129,15 @@ export const OrganizationOverview = ({ organization }: OrganizationOverviewProps
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <div className="flex items-center gap-2">
             <CardTitle className="text-sm font-medium">Projects</CardTitle>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => {
-              e.stopPropagation();
-              // TODO: Open new project dialog
-            }}>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-8 w-8" 
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsNewProjectOpen(true);
+              }}
+            >
               <Plus className="h-4 w-4" />
               <span className="sr-only">Add new project</span>
             </Button>
@@ -127,6 +149,22 @@ export const OrganizationOverview = ({ organization }: OrganizationOverviewProps
           <p className="text-xs text-muted-foreground mt-1">Click to view all projects</p>
         </CardContent>
       </Card>
+
+      <NewContactDialog
+        isOpen={isNewContactOpen}
+        onClose={() => setIsNewContactOpen(false)}
+        organizationId={organization.id}
+      />
+      <NewOpportunityDialog
+        isOpen={isNewOpportunityOpen}
+        onClose={() => setIsNewOpportunityOpen(false)}
+        organizationId={organization.id}
+      />
+      <NewProjectDialog
+        isOpen={isNewProjectOpen}
+        onClose={() => setIsNewProjectOpen(false)}
+        organizationId={organization.id}
+      />
     </div>
   );
 };
