@@ -5,7 +5,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   BrainCircuit, 
   Send, 
-  X, 
   Sparkles,
   Filter,
   ListFilter,
@@ -23,27 +22,28 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 
 const SUGGESTED_PROMPTS = [
   {
     icon: <ListFilter className="h-4 w-4" />,
-    text: "Show me organizations by industry",
-    action: "filter-by-industry"
+    text: "Analyze project timeline",
+    action: "analyze-timeline"
   },
   {
     icon: <ArrowUpDown className="h-4 w-4" />,
-    text: "Sort organizations by recent activity",
-    action: "sort-by-activity"
+    text: "Review project risks",
+    action: "review-risks"
   },
   {
     icon: <Target className="h-4 w-4" />,
-    text: "Find organizations with open opportunities",
-    action: "find-opportunities"
+    text: "Suggest next actions",
+    action: "suggest-actions"
   },
   {
     icon: <Users className="h-4 w-4" />,
-    text: "Show organizations without primary contacts",
-    action: "missing-contacts"
+    text: "Team performance insights",
+    action: "team-insights"
   }
 ];
 
@@ -53,7 +53,7 @@ export const FloatingAIAssistant = () => {
   const [messages, setMessages] = useState([
     {
       type: "system",
-      content: "Hello! I'm your AI assistant. How can I help you manage your organizations today?"
+      content: "Hello! I'm your AI project assistant. How can I help you today?"
     }
   ]);
 
@@ -84,19 +84,32 @@ export const FloatingAIAssistant = () => {
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-        <Button
-          className="fixed bottom-6 right-6 h-12 w-12 rounded-full shadow-lg"
-          size="icon"
-        >
-          <BrainCircuit className="h-6 w-6" />
-        </Button>
+        <HoverCard>
+          <HoverCardTrigger asChild>
+            <Button
+              className="fixed bottom-6 right-6 h-12 w-12 rounded-full shadow-lg"
+              size="icon"
+            >
+              <BrainCircuit className="h-6 w-6" />
+            </Button>
+          </HoverCardTrigger>
+          <HoverCardContent className="w-80" side="left" align="end">
+            <div className="space-y-2">
+              <h4 className="text-sm font-semibold">Project Co-pilot</h4>
+              <p className="text-sm text-muted-foreground">
+                Your personal AI assistant for project insights, analysis, and recommendations. 
+                Chat privately with the co-pilot to get help with your project tasks.
+              </p>
+            </div>
+          </HoverCardContent>
+        </HoverCard>
       </SheetTrigger>
       <SheetContent className="w-[400px] sm:w-[540px] flex flex-col h-full">
         <SheetHeader className="border-b pb-4">
           <div className="flex items-center justify-between">
             <SheetTitle className="flex items-center gap-2">
               <BrainCircuit className="h-5 w-5 text-primary" />
-              AI Assistant
+              Project Co-pilot
             </SheetTitle>
             <Button
               variant="ghost"
@@ -107,15 +120,18 @@ export const FloatingAIAssistant = () => {
               <X className="h-4 w-4" />
             </Button>
           </div>
+          <p className="text-sm text-muted-foreground">
+            Your personal AI assistant for project-specific insights and tasks
+          </p>
         </SheetHeader>
 
         <ScrollArea className="flex-1 px-1">
-          <div className="space-y-4 py-4">
+          <div className="space-y-4">
             {/* Suggested Actions */}
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Sparkles className="h-4 w-4" />
-                <span>Suggested Actions</span>
+                <span>Quick Actions</span>
               </div>
               <div className="grid grid-cols-1 gap-2">
                 {SUGGESTED_PROMPTS.map((prompt, index) => (
@@ -152,12 +168,12 @@ export const FloatingAIAssistant = () => {
           </div>
         </ScrollArea>
 
-        <form onSubmit={handleSubmit} className="border-t pt-4">
+        <form onSubmit={handleSubmit} className="mt-4">
           <div className="flex gap-2">
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask me anything about your organizations..."
+              placeholder="Ask me anything about the project..."
               className="flex-1"
             />
             <Button type="submit" size="icon">

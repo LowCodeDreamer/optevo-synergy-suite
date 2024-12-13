@@ -5,8 +5,13 @@ import { Tables } from "@/integrations/supabase/types";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, Bot } from "lucide-react";
+import { Send, MessageSquare } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 interface ProjectThreadProps {
   project: Tables<"projects"> & {
@@ -39,7 +44,7 @@ export const ProjectThread = ({ project }: ProjectThreadProps) => {
       // TODO: Implement message sending logic
       toast({
         title: "Message sent",
-        description: "Your message has been sent and is being processed by the AI.",
+        description: "Your message has been sent to the project team.",
       });
       setMessage("");
     } catch (error) {
@@ -54,18 +59,37 @@ export const ProjectThread = ({ project }: ProjectThreadProps) => {
 
   return (
     <div className="bg-card rounded-lg shadow-lg border dark:border-slate-800 h-[calc(100vh-8rem)]">
-      <div className="p-4 border-b dark:border-slate-800">
-        <h2 className="text-lg font-semibold">Project Thread</h2>
-        <p className="text-sm text-muted-foreground">
-          Discuss project updates, tasks, and questions with your team and AI assistant
-        </p>
+      <div className="p-4 border-b dark:border-slate-800 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <MessageSquare className="h-5 w-5 text-muted-foreground" />
+          <h2 className="text-lg font-semibold">Project Team Chat</h2>
+        </div>
+        <HoverCard>
+          <HoverCardTrigger asChild>
+            <Button variant="ghost" size="sm">
+              About Team Chat
+            </Button>
+          </HoverCardTrigger>
+          <HoverCardContent className="w-80">
+            <div className="space-y-2">
+              <h4 className="text-sm font-semibold">Team Communication Channel</h4>
+              <p className="text-sm text-muted-foreground">
+                This is where your team can discuss project updates, share information, 
+                and collaborate together. All team members can see these messages.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                For AI assistance or private inquiries, use the Project Co-pilot 
+                button in the bottom right corner.
+              </p>
+            </div>
+          </HoverCardContent>
+        </HoverCard>
       </div>
 
       <ScrollArea className="h-[calc(100%-10rem)] p-4">
         <div className="space-y-4">
           {messages?.map((message, index) => (
             <div key={index} className="flex gap-2">
-              <Bot className="h-6 w-6 text-primary" />
               <div className="bg-muted p-3 rounded-lg">
                 <p className="text-sm">Message content here</p>
               </div>
@@ -79,7 +103,7 @@ export const ProjectThread = ({ project }: ProjectThreadProps) => {
           <Textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            placeholder="Share updates, ask questions, or request project insights..."
+            placeholder="Send a message to the project team..."
             className="min-h-[80px]"
           />
           <Button type="submit" size="icon" className="h-auto">
