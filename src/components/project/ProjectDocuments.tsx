@@ -5,7 +5,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { FileText, Upload, Download, Trash2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
@@ -42,7 +41,6 @@ export const ProjectDocuments = ({ project }: ProjectDocumentsProps) => {
 
     setUploading(true);
     try {
-      // Upload file to storage
       const fileExt = file.name.split(".").pop();
       const filePath = `${project.id}/${Date.now()}.${fileExt}`;
       
@@ -52,7 +50,6 @@ export const ProjectDocuments = ({ project }: ProjectDocumentsProps) => {
 
       if (uploadError) throw uploadError;
 
-      // Create document record
       const { error: dbError } = await supabase.from("project_documents").insert({
         project_id: project.id,
         name: file.name,
@@ -89,13 +86,13 @@ export const ProjectDocuments = ({ project }: ProjectDocumentsProps) => {
 
       if (error) throw error;
 
-      // Create download link
-      const url = URL.createObjectURL(data);
-      const a = document.createElement("a");
+      // Create download link using window.document
+      const url = window.URL.createObjectURL(data);
+      const a = window.document.createElement("a");
       a.href = url;
       a.download = document.name;
       a.click();
-      URL.revokeObjectURL(url);
+      window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Error downloading document:", error);
       toast({
@@ -108,14 +105,12 @@ export const ProjectDocuments = ({ project }: ProjectDocumentsProps) => {
 
   const handleDelete = async (document: Tables<"project_documents">) => {
     try {
-      // Delete file from storage
       const { error: storageError } = await supabase.storage
         .from("project-files")
         .remove([document.file_path!]);
 
       if (storageError) throw storageError;
 
-      // Delete document record
       const { error: dbError } = await supabase
         .from("project_documents")
         .delete()

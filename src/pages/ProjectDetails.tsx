@@ -18,27 +18,25 @@ const ProjectDetails = () => {
     queryFn: async () => {
       if (!id) throw new Error("No project ID provided");
 
-      const { data: projects, error } = await supabase
+      const { data, error } = await supabase
         .from("projects")
         .select(`
           *,
           organization:organizations!projects_organization_id_fkey(*),
           primary_contact:contacts!projects_primary_contact_id_fkey(*),
           manager:profiles!projects_manager_id_fkey(*),
-          team_members!team_members_project_id_fkey(
+          team_members:team_members!team_members_project_id_fkey(
             *,
             profile:profiles!team_members_profile_id_fkey(*)
           )
         `)
         .eq("id", id)
-        .single();
+        .maybeSingle();
 
-      if (error) {
-        console.error("Error fetching project:", error);
-        throw error;
-      }
-
-      return projects;
+      if (error) throw error;
+      if (!data) throw new Error("Project not found");
+      
+      return data;
     },
   });
 
