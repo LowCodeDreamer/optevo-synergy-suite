@@ -12,10 +12,17 @@ import { SuggestedPrompts } from "./ai-assistant/SuggestedPrompts";
 import { ChatMessages } from "./ai-assistant/ChatMessages";
 import { ChatInput } from "./ai-assistant/ChatInput";
 
+type MessageType = "system" | "user" | "assistant";
+
+interface Message {
+  type: MessageType;
+  content: string;
+}
+
 export const FloatingAIAssistant = () => {
   const [input, setInput] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([
+  const [messages, setMessages] = useState<Message[]>([
     {
       type: "system",
       content: "Hello! I'm your AI project assistant. How can I help you today?"

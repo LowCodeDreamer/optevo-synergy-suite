@@ -1,7 +1,9 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 
+type MessageType = "system" | "user" | "assistant";
+
 interface Message {
-  type: "system" | "user" | "assistant";
+  type: MessageType;
   content: string;
 }
 
