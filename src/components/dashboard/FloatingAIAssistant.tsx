@@ -1,21 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { 
-  BrainCircuit, 
-  Send, 
-  Sparkles,
-  Filter,
-  ListFilter,
-  Mail,
-  Calendar,
-  ArrowUpDown,
-  Building2,
-  Users,
-  Target,
-  X
-} from "lucide-react";
+import { BrainCircuit, X } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -23,29 +8,9 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-
-const SUGGESTED_PROMPTS = [
-  {
-    icon: <ListFilter className="h-4 w-4" />,
-    text: "Analyze project timeline",
-    action: "analyze-timeline"
-  },
-  {
-    icon: <ArrowUpDown className="h-4 w-4" />,
-    text: "Review project risks",
-    action: "review-risks"
-  },
-  {
-    icon: <Target className="h-4 w-4" />,
-    text: "Suggest next actions",
-    action: "suggest-actions"
-  },
-  {
-    icon: <Users className="h-4 w-4" />,
-    text: "Team performance insights",
-    action: "team-insights"
-  }
-];
+import { SuggestedPrompts } from "./ai-assistant/SuggestedPrompts";
+import { ChatMessages } from "./ai-assistant/ChatMessages";
+import { ChatInput } from "./ai-assistant/ChatInput";
 
 export const FloatingAIAssistant = () => {
   const [input, setInput] = useState("");
@@ -59,7 +24,6 @@ export const FloatingAIAssistant = () => {
 
   const handleSuggestedPrompt = (prompt: string) => {
     setInput(prompt);
-    // In the future, this could automatically trigger the AI action
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -113,62 +77,18 @@ export const FloatingAIAssistant = () => {
           </p>
         </SheetHeader>
 
-        <ScrollArea className="flex-1 px-1">
-          <div className="space-y-4">
-            {/* Suggested Actions */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Sparkles className="h-4 w-4" />
-                <span>Quick Actions</span>
-              </div>
-              <div className="grid grid-cols-1 gap-2">
-                {SUGGESTED_PROMPTS.map((prompt, index) => (
-                  <Button
-                    key={index}
-                    variant="outline"
-                    className="justify-start gap-2 h-auto py-3 px-4"
-                    onClick={() => handleSuggestedPrompt(prompt.text)}
-                  >
-                    {prompt.icon}
-                    <span className="text-sm">{prompt.text}</span>
-                  </Button>
-                ))}
-              </div>
-            </div>
+        <div className="flex-1 flex flex-col space-y-4 p-4">
+          <SuggestedPrompts onPromptSelect={handleSuggestedPrompt} />
+          <ChatMessages messages={messages} />
+        </div>
 
-            {/* Chat Messages */}
-            <div className="space-y-4">
-              {messages.map((message, index) => (
-                <div
-                  key={index}
-                  className={`rounded-lg p-4 ${
-                    message.type === "user"
-                      ? "bg-primary text-primary-foreground ml-8"
-                      : "bg-muted"
-                  }`}
-                >
-                  <p className="text-sm">
-                    {message.content}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </ScrollArea>
-
-        <form onSubmit={handleSubmit} className="mt-4">
-          <div className="flex gap-2">
-            <Input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask me anything about the project..."
-              className="flex-1"
-            />
-            <Button type="submit" size="icon">
-              <Send className="h-4 w-4" />
-            </Button>
-          </div>
-        </form>
+        <div className="p-4 border-t">
+          <ChatInput
+            input={input}
+            onInputChange={setInput}
+            onSubmit={handleSubmit}
+          />
+        </div>
       </SheetContent>
     </Sheet>
   );
