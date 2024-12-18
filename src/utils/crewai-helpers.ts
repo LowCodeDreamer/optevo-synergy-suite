@@ -31,19 +31,38 @@ export const processCrewAIResponse = async (
       ? crewAIResponse 
       : [crewAIResponse];
 
-    // Ensure each prospect has required fields and validate
+    // Validate each prospect and ensure required fields
     const validatedProspects = prospects.map(prospect => {
-      if (!prospect || typeof prospect !== 'object' || !('company_name' in prospect)) {
+      if (!prospect || typeof prospect !== 'object') {
+        throw new Error('Invalid prospect data: not an object');
+      }
+
+      // Cast to unknown first, then to a partial prospect type
+      const prospectData = prospect as Partial<CrewAIProspect>;
+      
+      if (!prospectData.company_name) {
         throw new Error('Invalid prospect data: missing company_name');
       }
-      
-      // Force company_name to be a required field before validation
-      const prospectWithRequiredFields = {
-        company_name: prospect.company_name,
-        ...prospect
+
+      // Create a complete prospect object with all required fields
+      const completeProspect: CrewAIProspect = {
+        company_name: prospectData.company_name,
+        website: prospectData.website ?? null,
+        description: prospectData.description ?? null,
+        fit_score: prospectData.fit_score ?? null,
+        potential_services: prospectData.potential_services ?? null,
+        fit_summary: prospectData.fit_summary ?? null,
+        draft_email: prospectData.draft_email ?? null,
+        contact_name: prospectData.contact_name ?? null,
+        contact_email: prospectData.contact_email ?? null,
+        contact_phone: prospectData.contact_phone ?? null,
+        linkedin_url: prospectData.linkedin_url ?? null,
+        ai_intro: prospectData.ai_intro ?? null,
+        ai_fit_analysis: prospectData.ai_fit_analysis ?? null,
+        ai_next_steps: prospectData.ai_next_steps ?? null,
       };
       
-      return prospectSchema.parse(prospectWithRequiredFields);
+      return prospectSchema.parse(completeProspect);
     });
 
     // Insert prospects into the database
