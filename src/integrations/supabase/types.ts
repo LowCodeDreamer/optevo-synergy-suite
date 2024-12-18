@@ -9,6 +9,101 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      agent_tools: {
+        Row: {
+          agent_id: string | null
+          created_at: string
+          id: string
+          tool_config: Json | null
+          tool_name: string
+          updated_at: string
+        }
+        Insert: {
+          agent_id?: string | null
+          created_at?: string
+          id?: string
+          tool_config?: Json | null
+          tool_name: string
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string | null
+          created_at?: string
+          id?: string
+          tool_config?: Json | null
+          tool_name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_tools_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agents: {
+        Row: {
+          backstory: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          goal: string | null
+          id: string
+          name: string
+          parent_id: string | null
+          role: string
+          status: Database["public"]["Enums"]["agent_status"] | null
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          backstory?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          goal?: string | null
+          id?: string
+          name: string
+          parent_id?: string | null
+          role: string
+          status?: Database["public"]["Enums"]["agent_status"] | null
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          backstory?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          goal?: string | null
+          id?: string
+          name?: string
+          parent_id?: string | null
+          role?: string
+          status?: Database["public"]["Enums"]["agent_status"] | null
+          updated_at?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agents_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agents_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contacts: {
         Row: {
           created_at: string
@@ -71,6 +166,144 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crew_tasks: {
+        Row: {
+          created_at: string
+          crew_id: string | null
+          id: string
+          order_index: number
+          task_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          crew_id?: string | null
+          id?: string
+          order_index: number
+          task_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          crew_id?: string | null
+          id?: string
+          order_index?: number
+          task_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crew_tasks_crew_id_fkey"
+            columns: ["crew_id"]
+            isOneToOne: false
+            referencedRelation: "crews"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crew_tasks_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crews: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          name: string
+          parent_id: string | null
+          process_type: Database["public"]["Enums"]["crew_process_type"] | null
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          parent_id?: string | null
+          process_type?: Database["public"]["Enums"]["crew_process_type"] | null
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          parent_id?: string | null
+          process_type?: Database["public"]["Enums"]["crew_process_type"] | null
+          updated_at?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crews_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crews_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "crews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      executions: {
+        Row: {
+          completed_at: string | null
+          created_by: string | null
+          crew_id: string | null
+          error_log: string | null
+          id: string
+          performance_metrics: Json | null
+          started_at: string
+          status: Database["public"]["Enums"]["task_status"] | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_by?: string | null
+          crew_id?: string | null
+          error_log?: string | null
+          id?: string
+          performance_metrics?: Json | null
+          started_at?: string
+          status?: Database["public"]["Enums"]["task_status"] | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_by?: string | null
+          crew_id?: string | null
+          error_log?: string | null
+          id?: string
+          performance_metrics?: Json | null
+          started_at?: string
+          status?: Database["public"]["Enums"]["task_status"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "executions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "executions_crew_id_fkey"
+            columns: ["crew_id"]
+            isOneToOne: false
+            referencedRelation: "crews"
             referencedColumns: ["id"]
           },
         ]
@@ -793,6 +1026,160 @@ export type Database = {
           },
         ]
       }
+      task_dependencies: {
+        Row: {
+          created_at: string
+          depends_on_task_id: string | null
+          id: string
+          task_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          depends_on_task_id?: string | null
+          id?: string
+          task_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          depends_on_task_id?: string | null
+          id?: string
+          task_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_dependencies_depends_on_task_id_fkey"
+            columns: ["depends_on_task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "task_dependencies_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      task_executions: {
+        Row: {
+          completed_at: string | null
+          error_log: string | null
+          execution_id: string | null
+          id: string
+          output: string | null
+          performance_metrics: Json | null
+          started_at: string
+          status: Database["public"]["Enums"]["task_status"] | null
+          task_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          error_log?: string | null
+          execution_id?: string | null
+          id?: string
+          output?: string | null
+          performance_metrics?: Json | null
+          started_at?: string
+          status?: Database["public"]["Enums"]["task_status"] | null
+          task_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          error_log?: string | null
+          execution_id?: string | null
+          id?: string
+          output?: string | null
+          performance_metrics?: Json | null
+          started_at?: string
+          status?: Database["public"]["Enums"]["task_status"] | null
+          task_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_executions_execution_id_fkey"
+            columns: ["execution_id"]
+            isOneToOne: false
+            referencedRelation: "executions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "task_executions_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tasks: {
+        Row: {
+          agent_id: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          expected_output: string | null
+          id: string
+          is_async: boolean | null
+          name: string
+          parent_id: string | null
+          status: Database["public"]["Enums"]["task_status"] | null
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          agent_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          expected_output?: string | null
+          id?: string
+          is_async?: boolean | null
+          name: string
+          parent_id?: string | null
+          status?: Database["public"]["Enums"]["task_status"] | null
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          agent_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          expected_output?: string | null
+          id?: string
+          is_async?: boolean | null
+          name?: string
+          parent_id?: string | null
+          status?: Database["public"]["Enums"]["task_status"] | null
+          updated_at?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       team_members: {
         Row: {
           created_at: string
@@ -853,7 +1240,9 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      agent_status: "active" | "archived" | "draft"
       ai_suggestion_status: "pending" | "approved" | "rejected"
+      crew_process_type: "sequential" | "parallel"
       entity_lifecycle_stage:
         | "lead"
         | "qualified"
@@ -868,6 +1257,7 @@ export type Database = {
         | "on_hold"
         | "completed"
         | "cancelled"
+      task_status: "pending" | "in_progress" | "completed" | "failed"
     }
     CompositeTypes: {
       [_ in never]: never

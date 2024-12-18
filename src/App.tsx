@@ -10,6 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import Prospects from "./pages/Prospects";
 import Organizations from "./pages/Organizations";
 import Projects from "./pages/Projects";
+import Agents from "./pages/Agents";
 import OrganizationDetails from "./pages/OrganizationDetails";
 import ProjectDetails from "./pages/ProjectDetails";
 import { Sidebar } from "./components/layout/Sidebar";
@@ -35,6 +36,7 @@ const App = () => (
                   <Route path="/organizations/:id" element={<OrganizationDetails />} />
                   <Route path="/projects" element={<Projects />} />
                   <Route path="/projects/:id" element={<ProjectDetails />} />
+                  <Route path="/agents" element={<Agents />} />
                 </Routes>
               </main>
             </div>
