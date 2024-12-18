@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
 import { ProspectList } from "@/components/dashboard/ProspectList";
+import { ProspectingForm } from "@/components/dashboard/ProspectingForm";
 import { LayoutDashboard } from "lucide-react";
 
 const Dashboard = () => {
@@ -36,16 +37,8 @@ const Dashboard = () => {
         <h1 className="text-3xl font-bold mb-6 text-foreground">Dashboard</h1>
         
         <div className="grid gap-6">
-          <DashboardCard title="Overview" className="col-span-1">
-            <div className="flex flex-col md:flex-row gap-4 items-center justify-center text-center md:text-left">
-              <LayoutDashboard className="w-12 h-12 text-primary" />
-              <div>
-                <h3 className="text-lg font-semibold mb-2">Welcome to Your Prospect Dashboard</h3>
-                <p className="text-muted-foreground">
-                  Review and manage AI-generated prospects for your business.
-                </p>
-              </div>
-            </div>
+          <DashboardCard title="AI Prospecting" className="col-span-1">
+            <ProspectingForm />
           </DashboardCard>
 
           <DashboardCard title="Prospects" className="col-span-1">
