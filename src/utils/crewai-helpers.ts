@@ -31,12 +31,19 @@ export const processCrewAIResponse = async (
       ? crewAIResponse 
       : [crewAIResponse];
 
-    // Ensure each prospect has a company_name before validation
+    // Ensure each prospect has required fields and validate
     const validatedProspects = prospects.map(prospect => {
       if (!prospect || typeof prospect !== 'object' || !('company_name' in prospect)) {
         throw new Error('Invalid prospect data: missing company_name');
       }
-      return prospectSchema.parse(prospect);
+      
+      // Force company_name to be a required field before validation
+      const prospectWithRequiredFields = {
+        company_name: prospect.company_name,
+        ...prospect
+      };
+      
+      return prospectSchema.parse(prospectWithRequiredFields);
     });
 
     // Insert prospects into the database
@@ -106,7 +113,41 @@ export const prepareCrewAIRequest = (config: CrewAIConfig) => {
       }
     },
     tasks_config: {
-      // ... Task configurations will be added in the next step
+      search_potential_leads: {
+        description: `Use ${config.search_keywords} to find potential companies and decision-makers. Utilize web search tools to identify promising leads based on industry, company size, and relevance to ${config.services_offered}.`,
+        expected_output: "A list of potential leads with basic information including company names, websites, and key contact details.",
+        agent: "lead_researcher"
+      },
+      analyze_csv_data: config.csv_file_path ? {
+        description: `Extract and analyze initial lead data from ${config.csv_file_path}. Look for patterns, key information, and potential high-value prospects within the provided dataset.`,
+        expected_output: "A structured dataset of leads extracted from the CSV file, with initial analysis highlighting promising prospects.",
+        agent: "lead_researcher"
+      } : null,
+      gather_detailed_information: {
+        description: "Scrape websites and search for additional information on identified leads. Focus on company descriptions, recent news, key personnel, and any information relevant to services offered.",
+        expected_output: "Detailed profiles for each lead, including comprehensive company information, key decision-makers, and relevant business details.",
+        agent: "lead_researcher"
+      },
+      create_lead_profiles: {
+        description: "Analyze gathered data to create comprehensive lead profiles. Synthesize information from various sources to build a cohesive picture of each prospect.",
+        expected_output: "In-depth lead profiles containing synthesized information, highlighting key aspects of each company and its potential needs.",
+        agent: "profile_analyzer"
+      },
+      assess_fit_and_potential: {
+        description: `Evaluate each lead's fit and potential for ${config.services_offered}. Assign a fit score (0-100) and identify potential services that align with the prospect's needs.`,
+        expected_output: "A fit assessment for each lead, including a numerical score, potential services, and a brief fit summary.",
+        agent: "profile_analyzer"
+      },
+      craft_personalized_emails: {
+        description: `Create tailored email drafts for each lead, mentioning ${config.company_name} and relevant services. Focus on addressing the prospect's specific needs and pain points identified in their profile.`,
+        expected_output: "Personalized email drafts for each lead, highlighting the value proposition and how services can address their specific needs.",
+        agent: "email_crafter"
+      },
+      compile_json_output: {
+        description: "Organize all gathered and created information into a JSON file matching the prospects table structure. Ensure all required fields are populated and data types are correct.",
+        expected_output: "A structured JSON file containing all lead information, ready for import into the CRM's prospects table.",
+        agent: "data_compiler"
+      }
     }
   };
 };
