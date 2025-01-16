@@ -8,6 +8,7 @@ import { FloatingAIAssistant } from "@/components/dashboard/FloatingAIAssistant"
 import { ProjectsTable } from "@/components/project/ProjectsTable";
 import { ActiveProjectsCard } from "@/components/project/ActiveProjectsCard";
 import { ProjectsAtRiskCard } from "@/components/project/ProjectsAtRiskCard";
+import { CopilotCanvas } from "@/components/copilot/CopilotCanvas";
 
 const Projects = () => {
   const { data: projects, isLoading, error } = useQuery({
@@ -65,6 +66,7 @@ const Projects = () => {
           <TabsTrigger value="all">All Projects</TabsTrigger>
           <TabsTrigger value="active">Active Projects</TabsTrigger>
           <TabsTrigger value="management">Management View</TabsTrigger>
+          <TabsTrigger value="copilot">Co-pilot</TabsTrigger>
         </TabsList>
 
         <TabsContent value="all">
@@ -83,6 +85,10 @@ const Projects = () => {
           <div className="grid gap-6">
             <ProjectsAtRiskCard projects={atRiskProjects} />
           </div>
+        </TabsContent>
+
+        <TabsContent value="copilot">
+          <CopilotCanvas />
         </TabsContent>
       </Tabs>
 
