@@ -4,6 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { ContactOverview } from "@/components/contact/ContactOverview";
 import { ContactActivityFeed } from "@/components/contact/ContactActivityFeed";
 import { ContactAIAssistant } from "@/components/contact/ContactAIAssistant";
+import { ContactNotes } from "@/components/contact/records/ContactNotes";
+import { ContactTasks } from "@/components/contact/records/ContactTasks";
+import { ContactProjects } from "@/components/contact/records/ContactProjects";
+import { ContactOpportunities } from "@/components/contact/records/ContactOpportunities";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -72,16 +76,38 @@ const ContactDetails = () => {
     <div className="container mx-auto p-6 space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <Tabs defaultValue="ai">
-            <TabsList>
+          <Tabs defaultValue="ai" className="space-y-4">
+            <TabsList className="grid grid-cols-3 lg:grid-cols-6">
               <TabsTrigger value="ai">AI Assistant</TabsTrigger>
-              <TabsTrigger value="activity">Activity Feed</TabsTrigger>
+              <TabsTrigger value="activity">Activity</TabsTrigger>
+              <TabsTrigger value="notes">Notes</TabsTrigger>
+              <TabsTrigger value="tasks">Tasks</TabsTrigger>
+              <TabsTrigger value="projects">Projects</TabsTrigger>
+              <TabsTrigger value="opportunities">Opportunities</TabsTrigger>
             </TabsList>
+
             <TabsContent value="ai">
               <ContactAIAssistant contact={contact} />
             </TabsContent>
+
             <TabsContent value="activity">
               <ContactActivityFeed contact={contact} />
+            </TabsContent>
+
+            <TabsContent value="notes">
+              <ContactNotes contact={contact} />
+            </TabsContent>
+
+            <TabsContent value="tasks">
+              <ContactTasks contact={contact} />
+            </TabsContent>
+
+            <TabsContent value="projects">
+              <ContactProjects contact={contact} />
+            </TabsContent>
+
+            <TabsContent value="opportunities">
+              <ContactOpportunities contact={contact} />
             </TabsContent>
           </Tabs>
         </div>
