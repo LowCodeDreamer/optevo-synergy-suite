@@ -35,79 +35,29 @@ export const createProspect = async (prospectData: {
   return data;
 };
 
-export const analyzeProspect = async (prospectData: {
+export const processCrewAIResponse = async (prospects: Array<{
   company_name: string;
   website?: string;
   description?: string;
-  linkedin_url?: string;
-}) => {
+  fit_score?: number;
+  potential_services?: string;
+  contact_name?: string;
+  contact_email?: string;
+}>) => {
   try {
-    // Analyze company data
-    const analysis = {
-      intro: `Based on the available information about ${prospectData.company_name}, `,
-      fitAnalysis: "Analysis of potential fit: ",
-      nextSteps: "Recommended next steps: ",
-      potentialServices: "Potential services to offer: "
-    };
-
-    // Update prospect with AI analysis
-    const { data, error } = await supabase
-      .from("prospects")
-      .update({
-        ai_intro: analysis.intro,
-        ai_fit_analysis: analysis.fitAnalysis,
-        ai_next_steps: analysis.nextSteps,
-        potential_services: analysis.potentialServices
-      })
-      .eq("company_name", prospectData.company_name)
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
+    const results = await Promise.all(
+      prospects.map(prospect => createProspect({
+        company_name: prospect.company_name,
+        website: prospect.website,
+        description: prospect.description,
+        potential_services: prospect.potential_services,
+        contact_name: prospect.contact_name,
+        contact_email: prospect.contact_email,
+      }))
+    );
+    return true;
   } catch (error) {
-    console.error("Error analyzing prospect:", error);
-    throw error;
-  }
-};
-
-export const getProspectAnalysis = async (companyName: string) => {
-  try {
-    const { data, error } = await supabase
-      .from("prospects")
-      .select("ai_intro, ai_fit_analysis, ai_next_steps, potential_services")
-      .eq("company_name", companyName)
-      .single();
-
-    if (error) throw error;
-    return data;
-  } catch (error) {
-    console.error("Error fetching prospect analysis:", error);
-    throw error;
-  }
-};
-
-export const updateProspectAnalysis = async (
-  companyName: string,
-  analysis: {
-    ai_intro?: string;
-    ai_fit_analysis?: string;
-    ai_next_steps?: string;
-    potential_services?: string;
-  }
-) => {
-  try {
-    const { data, error } = await supabase
-      .from("prospects")
-      .update(analysis)
-      .eq("company_name", companyName)
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
-  } catch (error) {
-    console.error("Error updating prospect analysis:", error);
-    throw error;
+    console.error("Error processing prospects:", error);
+    return false;
   }
 };

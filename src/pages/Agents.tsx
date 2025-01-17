@@ -63,8 +63,8 @@ const Agents = () => {
       <AgentList agents={agents || []} />
       
       <NewAgentDialog 
-        open={isNewAgentDialogOpen} 
-        onOpenChange={setIsNewAgentDialogOpen}
+        isOpen={isNewAgentDialogOpen} 
+        onClose={() => setIsNewAgentDialogOpen(false)}
       />
     </div>
   );
