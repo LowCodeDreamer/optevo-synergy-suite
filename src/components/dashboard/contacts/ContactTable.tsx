@@ -7,8 +7,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { ArrowUpDown, Mail, Phone } from "lucide-react";
+import { Building2, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface ContactTableProps {
   contacts: (Tables<"contacts"> & {
@@ -16,7 +16,7 @@ interface ContactTableProps {
   })[];
   sortField: keyof Tables<"contacts">;
   onSortChange: (field: keyof Tables<"contacts">) => void;
-  onContactSelect: (contact: Tables<"contacts"> & {
+  onContactSelect?: (contact: Tables<"contacts"> & {
     organization: { name: string } | null;
   }) => void;
 }
@@ -27,52 +27,60 @@ export const ContactTable = ({
   onSortChange,
   onContactSelect,
 }: ContactTableProps) => {
+  const navigate = useNavigate();
+
+  const handleRowClick = (contact: Tables<"contacts"> & {
+    organization: { name: string } | null;
+  }) => {
+    if (onContactSelect) {
+      onContactSelect(contact);
+    } else {
+      navigate(`/contacts/${contact.id}`);
+    }
+  };
+
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>
-            <Button
-              variant="ghost"
-              className="h-8 w-full justify-start"
-              onClick={() => onSortChange("first_name")}
-            >
-              Name <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-          </TableHead>
-          <TableHead>Organization</TableHead>
-          <TableHead>Position</TableHead>
-          <TableHead>
-            <div className="flex items-center space-x-2">
-              <Mail className="h-4 w-4" />
-              <span>Contact</span>
-            </div>
-          </TableHead>
-          <TableHead>
-            <div className="flex items-center space-x-2">
-              <Phone className="h-4 w-4" />
-              <span>Phone</span>
-            </div>
-          </TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {contacts.map((contact) => (
-          <TableRow
-            key={contact.id}
-            className="cursor-pointer hover:bg-muted/50"
-            onClick={() => onContactSelect(contact)}
-          >
-            <TableCell>
-              {contact.first_name} {contact.last_name}
-            </TableCell>
-            <TableCell>{contact.organization?.name}</TableCell>
-            <TableCell>{contact.position}</TableCell>
-            <TableCell>{contact.email}</TableCell>
-            <TableCell>{contact.phone}</TableCell>
+    <div className="rounded-md border">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead onClick={() => onSortChange("first_name")}>Name</TableHead>
+            <TableHead onClick={() => onSortChange("email")}>Email</TableHead>
+            <TableHead>Organization</TableHead>
+            <TableHead onClick={() => onSortChange("position")}>Position</TableHead>
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {contacts.map((contact) => (
+            <TableRow
+              key={contact.id}
+              className="cursor-pointer hover:bg-muted/50"
+              onClick={() => handleRowClick(contact)}
+            >
+              <TableCell>
+                <div className="flex items-center space-x-2">
+                  <User className="h-4 w-4 text-muted-foreground" />
+                  <span>
+                    {contact.first_name} {contact.last_name}
+                  </span>
+                </div>
+              </TableCell>
+              <TableCell>{contact.email || "-"}</TableCell>
+              <TableCell>
+                {contact.organization ? (
+                  <div className="flex items-center space-x-2">
+                    <Building2 className="h-4 w-4 text-muted-foreground" />
+                    <span>{contact.organization.name}</span>
+                  </div>
+                ) : (
+                  "-"
+                )}
+              </TableCell>
+              <TableCell>{contact.position || "-"}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
   );
 };
