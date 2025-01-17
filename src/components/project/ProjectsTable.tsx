@@ -15,19 +15,49 @@ interface Project {
   } | null;
 }
 
-export const ProjectsTable = ({ projects }: { projects: Project[] }) => {
+interface ProjectsTableProps {
+  projects: Project[];
+  displayFields?: string[];
+}
+
+export const ProjectsTable = ({ projects, displayFields }: ProjectsTableProps) => {
   const navigate = useNavigate();
+
+  const defaultFields = [
+    { key: "name", label: "Name" },
+    { key: "organizations.name", label: "Organization" },
+    { key: "status", label: "Status" },
+    { key: "manager.username", label: "Manager" },
+    { key: "start_date", label: "Start Date" },
+    { key: "end_date", label: "End Date" },
+  ];
+
+  const fields = displayFields
+    ? defaultFields.filter(field => displayFields.includes(field.key))
+    : defaultFields;
+
+  const getCellValue = (project: Project, key: string) => {
+    const keys = key.split('.');
+    let value: any = project;
+    
+    for (const k of keys) {
+      value = value?.[k];
+    }
+
+    if (key.endsWith('_date') && value) {
+      return new Date(value).toLocaleDateString();
+    }
+
+    return value || "N/A";
+  };
 
   return (
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Name</TableHead>
-          <TableHead>Organization</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Manager</TableHead>
-          <TableHead>Start Date</TableHead>
-          <TableHead>End Date</TableHead>
+          {fields.map((field) => (
+            <TableHead key={field.key}>{field.label}</TableHead>
+          ))}
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -37,12 +67,11 @@ export const ProjectsTable = ({ projects }: { projects: Project[] }) => {
             className="cursor-pointer hover:bg-muted/50"
             onClick={() => navigate(`/projects/${project.id}`)}
           >
-            <TableCell className="font-medium">{project.name}</TableCell>
-            <TableCell>{project.organizations?.name || "N/A"}</TableCell>
-            <TableCell>{project.status}</TableCell>
-            <TableCell>{project.manager?.username || "Unassigned"}</TableCell>
-            <TableCell>{project.start_date ? new Date(project.start_date).toLocaleDateString() : "N/A"}</TableCell>
-            <TableCell>{project.end_date ? new Date(project.end_date).toLocaleDateString() : "N/A"}</TableCell>
+            {fields.map((field) => (
+              <TableCell key={field.key} className={field.key === "name" ? "font-medium" : ""}>
+                {getCellValue(project, field.key)}
+              </TableCell>
+            ))}
           </TableRow>
         ))}
       </TableBody>
