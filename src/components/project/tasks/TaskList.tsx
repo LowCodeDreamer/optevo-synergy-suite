@@ -36,7 +36,11 @@ export const TaskList = ({ projectId }: TaskListProps) => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data || [];
+      
+      // Filter out any tasks with status "failed" to match our type constraints
+      return (data || []).filter(task => 
+        ["pending", "in_progress", "completed"].includes(task.status)
+      );
     },
   });
 
@@ -71,7 +75,13 @@ export const TaskList = ({ projectId }: TaskListProps) => {
         </Button>
       </div>
 
-      <TaskTable tasks={tasks} />
+      {tasks && tasks.length > 0 ? (
+        <TaskTable tasks={tasks} />
+      ) : (
+        <div className="text-center py-8 text-muted-foreground">
+          No tasks found. Click "New Task" to create one.
+        </div>
+      )}
 
       <NewTaskDialog
         projectId={projectId}

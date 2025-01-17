@@ -27,6 +27,8 @@ interface NewTaskDialogProps {
   onTaskCreated: () => void;
 }
 
+type TaskStatus = "pending" | "in_progress" | "completed";
+
 export const NewTaskDialog = ({
   projectId,
   isOpen,
@@ -35,7 +37,7 @@ export const NewTaskDialog = ({
 }: NewTaskDialogProps) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [status, setStatus] = useState<"pending" | "in_progress" | "completed">("pending");
+  const [status, setStatus] = useState<TaskStatus>("pending");
   const [dueDate, setDueDate] = useState<Date>();
   const [assignedTo, setAssignedTo] = useState<string>();
   const [dependsOn, setDependsOn] = useState<string[]>([]);
@@ -157,7 +159,10 @@ export const NewTaskDialog = ({
             rows={3}
           />
 
-          <Select value={status} onValueChange={setStatus}>
+          <Select
+            value={status}
+            onValueChange={(value: TaskStatus) => setStatus(value)}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Select status" />
             </SelectTrigger>
