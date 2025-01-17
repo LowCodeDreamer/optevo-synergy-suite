@@ -10,12 +10,13 @@ import { ActiveProjectsCard } from "@/components/project/ActiveProjectsCard";
 import { ProjectsAtRiskCard } from "@/components/project/ProjectsAtRiskCard";
 import { CopilotCanvas } from "@/components/copilot/CopilotCanvas";
 import { NewProjectViewDialog } from "@/components/project/NewProjectViewDialog";
-import { ProjectPlanner } from "@/components/project/ProjectPlanner";
+import { ProjectCreationFlow } from "@/components/project/ProjectCreationFlow";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
 const Projects = () => {
   const [isNewViewDialogOpen, setIsNewViewDialogOpen] = useState(false);
+  const [isCreatingProject, setIsCreatingProject] = useState(false);
   
   const { data: projects, isLoading: projectsLoading, error: projectsError } = useQuery({
     queryKey: ["projects"],
@@ -74,18 +75,36 @@ const Projects = () => {
     );
   }
 
-  const atRiskProjects = projects?.filter(p => 
-    p.status === "in_progress" && p.end_date && new Date(p.end_date) < new Date()
-  ) || [];
+  if (isCreatingProject) {
+    return (
+      <div className="p-6">
+        <div className="mb-6">
+          <Button 
+            variant="outline" 
+            onClick={() => setIsCreatingProject(false)}
+          >
+            Back to Projects
+          </Button>
+        </div>
+        <ProjectCreationFlow />
+      </div>
+    );
+  }
 
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Projects</h1>
-        <Button onClick={() => setIsNewViewDialogOpen(true)} size="sm">
-          <Plus className="h-4 w-4 mr-2" />
-          New View
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={() => setIsCreatingProject(true)} size="sm">
+            <Plus className="h-4 w-4 mr-2" />
+            New Project
+          </Button>
+          <Button onClick={() => setIsNewViewDialogOpen(true)} size="sm">
+            <Plus className="h-4 w-4 mr-2" />
+            New View
+          </Button>
+        </div>
       </div>
 
       <Tabs defaultValue="planner" className="space-y-6">
