@@ -36,7 +36,11 @@ const Projects = () => {
     },
   });
 
-  const { data: customViews, isLoading: viewsLoading } = useQuery({
+  const { 
+    data: customViews, 
+    isLoading: viewsLoading,
+    refetch: refetchViews 
+  } = useQuery({
     queryKey: ["project_views"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -124,6 +128,9 @@ const Projects = () => {
               <ProjectsTable
                 projects={projects || []}
                 displayFields={view.display_fields}
+                viewId={view.id}
+                onViewDeleted={refetchViews}
+                isCustomView
               />
             </DashboardCard>
           </TabsContent>
@@ -134,8 +141,7 @@ const Projects = () => {
         isOpen={isNewViewDialogOpen}
         onClose={() => setIsNewViewDialogOpen(false)}
         onViewCreated={() => {
-          // Refetch the views
-          customViews?.refetch?.();
+          refetchViews();
         }}
       />
 
