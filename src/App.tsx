@@ -1,50 +1,33 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { ThemeProvider } from "next-themes";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import AIAssistant from "@/pages/AIAssistant";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { StrictMode } from "react";
-import Index from "./pages/Index";
-import Dashboard from "./pages/Dashboard";
-import Prospects from "./pages/Prospects";
-import Organizations from "./pages/Organizations";
-import Projects from "./pages/Projects";
-import Agents from "./pages/Agents";
-import OrganizationDetails from "./pages/OrganizationDetails";
-import ProjectDetails from "./pages/ProjectDetails";
-import { Sidebar } from "./components/layout/Sidebar";
+import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/toaster";
+import { Sidebar } from "@/components/layout/Sidebar";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <StrictMode>
+function App() {
+  return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <div className="flex">
-              <Sidebar />
-              <main className="flex-1 ml-16">
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/prospects" element={<Prospects />} />
-                  <Route path="/organizations" element={<Organizations />} />
-                  <Route path="/organizations/:id" element={<OrganizationDetails />} />
-                  <Route path="/projects" element={<Projects />} />
-                  <Route path="/projects/:id" element={<ProjectDetails />} />
-                  <Route path="/agents" element={<Agents />} />
-                </Routes>
-              </main>
-            </div>
-          </BrowserRouter>
-        </TooltipProvider>
+      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+        <Router>
+          <div className="flex min-h-screen">
+            <Sidebar />
+            <main className="flex-1">
+              <Routes>
+                <Route path="/" element={<div>Home</div>} />
+                <Route path="/assistant" element={<AIAssistant />} />
+                <Route path="/dashboard" element={<div>Dashboard</div>} />
+                <Route path="/settings" element={<div>Settings</div>} />
+              </Routes>
+            </main>
+          </div>
+        </Router>
+        <Toaster />
       </ThemeProvider>
     </QueryClientProvider>
-  </StrictMode>
-);
+  );
+}
 
 export default App;

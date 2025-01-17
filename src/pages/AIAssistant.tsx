@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AIOverviewStats } from "@/components/ai-assistant/AIOverviewStats";
 import { AIQuickActions } from "@/components/ai-assistant/AIQuickActions";
 
-export const AIAssistant = () => {
+const AIAssistant = () => {
   const [activeTab, setActiveTab] = useState("overview");
 
   const { data: stats } = useQuery({
