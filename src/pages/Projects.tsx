@@ -38,6 +38,11 @@ export const Projects = () => {
     },
   });
 
+  // Filter projects at risk (those past due date)
+  const atRiskProjects = projects?.filter(project => 
+    project.end_date && new Date(project.end_date) < new Date()
+  ) || [];
+
   if (projectsLoading) {
     return (
       <div className="container mx-auto p-6 flex items-center justify-center min-h-[200px]">
