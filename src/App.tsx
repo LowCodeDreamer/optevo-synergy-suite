@@ -5,6 +5,11 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { Sidebar } from "@/components/layout/Sidebar";
 import Contacts from "@/pages/Contacts";
+import Dashboard from "@/pages/Dashboard";
+import Organizations from "@/pages/Organizations";
+import Projects from "@/pages/Projects";
+import Prospects from "@/pages/Prospects";
+import Analytics from "@/pages/Analytics";
 
 const queryClient = new QueryClient();
 
@@ -17,10 +22,14 @@ function App() {
             <Sidebar />
             <main className="flex-1">
               <Routes>
-                <Route path="/" element={<div>Home</div>} />
-                <Route path="/assistant" element={<AIAssistant />} />
-                <Route path="/dashboard" element={<div>Dashboard</div>} />
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/prospects" element={<Prospects />} />
+                <Route path="/organizations" element={<Organizations />} />
                 <Route path="/contacts" element={<Contacts />} />
+                <Route path="/projects" element={<Projects />} />
+                <Route path="/assistant" element={<AIAssistant />} />
+                <Route path="/analytics" element={<Analytics />} />
                 <Route path="/settings" element={<div>Settings</div>} />
               </Routes>
             </main>
