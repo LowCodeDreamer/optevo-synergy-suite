@@ -18,6 +18,25 @@ import {
 import { format } from "date-fns";
 import { useToast } from "@/components/ui/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Database } from "@/integrations/supabase/types";
+
+type OpportunityWithRelations = Database["public"]["Tables"]["opportunities"]["Row"] & {
+  organization: {
+    name: string;
+    website: string | null;
+    industry: string | null;
+  } | null;
+  owner: {
+    username: string | null;
+    avatar_url: string | null;
+  } | null;
+  primary_contact: {
+    first_name: string | null;
+    last_name: string | null;
+    email: string | null;
+    phone: string | null;
+  } | null;
+};
 
 const OpportunityDetails = () => {
   const { id } = useParams();
@@ -50,7 +69,7 @@ const OpportunityDetails = () => {
         .maybeSingle();
 
       if (error) throw error;
-      return data;
+      return data as OpportunityWithRelations;
     },
   });
 
@@ -90,6 +109,15 @@ const OpportunityDetails = () => {
       description: "Delete functionality coming soon",
     });
   };
+
+  // Parse AI insights if they exist and are in the correct format
+  const aiInsights = (() => {
+    if (!opportunity.ai_insights) return [];
+    if (typeof opportunity.ai_insights === 'object' && 'key_points' in opportunity.ai_insights) {
+      return opportunity.ai_insights.key_points as string[];
+    }
+    return [];
+  })();
 
   return (
     <div className="container mx-auto py-6 space-y-6">
@@ -249,7 +277,7 @@ const OpportunityDetails = () => {
           )}
 
           {/* AI Insights */}
-          {opportunity.ai_insights && (
+          {aiInsights.length > 0 && (
             <Card className="p-6 space-y-4">
               <div className="flex items-center gap-2">
                 <Info className="h-4 w-4 text-muted-foreground" />
@@ -258,7 +286,7 @@ const OpportunityDetails = () => {
               <Separator />
               <ScrollArea className="h-[200px] w-full">
                 <div className="space-y-2">
-                  {opportunity.ai_insights.key_points?.map((point: string, index: number) => (
+                  {aiInsights.map((point, index) => (
                     <p key={index} className="text-sm text-muted-foreground">
                       • {point}
                     </p>
