@@ -56,6 +56,10 @@ const Prospects = () => {
     { name: "Rejected", value: metrics?.rejected || 0 },
   ];
 
+  const activeProspects = prospects?.filter(
+    (prospect) => prospect.status === "approved" && !prospect.meeting_scheduled
+  );
+
   return (
     <div className="flex-1 p-6 overflow-auto">
       <h1 className="text-3xl font-bold mb-6 text-foreground">Prospects</h1>
@@ -64,6 +68,7 @@ const Prospects = () => {
         <TabsList className="flex-wrap">
           <TabsTrigger value="management">Management View</TabsTrigger>
           <TabsTrigger value="all">All Prospects</TabsTrigger>
+          <TabsTrigger value="active">Active Prospects</TabsTrigger>
           <TabsTrigger value="copilot">Co-pilot</TabsTrigger>
         </TabsList>
 
@@ -118,6 +123,12 @@ const Prospects = () => {
         <TabsContent value="all">
           <DashboardCard title="All Prospects" className="mb-6">
             <ProspectList />
+          </DashboardCard>
+        </TabsContent>
+
+        <TabsContent value="active">
+          <DashboardCard title="Active Prospects" className="mb-6">
+            <ProspectList initialProspects={activeProspects} />
           </DashboardCard>
         </TabsContent>
 
