@@ -1,162 +1,146 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { ProjectPlanner } from "./ProjectPlanner";
-import { MilestonePlanner } from "./MilestonePlanner";
-import { TaskList } from "./tasks/TaskList";
-import { ChevronLeft, ChevronRight, Circle, CheckCircle2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Send, BrainCircuit } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import { ProjectPlanVisualizer } from "./planner/ProjectPlanVisualizer";
 
-type ProjectStep = "objectives" | "planning" | "tasks";
+type PlanningPhase = "high-level" | "planning" | "detailed";
 
-interface StepIndicatorProps {
-  currentStep: ProjectStep;
-  step: ProjectStep;
-  label: string;
+interface Message {
+  type: "system" | "user" | "assistant";
+  content: string;
 }
 
-const StepIndicator = ({ currentStep, step, label }: StepIndicatorProps) => {
-  const isCompleted = getStepIndex(currentStep) > getStepIndex(step);
-  const isCurrent = currentStep === step;
-
-  return (
-    <div className="flex items-center gap-2">
-      {isCompleted ? (
-        <CheckCircle2 className="h-6 w-6 text-primary" />
-      ) : (
-        <Circle className={`h-6 w-6 ${isCurrent ? "text-primary" : "text-muted-foreground"}`} />
-      )}
-      <span className={isCurrent ? "font-medium" : "text-muted-foreground"}>
-        {label}
-      </span>
-    </div>
-  );
-};
-
-const getStepIndex = (step: ProjectStep): number => {
-  const steps: ProjectStep[] = ["objectives", "planning", "tasks"];
-  return steps.indexOf(step);
-};
+const INITIAL_MESSAGES: Message[] = [
+  {
+    type: "system",
+    content: "Welcome! I'll help you create your project plan. Let's start with the high-level details. What's the main objective of this project?",
+  },
+];
 
 export const ProjectCreationFlow = () => {
-  const [currentStep, setCurrentStep] = useState<ProjectStep>("objectives");
-  const [objectives, setObjectives] = useState<string[]>([]);
+  const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
+  const [input, setInput] = useState("");
+  const [currentPhase, setCurrentPhase] = useState<PlanningPhase>("high-level");
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const progress = ((getStepIndex(currentStep) + 1) / 3) * 100;
+  const [projectPlan, setProjectPlan] = useState({
+    objectives: [],
+    team: [],
+    milestones: [],
+    tasks: [],
+  });
 
-  const handleNext = () => {
-    const steps: ProjectStep[] = ["objectives", "planning", "tasks"];
-    const currentIndex = steps.indexOf(currentStep);
-    
-    // Validate current step before proceeding
-    if (currentStep === "objectives" && objectives.length === 0) {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim() || isLoading) return;
+
+    const userMessage = input;
+    setInput("");
+    setMessages((prev) => [...prev, { type: "user", content: userMessage }]);
+    setIsLoading(true);
+
+    try {
+      // TODO: Implement AI interaction
+      // For now, we'll simulate a response
+      setTimeout(() => {
+        let response = "";
+        
+        if (currentPhase === "high-level") {
+          response = "Great objective! Now, let's identify the key stakeholders and team members for this project. Who will be involved?";
+        } else if (currentPhase === "planning") {
+          response = "Excellent! Based on that, I suggest breaking this down into the following milestones. Does this timeline look right to you?";
+        } else {
+          response = "Perfect! I'll help you break down these milestones into specific tasks. Let's start with the first milestone.";
+        }
+
+        setMessages((prev) => [
+          ...prev,
+          { type: "assistant", content: response },
+        ]);
+        setIsLoading(false);
+      }, 1000);
+    } catch (error) {
       toast({
-        title: "Missing Objectives",
-        description: "Please define at least one project objective before proceeding.",
+        title: "Error",
+        description: "Failed to get a response. Please try again.",
         variant: "destructive",
       });
-      return;
-    }
-
-    if (currentIndex < steps.length - 1) {
-      setCurrentStep(steps[currentIndex + 1]);
-    }
-  };
-
-  const handlePrevious = () => {
-    const steps: ProjectStep[] = ["objectives", "planning", "tasks"];
-    const currentIndex = steps.indexOf(currentStep);
-    if (currentIndex > 0) {
-      setCurrentStep(steps[currentIndex - 1]);
-    }
-  };
-
-  const handleObjectivesChange = (newObjectives: string[]) => {
-    setObjectives(newObjectives);
-  };
-
-  const renderStep = () => {
-    switch (currentStep) {
-      case "objectives":
-        return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold">Project Objectives & Scope</h2>
-            <ProjectPlanner onObjectivesChange={handleObjectivesChange} />
-          </div>
-        );
-      case "planning":
-        return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold">Project Planning</h2>
-            <p className="text-muted-foreground">
-              Based on the objectives, let's create a detailed project plan with milestones and dependencies.
-            </p>
-            <MilestonePlanner />
-          </div>
-        );
-      case "tasks":
-        return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold">Task Creation & Assignment</h2>
-            <p className="text-muted-foreground">
-              Let's break down the milestones into specific tasks and assign them to team members.
-            </p>
-            <TaskList projectId="" />
-          </div>
-        );
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="space-y-8 pb-20">
-      <Card className="p-6">
-        <div className="space-y-6">
-          <div className="flex justify-between">
-            <StepIndicator
-              currentStep={currentStep}
-              step="objectives"
-              label="Objectives & Scope"
-            />
-            <div className="h-px w-24 bg-border self-center" />
-            <StepIndicator
-              currentStep={currentStep}
-              step="planning"
-              label="Project Planning"
-            />
-            <div className="h-px w-24 bg-border self-center" />
-            <StepIndicator
-              currentStep={currentStep}
-              step="tasks"
-              label="Tasks & Assignment"
-            />
-          </div>
-          <Progress value={progress} className="h-2" />
+    <div className="flex h-[calc(100vh-6rem)] gap-6 p-6">
+      {/* Chat Interface */}
+      <Card className="flex-1 flex flex-col">
+        <div className="p-4 border-b flex items-center gap-2">
+          <BrainCircuit className="h-5 w-5 text-primary" />
+          <h2 className="font-semibold">Project Co-pilot</h2>
         </div>
+
+        <ScrollArea className="flex-1 p-4">
+          <div className="space-y-4">
+            {messages.map((message, index) => (
+              <div
+                key={index}
+                className={`flex ${
+                  message.type === "user" ? "justify-end" : "justify-start"
+                }`}
+              >
+                <div
+                  className={`max-w-[80%] rounded-lg p-4 ${
+                    message.type === "user"
+                      ? "bg-primary text-primary-foreground"
+                      : message.type === "system"
+                      ? "bg-muted"
+                      : "bg-card border"
+                  }`}
+                >
+                  {message.content}
+                </div>
+              </div>
+            ))}
+            {isLoading && (
+              <div className="flex justify-start">
+                <div className="max-w-[80%] rounded-lg p-4 bg-muted animate-pulse">
+                  Thinking...
+                </div>
+              </div>
+            )}
+          </div>
+        </ScrollArea>
+
+        <form onSubmit={handleSubmit} className="p-4 border-t">
+          <div className="flex gap-2">
+            <Input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Type your message..."
+              disabled={isLoading}
+            />
+            <Button type="submit" disabled={isLoading}>
+              <Send className="h-4 w-4" />
+            </Button>
+          </div>
+        </form>
       </Card>
 
-      <div className="min-h-[600px]">
-        {renderStep()}
-      </div>
-
-      <div className="fixed bottom-0 left-0 right-0 bg-background border-t p-4 flex justify-between">
-        <Button
-          variant="outline"
-          onClick={handlePrevious}
-          disabled={currentStep === "objectives"}
-        >
-          <ChevronLeft className="h-4 w-4 mr-2" />
-          Previous
-        </Button>
-        <Button
-          onClick={handleNext}
-          disabled={currentStep === "tasks"}
-        >
-          {currentStep === "tasks" ? "Complete" : "Next"}
-          <ChevronRight className="h-4 w-4 ml-2" />
-        </Button>
-      </div>
+      {/* Project Plan Visualization */}
+      <Card className="w-1/2">
+        <div className="p-4 border-b">
+          <h2 className="font-semibold">Project Plan</h2>
+        </div>
+        <div className="p-4">
+          <ProjectPlanVisualizer plan={projectPlan} phase={currentPhase} />
+        </div>
+      </Card>
     </div>
   );
 };
+
+export default ProjectCreationFlow;
