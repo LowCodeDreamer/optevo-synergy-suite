@@ -1,14 +1,15 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AIAssistant } from "@/components/organization/AIAssistant";
 import { OrganizationOverview } from "@/components/organization/OrganizationOverview";
+import { ActivityFeed } from "@/components/organization/ActivityFeed";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2 } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const OrganizationDetails = () => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
 
   const { data: organization, isLoading, error } = useQuery({
     queryKey: ["organization", id],
@@ -73,7 +74,18 @@ const OrganizationDetails = () => {
     <div className="container mx-auto p-6 space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <AIAssistant organization={organization} />
+          <Tabs defaultValue="ai">
+            <TabsList>
+              <TabsTrigger value="ai">AI Assistant</TabsTrigger>
+              <TabsTrigger value="activity">Activity Feed</TabsTrigger>
+            </TabsList>
+            <TabsContent value="ai">
+              <AIAssistant organization={organization} />
+            </TabsContent>
+            <TabsContent value="activity">
+              <ActivityFeed organization={organization} />
+            </TabsContent>
+          </Tabs>
         </div>
         <div>
           <OrganizationOverview organization={organization} />
