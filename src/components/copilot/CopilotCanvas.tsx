@@ -16,7 +16,16 @@ export const CopilotCanvas = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       type: "assistant",
-      content: "Hello! I'm your project co-pilot. Ask me anything about your projects, and I can help visualize data or provide insights.",
+      content: "Hello! I'm your AI configuration co-pilot. I can help you manage your AI providers, prompt templates, and copilot configurations. What would you like to do?",
+    },
+    {
+      type: "assistant",
+      content: "Here are some things I can help with:\n\n" +
+        "• Set up a new AI provider configuration\n" +
+        "• Create or modify prompt templates\n" +
+        "• Configure a new copilot\n" +
+        "• Manage API keys and settings\n" +
+        "• Troubleshoot configuration issues",
     },
   ]);
   const [input, setInput] = useState("");
@@ -33,14 +42,14 @@ export const CopilotCanvas = () => {
     setIsLoading(true);
 
     try {
-      // TODO: Implement AI interaction with component rendering
-      // For now, we'll simulate a response
+      // TODO: Implement AI interaction with configuration management
       setTimeout(() => {
+        const response = "I understand you want to " + userMessage.toLowerCase() + ". Let me help you with that. What specific details would you like to configure?";
         setMessages((prev) => [
           ...prev,
           {
             type: "assistant",
-            content: "I understand you want to know about: " + userMessage,
+            content: response,
           },
         ]);
         setIsLoading(false);
@@ -59,7 +68,7 @@ export const CopilotCanvas = () => {
     <div className="flex flex-col h-[calc(100vh-12rem)] bg-background rounded-lg border shadow-sm">
       <div className="flex items-center gap-2 p-4 border-b">
         <BrainCircuit className="h-5 w-5 text-primary" />
-        <h2 className="font-semibold">Project Co-pilot Canvas</h2>
+        <h2 className="font-semibold">AI Configuration Co-pilot</h2>
       </div>
 
       <ScrollArea className="flex-1 p-4">
@@ -99,7 +108,7 @@ export const CopilotCanvas = () => {
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask me anything about your projects..."
+            placeholder="Ask me about AI configuration..."
             disabled={isLoading}
           />
           <Button type="submit" disabled={isLoading}>
