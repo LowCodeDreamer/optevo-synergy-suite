@@ -22,7 +22,11 @@ export const TaskList = ({ projectId }: TaskListProps) => {
       const { data, error } = await supabase
         .from("tasks")
         .select(`
-          *,
+          id,
+          name,
+          description,
+          status,
+          due_date,
           dependencies:task_dependencies!task_dependencies_task_id_fkey(
             depends_on:tasks!task_dependencies_depends_on_task_id_fkey(id, name)
           ),

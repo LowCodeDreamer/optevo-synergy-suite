@@ -14,7 +14,7 @@ interface Task {
   id: string;
   name: string;
   description: string | null;
-  status: string;
+  status: "pending" | "in_progress" | "completed";
   due_date: string | null;
   assigned_to: { username: string | null; avatar_url: string | null } | null;
   dependencies: {
@@ -58,10 +58,10 @@ export const TaskTable = ({ tasks }: TaskTableProps) => {
               <Badge
                 variant={
                   task.status === "completed"
-                    ? "success"
-                    : task.status === "in_progress"
                     ? "default"
-                    : "secondary"
+                    : task.status === "in_progress"
+                    ? "secondary"
+                    : "outline"
                 }
               >
                 {task.status}

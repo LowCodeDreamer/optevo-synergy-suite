@@ -1160,42 +1160,51 @@ export type Database = {
       tasks: {
         Row: {
           agent_id: string | null
+          assigned_to: string | null
           created_at: string
           created_by: string | null
           description: string | null
+          due_date: string | null
           expected_output: string | null
           id: string
           is_async: boolean | null
           name: string
           parent_id: string | null
+          project_id: string | null
           status: Database["public"]["Enums"]["task_status"] | null
           updated_at: string
           version: number
         }
         Insert: {
           agent_id?: string | null
+          assigned_to?: string | null
           created_at?: string
           created_by?: string | null
           description?: string | null
+          due_date?: string | null
           expected_output?: string | null
           id?: string
           is_async?: boolean | null
           name: string
           parent_id?: string | null
+          project_id?: string | null
           status?: Database["public"]["Enums"]["task_status"] | null
           updated_at?: string
           version?: number
         }
         Update: {
           agent_id?: string | null
+          assigned_to?: string | null
           created_at?: string
           created_by?: string | null
           description?: string | null
+          due_date?: string | null
           expected_output?: string | null
           id?: string
           is_async?: boolean | null
           name?: string
           parent_id?: string | null
+          project_id?: string | null
           status?: Database["public"]["Enums"]["task_status"] | null
           updated_at?: string
           version?: number
@@ -1206,6 +1215,13 @@ export type Database = {
             columns: ["agent_id"]
             isOneToOne: false
             referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
@@ -1220,6 +1236,13 @@ export type Database = {
             columns: ["parent_id"]
             isOneToOne: false
             referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
         ]
