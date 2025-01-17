@@ -16,27 +16,19 @@ interface ContactTableProps {
   })[];
   sortField: keyof Tables<"contacts">;
   onSortChange: (field: keyof Tables<"contacts">) => void;
-  onContactSelect?: (contact: Tables<"contacts"> & {
-    organization: { name: string } | null;
-  }) => void;
 }
 
 export const ContactTable = ({
   contacts,
   sortField,
   onSortChange,
-  onContactSelect,
 }: ContactTableProps) => {
   const navigate = useNavigate();
 
   const handleRowClick = (contact: Tables<"contacts"> & {
     organization: { name: string } | null;
   }) => {
-    if (onContactSelect) {
-      onContactSelect(contact);
-    } else {
-      navigate(`/contacts/${contact.id}`);
-    }
+    navigate(`/contacts/${contact.id}`);
   };
 
   return (

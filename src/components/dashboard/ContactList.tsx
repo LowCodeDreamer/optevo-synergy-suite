@@ -1,7 +1,5 @@
 import { Tables } from "@/integrations/supabase/types";
 import { useState } from "react";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { ContactCard } from "./contact-card/ContactCard";
 import { ContactSearch } from "./contacts/ContactSearch";
 import { ContactTable } from "./contacts/ContactTable";
 
@@ -16,9 +14,6 @@ export const ContactList = ({ contacts, showViewAll = false }: ContactListProps)
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState<keyof Tables<"contacts">>("created_at");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
-  const [selectedContact, setSelectedContact] = useState<(Tables<"contacts"> & {
-    organization: { name: string } | null;
-  }) | null>(null);
 
   const handleSort = (field: keyof Tables<"contacts">) => {
     if (sortField === field) {
@@ -64,19 +59,7 @@ export const ContactList = ({ contacts, showViewAll = false }: ContactListProps)
         contacts={filteredAndSortedContacts}
         sortField={sortField}
         onSortChange={handleSort}
-        onContactSelect={setSelectedContact}
       />
-
-      <Sheet open={selectedContact !== null} onOpenChange={() => setSelectedContact(null)}>
-        <SheetContent className="sm:max-w-xl">
-          <SheetHeader>
-            <SheetTitle>Contact Details</SheetTitle>
-          </SheetHeader>
-          {selectedContact && (
-            <ContactCard contact={selectedContact} onClose={() => setSelectedContact(null)} />
-          )}
-        </SheetContent>
-      </Sheet>
     </div>
   );
 };
