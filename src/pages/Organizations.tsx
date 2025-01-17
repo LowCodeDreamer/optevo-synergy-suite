@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { DashboardCard } from "@/components/dashboard/DashboardCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FloatingAIAssistant } from "@/components/dashboard/FloatingAIAssistant";
 import { CopilotCanvas } from "@/components/copilot/CopilotCanvas";
 import { ManagementView } from "@/components/dashboard/organizations/ManagementView";
+import { OrganizationsTable } from "@/components/dashboard/organizations/OrganizationsTable";
+import { DashboardCard } from "@/components/dashboard/DashboardCard";
 
 const Organizations = () => {
   const { data: organizations } = useQuery({
@@ -13,7 +14,7 @@ const Organizations = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("organizations")
-        .select("*")
+        .select("*, contacts(*)")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -43,69 +44,13 @@ const Organizations = () => {
 
         <TabsContent value="all">
           <DashboardCard title="All Organizations" className="mb-6">
-            <table className="min-w-full">
-              <thead>
-                <tr>
-                  <th className="text-left">Name</th>
-                  <th className="text-left">Industry</th>
-                  <th className="text-left">Status</th>
-                  <th className="text-left">Website</th>
-                  <th className="text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {organizations?.map((org) => (
-                  <tr key={org.id}>
-                    <td className="font-medium">{org.name}</td>
-                    <td>{org.industry || "N/A"}</td>
-                    <td>{org.status}</td>
-                    <td>{org.website || "N/A"}</td>
-                    <td className="text-right">
-                      <button
-                        className="text-blue-500 hover:underline"
-                        onClick={() => console.log(`Viewing ${org.name}`)}
-                      >
-                        View Details
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <OrganizationsTable organizations={organizations || []} />
           </DashboardCard>
         </TabsContent>
 
         <TabsContent value="active">
           <DashboardCard title="Active Organizations" className="mb-6">
-            <table className="min-w-full">
-              <thead>
-                <tr>
-                  <th className="text-left">Name</th>
-                  <th className="text-left">Industry</th>
-                  <th className="text-left">Status</th>
-                  <th className="text-left">Website</th>
-                  <th className="text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {activeOrganizations?.map((org) => (
-                  <tr key={org.id}>
-                    <td className="font-medium">{org.name}</td>
-                    <td>{org.industry || "N/A"}</td>
-                    <td>{org.status}</td>
-                    <td>{org.website || "N/A"}</td>
-                    <td className="text-right">
-                      <button
-                        className="text-blue-500 hover:underline"
-                        onClick={() => console.log(`Viewing ${org.name}`)}
-                      >
-                        View Details
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <OrganizationsTable organizations={activeOrganizations || []} />
           </DashboardCard>
         </TabsContent>
 
