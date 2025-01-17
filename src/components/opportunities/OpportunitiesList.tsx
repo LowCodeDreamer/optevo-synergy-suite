@@ -10,6 +10,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { DollarSign, Percent } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface OpportunitiesListProps {
   opportunities: (Tables<"opportunities"> & {
@@ -20,6 +21,8 @@ interface OpportunitiesListProps {
 }
 
 export const OpportunitiesList = ({ opportunities }: OpportunitiesListProps) => {
+  const navigate = useNavigate();
+
   return (
     <Table>
       <TableHeader>
@@ -35,7 +38,11 @@ export const OpportunitiesList = ({ opportunities }: OpportunitiesListProps) => 
       </TableHeader>
       <TableBody>
         {opportunities.map((opportunity) => (
-          <TableRow key={opportunity.id}>
+          <TableRow 
+            key={opportunity.id}
+            className="cursor-pointer hover:bg-muted/50"
+            onClick={() => navigate(`/opportunities/${opportunity.id}`)}
+          >
             <TableCell className="font-medium">{opportunity.name}</TableCell>
             <TableCell>{opportunity.organization?.name}</TableCell>
             <TableCell>

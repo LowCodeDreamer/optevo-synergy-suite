@@ -8,6 +8,7 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { format } from "date-fns";
+import { useNavigate } from "react-router-dom";
 
 interface OpportunitiesPipelineProps {
   opportunities: (Tables<"opportunities"> & {
@@ -56,6 +57,8 @@ const getConfidenceColor = (score: number | null) => {
 };
 
 export const OpportunitiesPipeline = ({ opportunities }: OpportunitiesPipelineProps) => {
+  const navigate = useNavigate();
+  
   const opportunitiesByStage = PIPELINE_STAGES.reduce((acc, stage) => {
     acc[stage] = opportunities.filter((opp) => opp.pipeline_stage === stage);
     return acc;
@@ -71,7 +74,11 @@ export const OpportunitiesPipeline = ({ opportunities }: OpportunitiesPipelinePr
           </div>
           <div className="space-y-4">
             {opportunitiesByStage[stage].map((opportunity) => (
-              <Card key={opportunity.id} className="p-4">
+              <Card 
+                key={opportunity.id} 
+                className="p-4 cursor-pointer hover:bg-muted/50"
+                onClick={() => navigate(`/opportunities/${opportunity.id}`)}
+              >
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <Building2 className="h-4 w-4 text-muted-foreground" />
