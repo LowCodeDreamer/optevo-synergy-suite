@@ -10,6 +10,7 @@ import { ActiveProjectsCard } from "@/components/project/ActiveProjectsCard";
 import { ProjectsAtRiskCard } from "@/components/project/ProjectsAtRiskCard";
 import { CopilotCanvas } from "@/components/copilot/CopilotCanvas";
 import { NewProjectViewDialog } from "@/components/project/NewProjectViewDialog";
+import { ProjectPlanner } from "@/components/project/ProjectPlanner";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
@@ -87,8 +88,9 @@ const Projects = () => {
         </Button>
       </div>
 
-      <Tabs defaultValue="copilot" className="space-y-6">
+      <Tabs defaultValue="planner" className="space-y-6">
         <TabsList className="flex-wrap">
+          <TabsTrigger value="planner">Project Planner</TabsTrigger>
           <TabsTrigger value="copilot">Co-pilot</TabsTrigger>
           <TabsTrigger value="management">Management View</TabsTrigger>
           <TabsTrigger value="all">All Projects</TabsTrigger>
@@ -99,6 +101,10 @@ const Projects = () => {
             </TabsTrigger>
           ))}
         </TabsList>
+
+        <TabsContent value="planner">
+          <ProjectPlanner />
+        </TabsContent>
 
         <TabsContent value="copilot">
           <CopilotCanvas />
