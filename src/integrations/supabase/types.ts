@@ -400,16 +400,21 @@ export type Database = {
       }
       opportunities: {
         Row: {
+          ai_insights: Json | null
           closed_at: string | null
+          confidence_score: number | null
           created_at: string
           created_by: string | null
           description: string | null
           expected_close_date: string | null
           expected_value: number | null
           id: string
+          last_activity_at: string | null
           name: string
+          next_steps: string | null
           organization_id: string
           owner_id: string | null
+          pipeline_stage: string
           primary_contact_id: string | null
           probability: number | null
           stage: string
@@ -417,16 +422,21 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          ai_insights?: Json | null
           closed_at?: string | null
+          confidence_score?: number | null
           created_at?: string
           created_by?: string | null
           description?: string | null
           expected_close_date?: string | null
           expected_value?: number | null
           id?: string
+          last_activity_at?: string | null
           name: string
+          next_steps?: string | null
           organization_id: string
           owner_id?: string | null
+          pipeline_stage?: string
           primary_contact_id?: string | null
           probability?: number | null
           stage?: string
@@ -434,16 +444,21 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          ai_insights?: Json | null
           closed_at?: string | null
+          confidence_score?: number | null
           created_at?: string
           created_by?: string | null
           description?: string | null
           expected_close_date?: string | null
           expected_value?: number | null
           id?: string
+          last_activity_at?: string | null
           name?: string
+          next_steps?: string | null
           organization_id?: string
           owner_id?: string | null
+          pipeline_stage?: string
           primary_contact_id?: string | null
           probability?: number | null
           stage?: string
@@ -1494,6 +1509,14 @@ export type Database = {
         | "active"
         | "at_risk"
         | "churned"
+      pipeline_stage:
+        | "qualification"
+        | "discovery"
+        | "proposal"
+        | "negotiation"
+        | "closing"
+        | "won"
+        | "lost"
       process_status:
         | "draft"
         | "in_progress"
