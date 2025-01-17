@@ -30,7 +30,7 @@ export const TaskList = ({ projectId }: TaskListProps) => {
           dependencies:task_dependencies!task_dependencies_task_id_fkey(
             depends_on:tasks!task_dependencies_depends_on_task_id_fkey(id, name)
           ),
-          assigned_to:profiles(username, avatar_url)
+          assigned_to:profiles!tasks_assigned_to_fkey(username, avatar_url)
         `)
         .eq("project_id", projectId)
         .order("created_at", { ascending: false });
