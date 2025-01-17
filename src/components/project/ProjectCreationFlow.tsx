@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { ProjectPlanner } from "./ProjectPlanner";
 import { MilestonePlanner } from "./MilestonePlanner";
 import { TaskList } from "./tasks/TaskList";
 import { ChevronLeft, ChevronRight, Circle, CheckCircle2 } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 type ProjectStep = "objectives" | "planning" | "tasks";
 
@@ -47,10 +49,24 @@ export const ProjectCreationFlow = () => {
     team: [],
     budget: null,
   });
+  const { toast } = useToast();
+
+  const progress = ((getStepIndex(currentStep) + 1) / 3) * 100;
 
   const handleNext = () => {
     const steps: ProjectStep[] = ["objectives", "planning", "tasks"];
     const currentIndex = steps.indexOf(currentStep);
+    
+    // Validate current step before proceeding
+    if (currentStep === "objectives" && projectData.objectives.length === 0) {
+      toast({
+        title: "Missing Objectives",
+        description: "Please define at least one project objective before proceeding.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (currentIndex < steps.length - 1) {
       setCurrentStep(steps[currentIndex + 1]);
     }
@@ -99,24 +115,27 @@ export const ProjectCreationFlow = () => {
   return (
     <div className="space-y-8">
       <Card className="p-6">
-        <div className="flex justify-between">
-          <StepIndicator
-            currentStep={currentStep}
-            step="objectives"
-            label="Objectives & Scope"
-          />
-          <div className="h-px w-24 bg-border self-center" />
-          <StepIndicator
-            currentStep={currentStep}
-            step="planning"
-            label="Project Planning"
-          />
-          <div className="h-px w-24 bg-border self-center" />
-          <StepIndicator
-            currentStep={currentStep}
-            step="tasks"
-            label="Tasks & Assignment"
-          />
+        <div className="space-y-6">
+          <div className="flex justify-between">
+            <StepIndicator
+              currentStep={currentStep}
+              step="objectives"
+              label="Objectives & Scope"
+            />
+            <div className="h-px w-24 bg-border self-center" />
+            <StepIndicator
+              currentStep={currentStep}
+              step="planning"
+              label="Project Planning"
+            />
+            <div className="h-px w-24 bg-border self-center" />
+            <StepIndicator
+              currentStep={currentStep}
+              step="tasks"
+              label="Tasks & Assignment"
+            />
+          </div>
+          <Progress value={progress} className="h-2" />
         </div>
       </Card>
 
