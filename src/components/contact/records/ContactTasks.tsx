@@ -15,6 +15,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { format } from "date-fns";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface ContactTasksProps {
   contact: Tables<"contacts"> & {
@@ -24,21 +25,26 @@ interface ContactTasksProps {
 
 export const ContactTasks = ({ contact }: ContactTasksProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const { data: tasks } = useQuery({
+  const prospectId = contact.organization?.prospect_id;
+
+  const { data: tasks, isError } = useQuery({
     queryKey: ["contact-tasks", contact.organization_id],
     queryFn: async () => {
+      if (!prospectId) return [];
+
       const { data, error } = await supabase
         .from("prospect_tasks")
         .select(`
           *,
           assignee:profiles!prospect_tasks_assigned_to_fkey(username)
         `)
-        .eq("prospect_id", contact.organization?.prospect_id)
+        .eq("prospect_id", prospectId)
         .order("due_date", { ascending: true });
 
       if (error) throw error;
       return data;
     },
+    enabled: !!prospectId,
   });
 
   const getPriorityColor = (priority: string) => {
@@ -66,6 +72,26 @@ export const ContactTasks = ({ contact }: ContactTasksProps) => {
         return "outline";
     }
   };
+
+  if (!prospectId) {
+    return (
+      <Alert>
+        <AlertDescription>
+          No prospect is associated with this contact's organization. Tasks can only be created for prospects.
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Alert variant="destructive">
+        <AlertDescription>
+          Failed to load tasks. Please try again later.
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -120,13 +146,20 @@ export const ContactTasks = ({ contact }: ContactTasksProps) => {
               </TableCell>
             </TableRow>
           ))}
+          {tasks?.length === 0 && (
+            <TableRow>
+              <TableCell colSpan={6} className="text-center text-muted-foreground">
+                No tasks found
+              </TableCell>
+            </TableRow>
+          )}
         </TableBody>
       </Table>
 
       <NewTaskDialog
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
-        prospectId={contact.organization?.prospect_id || ""}
+        prospectId={prospectId}
       />
     </div>
   );

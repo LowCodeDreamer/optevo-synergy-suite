@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { NotepadText, Plus } from "lucide-react";
 import { NewNoteDialog } from "@/components/dashboard/NewNoteDialog";
 import { format } from "date-fns";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface ContactNotesProps {
   contact: Tables<"contacts"> & {
@@ -17,19 +18,44 @@ interface ContactNotesProps {
 
 export const ContactNotes = ({ contact }: ContactNotesProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const { data: notes } = useQuery({
+  const prospectId = contact.organization?.prospect_id;
+
+  const { data: notes, isError } = useQuery({
     queryKey: ["contact-notes", contact.organization_id],
     queryFn: async () => {
+      if (!prospectId) return [];
+
       const { data, error } = await supabase
         .from("prospect_notes")
         .select("*")
-        .eq("prospect_id", contact.organization?.prospect_id)
+        .eq("prospect_id", prospectId)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
       return data;
     },
+    enabled: !!prospectId,
   });
+
+  if (!prospectId) {
+    return (
+      <Alert>
+        <AlertDescription>
+          No prospect is associated with this contact's organization. Notes can only be created for prospects.
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Alert variant="destructive">
+        <AlertDescription>
+          Failed to load notes. Please try again later.
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -62,7 +88,7 @@ export const ContactNotes = ({ contact }: ContactNotesProps) => {
       <NewNoteDialog
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
-        prospectId={contact.organization?.prospect_id || ""}
+        prospectId={prospectId}
       />
     </div>
   );
