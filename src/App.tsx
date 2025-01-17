@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/theme-provider";
-import Sidebar from "@/components/layout/Sidebar";
+import { Sidebar } from "@/components/layout/Sidebar";
 import Dashboard from "@/pages/Dashboard";
 import Opportunities from "@/pages/Opportunities";
 import OpportunityDetails from "@/pages/OpportunityDetails";
