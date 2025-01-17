@@ -51,9 +51,9 @@ export const ContactOpportunities = ({ contact }: ContactOpportunitiesProps) => 
       case "negotiation":
         return "destructive";
       case "closing":
-        return "warning";
+        return "secondary";
       case "won":
-        return "success";
+        return "default";
       case "lost":
         return "destructive";
       default:
@@ -63,8 +63,8 @@ export const ContactOpportunities = ({ contact }: ContactOpportunitiesProps) => 
 
   const getConfidenceColor = (score: number | null) => {
     if (!score) return "default";
-    if (score >= 80) return "success";
-    if (score >= 60) return "warning";
+    if (score >= 80) return "default";
+    if (score >= 60) return "secondary";
     return "destructive";
   };
 
