@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
@@ -11,11 +12,11 @@ import { ProjectsAtRiskCard } from "@/components/project/ProjectsAtRiskCard";
 import { CopilotCanvas } from "@/components/copilot/CopilotCanvas";
 import { NewProjectViewDialog } from "@/components/project/NewProjectViewDialog";
 import { ProjectCreationFlow } from "@/components/project/ProjectCreationFlow";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { ProjectPlanner } from "@/components/project/ProjectPlanner";
 import { MilestonePlanner } from "@/components/project/MilestonePlanner";
 
-const Projects = () => {
+export const Projects = () => {
   const [isNewViewDialogOpen, setIsNewViewDialogOpen] = useState(false);
   const [isCreatingProject, setIsCreatingProject] = useState(false);
   
@@ -140,9 +141,6 @@ const Projects = () => {
       <NewProjectViewDialog
         isOpen={isNewViewDialogOpen}
         onClose={() => setIsNewViewDialogOpen(false)}
-        onViewCreated={() => {
-          refetchViews();
-        }}
       />
 
       <FloatingAIAssistant />

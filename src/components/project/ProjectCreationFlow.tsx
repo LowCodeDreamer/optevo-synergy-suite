@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ProjectPlanner } from "./ProjectPlanner";
+import { MilestonePlanner } from "./MilestonePlanner";
 import { ChevronLeft, ChevronRight, Circle, CheckCircle2 } from "lucide-react";
 
 type ProjectStep = "objectives" | "planning" | "tasks";
@@ -77,7 +78,7 @@ export const ProjectCreationFlow = () => {
             <p className="text-muted-foreground">
               Based on the objectives, let's create a detailed project plan with milestones and dependencies.
             </p>
-            {/* Milestone planning component will go here */}
+            <MilestonePlanner />
           </div>
         );
       case "tasks":
@@ -87,7 +88,7 @@ export const ProjectCreationFlow = () => {
             <p className="text-muted-foreground">
               Let's break down the milestones into specific tasks and assign them to team members.
             </p>
-            {/* Task creation component will go here */}
+            {/* Task creation component will be implemented next */}
           </div>
         );
     }
@@ -95,7 +96,6 @@ export const ProjectCreationFlow = () => {
 
   return (
     <div className="space-y-8">
-      {/* Progress Bar */}
       <Card className="p-6">
         <div className="flex justify-between">
           <StepIndicator
@@ -118,12 +118,10 @@ export const ProjectCreationFlow = () => {
         </div>
       </Card>
 
-      {/* Content */}
       <div className="min-h-[600px]">
         {renderStep()}
       </div>
 
-      {/* Navigation */}
       <div className="flex justify-between">
         <Button
           variant="outline"

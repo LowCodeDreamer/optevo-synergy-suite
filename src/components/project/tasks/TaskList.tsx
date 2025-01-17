@@ -7,7 +7,6 @@ import { NewTaskDialog } from "./NewTaskDialog";
 import { TaskTable } from "./TaskTable";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2 } from "lucide-react";
-import { Card } from "@/components/ui/card";
 
 interface Task {
   id: string;
