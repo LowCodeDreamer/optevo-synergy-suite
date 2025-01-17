@@ -1,14 +1,12 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Settings, MessageSquare, FileCode, Bot, ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { AIOverviewStats } from "@/components/ai-assistant/AIOverviewStats";
+import { AIQuickActions } from "@/components/ai-assistant/AIQuickActions";
 
 export const AIAssistant = () => {
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
 
   const { data: stats } = useQuery({
@@ -48,115 +46,8 @@ export const AIAssistant = () => {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-3">
-            <Card>
-              <CardHeader className="space-y-1">
-                <CardTitle className="text-2xl">
-                  {stats?.providers || 0}
-                </CardTitle>
-                <CardDescription>AI Providers</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-between"
-                  onClick={() => setActiveTab("providers")}
-                >
-                  <span className="flex items-center">
-                    <Settings className="mr-2 h-4 w-4" />
-                    Manage Providers
-                  </span>
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="space-y-1">
-                <CardTitle className="text-2xl">
-                  {stats?.templates || 0}
-                </CardTitle>
-                <CardDescription>Prompt Templates</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-between"
-                  onClick={() => setActiveTab("templates")}
-                >
-                  <span className="flex items-center">
-                    <FileCode className="mr-2 h-4 w-4" />
-                    Manage Templates
-                  </span>
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="space-y-1">
-                <CardTitle className="text-2xl">
-                  {stats?.copilots || 0}
-                </CardTitle>
-                <CardDescription>Active Copilots</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-between"
-                  onClick={() => setActiveTab("copilots")}
-                >
-                  <span className="flex items-center">
-                    <Bot className="mr-2 h-4 w-4" />
-                    Manage Copilots
-                  </span>
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-              <CardDescription>
-                Common tasks and configurations
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-4 md:grid-cols-2">
-              <Button
-                variant="outline"
-                className="justify-start"
-                onClick={() => setActiveTab("providers")}
-              >
-                <Settings className="mr-2 h-4 w-4" />
-                Add New AI Provider
-              </Button>
-              <Button
-                variant="outline"
-                className="justify-start"
-                onClick={() => setActiveTab("templates")}
-              >
-                <FileCode className="mr-2 h-4 w-4" />
-                Create Prompt Template
-              </Button>
-              <Button
-                variant="outline"
-                className="justify-start"
-                onClick={() => setActiveTab("copilots")}
-              >
-                <Bot className="mr-2 h-4 w-4" />
-                Configure New Copilot
-              </Button>
-              <Button
-                variant="outline"
-                className="justify-start"
-              >
-                <MessageSquare className="mr-2 h-4 w-4" />
-                Test Copilot Chat
-              </Button>
-            </CardContent>
-          </Card>
+          <AIOverviewStats stats={stats} onTabChange={setActiveTab} />
+          <AIQuickActions onTabChange={setActiveTab} />
         </TabsContent>
 
         <TabsContent value="providers">
