@@ -12,6 +12,7 @@ import Projects from "@/pages/Projects";
 import Prospects from "@/pages/Prospects";
 import Analytics from "@/pages/Analytics";
 import ContactDetails from "@/pages/ContactDetails";
+import Opportunities from "@/pages/Opportunities";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ function App() {
                 <Route path="/organizations/:id" element={<OrganizationDetails />} />
                 <Route path="/contacts" element={<Contacts />} />
                 <Route path="/contacts/:id" element={<ContactDetails />} />
+                <Route path="/opportunities" element={<Opportunities />} />
                 <Route path="/projects" element={<Projects />} />
                 <Route path="/assistant" element={<AIAssistant />} />
                 <Route path="/analytics" element={<Analytics />} />

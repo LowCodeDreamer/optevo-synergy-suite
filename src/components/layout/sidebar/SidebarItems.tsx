@@ -6,7 +6,8 @@ import {
   Settings,
   Briefcase,
   Building2,
-  Contact
+  Contact,
+  Target
 } from "lucide-react";
 
 export const menuItems = [
@@ -14,6 +15,7 @@ export const menuItems = [
   { icon: Users, label: "Prospects", href: "/prospects" },
   { icon: Building2, label: "Organizations", href: "/organizations" },
   { icon: Contact, label: "Contacts", href: "/contacts" },
+  { icon: Target, label: "Opportunities", href: "/opportunities" },
   { icon: Briefcase, label: "Projects", href: "/projects" },
   { icon: BrainCircuit, label: "AI Assistant", href: "/assistant" },
   { icon: BarChart, label: "Analytics", href: "/analytics" },

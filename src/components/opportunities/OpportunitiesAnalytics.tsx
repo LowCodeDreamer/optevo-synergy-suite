@@ -58,18 +58,16 @@ export const OpportunitiesAnalytics = ({ opportunities }: OpportunitiesAnalytics
       </DashboardCard>
 
       <div className="grid grid-cols-3 gap-4">
-        <DashboardCard>
+        <DashboardCard title="Pipeline Value">
           <div className="text-center">
-            <h3 className="text-lg font-medium">Total Pipeline Value</h3>
             <p className="text-3xl font-bold mt-2">
               ${opportunities.reduce((sum, opp) => sum + (opp.expected_value || 0), 0).toLocaleString()}
             </p>
           </div>
         </DashboardCard>
 
-        <DashboardCard>
+        <DashboardCard title="Average Deal Size">
           <div className="text-center">
-            <h3 className="text-lg font-medium">Average Deal Size</h3>
             <p className="text-3xl font-bold mt-2">
               ${Math.round(
                 opportunities.reduce((sum, opp) => sum + (opp.expected_value || 0), 0) /
@@ -79,9 +77,8 @@ export const OpportunitiesAnalytics = ({ opportunities }: OpportunitiesAnalytics
           </div>
         </DashboardCard>
 
-        <DashboardCard>
+        <DashboardCard title="Win Rate">
           <div className="text-center">
-            <h3 className="text-lg font-medium">Win Rate</h3>
             <p className="text-3xl font-bold mt-2">
               {Math.round(
                 (opportunities.filter((opp) => opp.pipeline_stage === "won").length /
