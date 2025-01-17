@@ -11,6 +11,13 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { ArrowUpDown, Mail, Phone } from "lucide-react";
+import { ContactCard } from "./contact-card/ContactCard";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 
 interface ContactListProps {
   contacts: (Tables<"contacts"> & {
@@ -23,6 +30,9 @@ export const ContactList = ({ contacts, showViewAll = false }: ContactListProps)
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState<keyof Tables<"contacts">>("created_at");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+  const [selectedContact, setSelectedContact] = useState<(Tables<"contacts"> & {
+    organization: { name: string } | null;
+  }) | null>(null);
 
   const handleSort = (field: keyof Tables<"contacts">) => {
     if (sortField === field) {
@@ -98,7 +108,11 @@ export const ContactList = ({ contacts, showViewAll = false }: ContactListProps)
         </TableHeader>
         <TableBody>
           {filteredAndSortedContacts.map((contact) => (
-            <TableRow key={contact.id}>
+            <TableRow 
+              key={contact.id}
+              className="cursor-pointer hover:bg-muted/50"
+              onClick={() => setSelectedContact(contact)}
+            >
               <TableCell>
                 {contact.first_name} {contact.last_name}
               </TableCell>
@@ -110,6 +124,17 @@ export const ContactList = ({ contacts, showViewAll = false }: ContactListProps)
           ))}
         </TableBody>
       </Table>
+
+      <Sheet open={selectedContact !== null} onOpenChange={() => setSelectedContact(null)}>
+        <SheetContent className="sm:max-w-xl">
+          <SheetHeader>
+            <SheetTitle>Contact Details</SheetTitle>
+          </SheetHeader>
+          {selectedContact && (
+            <ContactCard contact={selectedContact} onClose={() => setSelectedContact(null)} />
+          )}
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };
