@@ -29,7 +29,7 @@ interface ContactActivityFeedProps {
 }
 
 export const ContactActivityFeed = ({ contact }: ContactActivityFeedProps) => {
-  const { data: activities, isLoading, error } = useQuery({
+  const { data: activities, isLoading, error, refetch } = useQuery({
     queryKey: ["contact-activities", contact.id],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -64,7 +64,7 @@ export const ContactActivityFeed = ({ contact }: ContactActivityFeedProps) => {
         },
         (payload) => {
           console.log("New activity:", payload);
-          // The useQuery hook will automatically refresh the data
+          refetch();
         }
       )
       .subscribe();
@@ -72,7 +72,7 @@ export const ContactActivityFeed = ({ contact }: ContactActivityFeedProps) => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [contact.organization_id]);
+  }, [contact.organization_id, refetch]);
 
   if (isLoading) {
     return (

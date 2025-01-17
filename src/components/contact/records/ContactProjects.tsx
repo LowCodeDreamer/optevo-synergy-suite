@@ -35,14 +35,14 @@ export const ContactProjects = ({ contact }: ContactProjectsProps) => {
     },
   });
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: string): "default" | "secondary" | "destructive" | "outline" => {
     switch (status) {
       case "completed":
         return "default";
       case "in_progress":
         return "secondary";
       case "on_hold":
-        return "warning";
+        return "outline";
       case "cancelled":
         return "destructive";
       default:
