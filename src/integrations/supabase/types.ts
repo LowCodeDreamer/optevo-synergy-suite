@@ -104,6 +104,39 @@ export type Database = {
           },
         ]
       }
+      ai_provider_configs: {
+        Row: {
+          config: Json | null
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          provider_type: Database["public"]["Enums"]["ai_provider_type"]
+          updated_at: string
+        }
+        Insert: {
+          config?: Json | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          provider_type: Database["public"]["Enums"]["ai_provider_type"]
+          updated_at?: string
+        }
+        Update: {
+          config?: Json | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          provider_type?: Database["public"]["Enums"]["ai_provider_type"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       contacts: {
         Row: {
           created_at: string
@@ -166,6 +199,63 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      copilot_configs: {
+        Row: {
+          additional_config: Json | null
+          context: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          prompt_template_id: string | null
+          provider_config_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          additional_config?: Json | null
+          context: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          prompt_template_id?: string | null
+          provider_config_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          additional_config?: Json | null
+          context?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          prompt_template_id?: string | null
+          provider_config_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "copilot_configs_prompt_template_id_fkey"
+            columns: ["prompt_template_id"]
+            isOneToOne: false
+            referencedRelation: "prompt_templates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "copilot_configs_provider_config_id_fkey"
+            columns: ["provider_config_id"]
+            isOneToOne: false
+            referencedRelation: "ai_provider_configs"
             referencedColumns: ["id"]
           },
         ]
@@ -772,6 +862,39 @@ export type Database = {
           },
         ]
       }
+      prompt_templates: {
+        Row: {
+          context_variables: Json | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          name: string
+          template: string
+          updated_at: string
+        }
+        Insert: {
+          context_variables?: Json | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          template: string
+          updated_at?: string
+        }
+        Update: {
+          context_variables?: Json | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          template?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       prospect_activities: {
         Row: {
           completed_at: string | null
@@ -1308,6 +1431,7 @@ export type Database = {
     }
     Enums: {
       agent_status: "active" | "archived" | "draft"
+      ai_provider_type: "openai" | "crewai" | "custom"
       ai_suggestion_status: "pending" | "approved" | "rejected"
       crew_process_type: "sequential" | "parallel"
       entity_lifecycle_stage:
