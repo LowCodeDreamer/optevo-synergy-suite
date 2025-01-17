@@ -13,6 +13,7 @@ import { NewProjectViewDialog } from "@/components/project/NewProjectViewDialog"
 import { ProjectCreationFlow } from "@/components/project/ProjectCreationFlow";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { MilestonePlanner } from "@/components/project/MilestonePlanner";
 
 const Projects = () => {
   const [isNewViewDialogOpen, setIsNewViewDialogOpen] = useState(false);
@@ -38,24 +39,12 @@ const Projects = () => {
     },
   });
 
-  const { 
-    data: customViews, 
-    isLoading: viewsLoading,
-    refetch: refetchViews 
-  } = useQuery({
-    queryKey: ["project_views"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("project_views")
-        .select("*")
-        .order("sort_order", { ascending: true });
+  // Filter projects at risk (for example, those past due date)
+  const atRiskProjects = projects?.filter(project => 
+    project.end_date && new Date(project.end_date) < new Date()
+  ) || [];
 
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  if (projectsLoading || viewsLoading) {
+  if (projectsLoading) {
     return (
       <div className="container mx-auto p-6 flex items-center justify-center min-h-[200px]">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -110,19 +99,19 @@ const Projects = () => {
       <Tabs defaultValue="planner" className="space-y-6">
         <TabsList className="flex-wrap">
           <TabsTrigger value="planner">Project Planner</TabsTrigger>
+          <TabsTrigger value="milestones">Milestone Planning</TabsTrigger>
           <TabsTrigger value="copilot">Co-pilot</TabsTrigger>
           <TabsTrigger value="management">Management View</TabsTrigger>
           <TabsTrigger value="all">All Projects</TabsTrigger>
           <TabsTrigger value="active">Active Projects</TabsTrigger>
-          {customViews?.map((view) => (
-            <TabsTrigger key={view.id} value={view.id}>
-              {view.name}
-            </TabsTrigger>
-          ))}
         </TabsList>
 
         <TabsContent value="planner">
           <ProjectPlanner />
+        </TabsContent>
+
+        <TabsContent value="milestones">
+          <MilestonePlanner />
         </TabsContent>
 
         <TabsContent value="copilot">
@@ -146,20 +135,6 @@ const Projects = () => {
             <ActiveProjectsCard projects={projects || []} />
           </div>
         </TabsContent>
-
-        {customViews?.map((view) => (
-          <TabsContent key={view.id} value={view.id}>
-            <DashboardCard title={view.name} className="mb-6">
-              <ProjectsTable
-                projects={projects || []}
-                displayFields={view.display_fields}
-                viewId={view.id}
-                onViewDeleted={refetchViews}
-                isCustomView
-              />
-            </DashboardCard>
-          </TabsContent>
-        ))}
       </Tabs>
 
       <NewProjectViewDialog

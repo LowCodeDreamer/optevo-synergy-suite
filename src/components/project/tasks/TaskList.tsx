@@ -7,6 +7,25 @@ import { NewTaskDialog } from "./NewTaskDialog";
 import { TaskTable } from "./TaskTable";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2 } from "lucide-react";
+import { Card } from "@/components/ui/card";
+
+interface Task {
+  id: string;
+  name: string;
+  description: string;
+  status: "pending" | "in_progress" | "completed";
+  due_date: string;
+  dependencies: {
+    depends_on: {
+      id: string;
+      name: string;
+    };
+  }[];
+  assigned_to: {
+    username: string;
+    avatar_url: string;
+  };
+}
 
 interface TaskListProps {
   projectId: string;
