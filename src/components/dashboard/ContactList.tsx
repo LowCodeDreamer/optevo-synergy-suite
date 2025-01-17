@@ -1,23 +1,9 @@
 import { Tables } from "@/integrations/supabase/types";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { ArrowUpDown, Mail, Phone } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { ContactCard } from "./contact-card/ContactCard";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+import { ContactSearch } from "./contacts/ContactSearch";
+import { ContactTable } from "./contacts/ContactTable";
 
 interface ContactListProps {
   contacts: (Tables<"contacts"> & {
@@ -66,64 +52,20 @@ export const ContactList = ({ contacts, showViewAll = false }: ContactListProps)
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <Input
-          placeholder="Search contacts..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="max-w-sm"
-        />
-        {showViewAll && (
-          <Button variant="outline">View All Contacts</Button>
-        )}
-      </div>
+      <ContactSearch
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        sortField={sortField}
+        onSortChange={handleSort}
+        showViewAll={showViewAll}
+      />
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>
-              <Button
-                variant="ghost"
-                className="h-8 w-full justify-start"
-                onClick={() => handleSort("first_name")}
-              >
-                Name <ArrowUpDown className="ml-2 h-4 w-4" />
-              </Button>
-            </TableHead>
-            <TableHead>Organization</TableHead>
-            <TableHead>Position</TableHead>
-            <TableHead>
-              <div className="flex items-center space-x-2">
-                <Mail className="h-4 w-4" />
-                <span>Contact</span>
-              </div>
-            </TableHead>
-            <TableHead>
-              <div className="flex items-center space-x-2">
-                <Phone className="h-4 w-4" />
-                <span>Phone</span>
-              </div>
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filteredAndSortedContacts.map((contact) => (
-            <TableRow 
-              key={contact.id}
-              className="cursor-pointer hover:bg-muted/50"
-              onClick={() => setSelectedContact(contact)}
-            >
-              <TableCell>
-                {contact.first_name} {contact.last_name}
-              </TableCell>
-              <TableCell>{contact.organization?.name}</TableCell>
-              <TableCell>{contact.position}</TableCell>
-              <TableCell>{contact.email}</TableCell>
-              <TableCell>{contact.phone}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <ContactTable
+        contacts={filteredAndSortedContacts}
+        sortField={sortField}
+        onSortChange={handleSort}
+        onContactSelect={setSelectedContact}
+      />
 
       <Sheet open={selectedContact !== null} onOpenChange={() => setSelectedContact(null)}>
         <SheetContent className="sm:max-w-xl">
