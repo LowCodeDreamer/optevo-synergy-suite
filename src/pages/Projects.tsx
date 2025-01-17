@@ -141,6 +141,10 @@ export const Projects = () => {
       <NewProjectViewDialog
         isOpen={isNewViewDialogOpen}
         onClose={() => setIsNewViewDialogOpen(false)}
+        onViewCreated={() => {
+          // Handle view creation
+          setIsNewViewDialogOpen(false);
+        }}
       />
 
       <FloatingAIAssistant />

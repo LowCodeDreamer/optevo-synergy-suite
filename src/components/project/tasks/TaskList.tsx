@@ -54,11 +54,7 @@ export const TaskList = ({ projectId }: TaskListProps) => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      
-      // Filter out any tasks with status "failed" to match our type constraints
-      return (data || []).filter(task => 
-        ["pending", "in_progress", "completed"].includes(task.status)
-      );
+      return data as Task[];
     },
   });
 

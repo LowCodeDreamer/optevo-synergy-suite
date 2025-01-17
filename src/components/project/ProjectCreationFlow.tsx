@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ProjectPlanner } from "./ProjectPlanner";
 import { MilestonePlanner } from "./MilestonePlanner";
+import { TaskList } from "./tasks/TaskList";
 import { ChevronLeft, ChevronRight, Circle, CheckCircle2 } from "lucide-react";
 
 type ProjectStep = "objectives" | "planning" | "tasks";
@@ -39,6 +40,7 @@ const getStepIndex = (step: ProjectStep): number => {
 export const ProjectCreationFlow = () => {
   const [currentStep, setCurrentStep] = useState<ProjectStep>("objectives");
   const [projectData, setProjectData] = useState({
+    id: "",
     objectives: [],
     scope: [],
     constraints: [],
@@ -88,7 +90,7 @@ export const ProjectCreationFlow = () => {
             <p className="text-muted-foreground">
               Let's break down the milestones into specific tasks and assign them to team members.
             </p>
-            {/* Task creation component will be implemented next */}
+            {projectData.id && <TaskList projectId={projectData.id} />}
           </div>
         );
     }
