@@ -1,46 +1,13 @@
 import { Tables } from "@/integrations/supabase/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MessageSquare, Mail, Phone, Calendar } from "lucide-react";
+import { MessageSquare, Mail, Phone, Calendar, Loader2 } from "lucide-react";
 import { format } from "date-fns";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect } from "react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
-interface ActivityItem {
-  id: string;
-  type: "message" | "email" | "call" | "meeting";
-  title: string;
-  description?: string;
-  timestamp: Date;
-  user?: {
-    name: string;
-    avatar?: string;
-  };
-}
-
-// This would be replaced with real data from your backend
-const mockActivities: ActivityItem[] = [
-  {
-    id: "1",
-    type: "message",
-    title: "Chat conversation",
-    description: "Discussed upcoming project timeline",
-    timestamp: new Date("2024-03-10T14:30:00"),
-    user: {
-      name: "John Doe",
-    },
-  },
-  {
-    id: "2",
-    type: "email",
-    title: "Email sent",
-    description: "Proposal document shared",
-    timestamp: new Date("2024-03-09T11:20:00"),
-    user: {
-      name: "Sarah Smith",
-    },
-  },
-  // Add more mock activities as needed
-];
-
-const getActivityIcon = (type: ActivityItem["type"]) => {
+const getActivityIcon = (type: Tables<"organization_activities">["type"]) => {
   switch (type) {
     case "message":
       return MessageSquare;
@@ -64,6 +31,83 @@ interface ActivityFeedProps {
 }
 
 export const ActivityFeed = ({ organization }: ActivityFeedProps) => {
+  const { data: activities, isLoading, error } = useQuery({
+    queryKey: ["organization-activities", organization.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("organization_activities")
+        .select(`
+          *,
+          created_by (
+            id,
+            username,
+            avatar_url
+          )
+        `)
+        .eq("organization_id", organization.id)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Set up real-time subscription for new activities
+  useEffect(() => {
+    const channel = supabase
+      .channel("organization-activities")
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "organization_activities",
+          filter: `organization_id=eq.${organization.id}`,
+        },
+        (payload) => {
+          console.log("New activity:", payload);
+          // The useQuery hook will automatically refresh the data
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [organization.id]);
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-xl">Activity Feed</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-xl">Activity Feed</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Alert variant="destructive">
+            <AlertDescription>
+              {error instanceof Error ? error.message : "Failed to load activities"}
+            </AlertDescription>
+          </Alert>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -71,7 +115,7 @@ export const ActivityFeed = ({ organization }: ActivityFeedProps) => {
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
-          {mockActivities.map((activity) => {
+          {activities?.map((activity) => {
             const Icon = getActivityIcon(activity.type);
             return (
               <div key={activity.id} className="flex gap-4">
@@ -82,7 +126,7 @@ export const ActivityFeed = ({ organization }: ActivityFeedProps) => {
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-medium">{activity.title}</p>
                     <time className="text-xs text-muted-foreground">
-                      {format(activity.timestamp, "MMM d, yyyy 'at' h:mm a")}
+                      {format(new Date(activity.created_at), "MMM d, yyyy 'at' h:mm a")}
                     </time>
                   </div>
                   {activity.description && (
@@ -90,15 +134,20 @@ export const ActivityFeed = ({ organization }: ActivityFeedProps) => {
                       {activity.description}
                     </p>
                   )}
-                  {activity.user && (
+                  {activity.created_by && (
                     <p className="text-xs text-muted-foreground">
-                      by {activity.user.name}
+                      by {activity.created_by.username || "Unknown user"}
                     </p>
                   )}
                 </div>
               </div>
             );
           })}
+          {activities?.length === 0 && (
+            <p className="text-sm text-muted-foreground text-center py-4">
+              No activities yet
+            </p>
+          )}
         </div>
       </CardContent>
     </Card>
