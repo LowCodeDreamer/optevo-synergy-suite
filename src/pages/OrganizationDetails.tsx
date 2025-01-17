@@ -23,18 +23,19 @@ const OrganizationDetails = () => {
           opportunities (*),
           projects (*)
         `)
-        .eq("id", id);
+        .eq("id", id)
+        .single();
 
       if (error) {
         console.error("Error fetching organization:", error);
         throw error;
       }
 
-      if (!organizations || organizations.length === 0) {
+      if (!organizations) {
         throw new Error("Organization not found");
       }
 
-      return organizations[0];
+      return organizations;
     },
   });
 
