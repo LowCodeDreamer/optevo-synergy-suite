@@ -7,6 +7,7 @@ import { ProjectDocuments } from "@/components/project/ProjectDocuments";
 import { ProjectMilestones } from "@/components/project/ProjectMilestones";
 import { ProjectAIAssistant } from "@/components/project/ProjectAIAssistant";
 import { TeamManagement } from "@/components/project/TeamManagement";
+import { TaskList } from "@/components/project/tasks/TaskList";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -76,9 +77,10 @@ const ProjectDetails = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <Tabs defaultValue="overview" className="space-y-4">
-            <TabsList className="grid grid-cols-4 lg:grid-cols-6">
+            <TabsList className="grid grid-cols-4 lg:grid-cols-7">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="team">Team</TabsTrigger>
+              <TabsTrigger value="tasks">Tasks</TabsTrigger>
               <TabsTrigger value="documents">Documents</TabsTrigger>
               <TabsTrigger value="milestones">Milestones</TabsTrigger>
               <TabsTrigger value="thread" className="hidden lg:block">Team Chat</TabsTrigger>
@@ -91,6 +93,10 @@ const ProjectDetails = () => {
 
             <TabsContent value="team">
               <TeamManagement project={project} />
+            </TabsContent>
+
+            <TabsContent value="tasks">
+              <TaskList projectId={project.id} />
             </TabsContent>
 
             <TabsContent value="documents">
