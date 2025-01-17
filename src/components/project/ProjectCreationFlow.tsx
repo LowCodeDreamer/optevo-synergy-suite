@@ -6,7 +6,7 @@ import { ProjectPlanner } from "./ProjectPlanner";
 import { MilestonePlanner } from "./MilestonePlanner";
 import { TaskList } from "./tasks/TaskList";
 import { ChevronLeft, ChevronRight, Circle, CheckCircle2 } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 type ProjectStep = "objectives" | "planning" | "tasks";
 
@@ -41,14 +41,7 @@ const getStepIndex = (step: ProjectStep): number => {
 
 export const ProjectCreationFlow = () => {
   const [currentStep, setCurrentStep] = useState<ProjectStep>("objectives");
-  const [projectData, setProjectData] = useState({
-    id: "",
-    objectives: [],
-    scope: [],
-    constraints: [],
-    team: [],
-    budget: null,
-  });
+  const [objectives, setObjectives] = useState<string[]>([]);
   const { toast } = useToast();
 
   const progress = ((getStepIndex(currentStep) + 1) / 3) * 100;
@@ -58,7 +51,7 @@ export const ProjectCreationFlow = () => {
     const currentIndex = steps.indexOf(currentStep);
     
     // Validate current step before proceeding
-    if (currentStep === "objectives" && projectData.objectives.length === 0) {
+    if (currentStep === "objectives" && objectives.length === 0) {
       toast({
         title: "Missing Objectives",
         description: "Please define at least one project objective before proceeding.",
@@ -80,13 +73,17 @@ export const ProjectCreationFlow = () => {
     }
   };
 
+  const handleObjectivesChange = (newObjectives: string[]) => {
+    setObjectives(newObjectives);
+  };
+
   const renderStep = () => {
     switch (currentStep) {
       case "objectives":
         return (
           <div className="space-y-6">
             <h2 className="text-2xl font-bold">Project Objectives & Scope</h2>
-            <ProjectPlanner />
+            <ProjectPlanner onObjectivesChange={handleObjectivesChange} />
           </div>
         );
       case "planning":
@@ -106,14 +103,14 @@ export const ProjectCreationFlow = () => {
             <p className="text-muted-foreground">
               Let's break down the milestones into specific tasks and assign them to team members.
             </p>
-            {projectData.id && <TaskList projectId={projectData.id} />}
+            <TaskList projectId="" />
           </div>
         );
     }
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 pb-20">
       <Card className="p-6">
         <div className="space-y-6">
           <div className="flex justify-between">
@@ -143,7 +140,7 @@ export const ProjectCreationFlow = () => {
         {renderStep()}
       </div>
 
-      <div className="flex justify-between">
+      <div className="fixed bottom-0 left-0 right-0 bg-background border-t p-4 flex justify-between">
         <Button
           variant="outline"
           onClick={handlePrevious}
