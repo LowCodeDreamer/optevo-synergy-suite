@@ -58,7 +58,10 @@ const Prospects = () => {
         </TabsContent>
       </Tabs>
 
-      <FloatingAIAssistant />
+      <FloatingAIAssistant 
+        context="Prospecting"
+        description="Your AI assistant for prospect research and outreach optimization"
+      />
     </div>
   );
 };

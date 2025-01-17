@@ -19,13 +19,21 @@ interface Message {
   content: string;
 }
 
-export const FloatingAIAssistant = () => {
+interface FloatingAIAssistantProps {
+  context?: string;
+  description?: string;
+}
+
+export const FloatingAIAssistant = ({ 
+  context = "Project",
+  description = "Your personal AI assistant for project-specific insights and tasks"
+}: FloatingAIAssistantProps) => {
   const [input, setInput] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       type: "system",
-      content: "Hello! I'm your AI project assistant. How can I help you today?"
+      content: `Hello! I'm your ${context} Co-pilot. How can I help you today?`
     }
   ]);
 
@@ -68,7 +76,7 @@ export const FloatingAIAssistant = () => {
           <div className="flex items-center justify-between">
             <SheetTitle className="flex items-center gap-2">
               <BrainCircuit className="h-5 w-5 text-primary" />
-              Project Co-pilot
+              {context} Co-pilot
             </SheetTitle>
             <Button
               variant="ghost"
@@ -80,7 +88,7 @@ export const FloatingAIAssistant = () => {
             </Button>
           </div>
           <p className="text-sm text-muted-foreground">
-            Your personal AI assistant for project-specific insights and tasks
+            {description}
           </p>
         </SheetHeader>
 
