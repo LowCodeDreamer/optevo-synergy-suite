@@ -12,6 +12,7 @@ import { ProjectCreationFlow } from "@/components/project/ProjectCreationFlow";
 import { ProjectsLoadingState } from "@/components/project/ProjectsLoadingState";
 import { ProjectsErrorState } from "@/components/project/ProjectsErrorState";
 import { ProjectsHeader } from "@/components/project/ProjectsHeader";
+import { Button } from "@/components/ui/button";
 
 export const Projects = () => {
   const [isNewViewDialogOpen, setIsNewViewDialogOpen] = useState(false);
