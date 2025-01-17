@@ -13,8 +13,6 @@ import { CopilotCanvas } from "@/components/copilot/CopilotCanvas";
 import { NewProjectViewDialog } from "@/components/project/NewProjectViewDialog";
 import { ProjectCreationFlow } from "@/components/project/ProjectCreationFlow";
 import { Button } from "@/components/ui/button";
-import { ProjectPlanner } from "@/components/project/ProjectPlanner";
-import { MilestonePlanner } from "@/components/project/MilestonePlanner";
 
 export const Projects = () => {
   const [isNewViewDialogOpen, setIsNewViewDialogOpen] = useState(false);
@@ -39,11 +37,6 @@ export const Projects = () => {
       return data;
     },
   });
-
-  // Filter projects at risk (for example, those past due date)
-  const atRiskProjects = projects?.filter(project => 
-    project.end_date && new Date(project.end_date) < new Date()
-  ) || [];
 
   if (projectsLoading) {
     return (
@@ -97,27 +90,13 @@ export const Projects = () => {
         </div>
       </div>
 
-      <Tabs defaultValue="planner" className="space-y-6">
+      <Tabs defaultValue="management" className="space-y-6">
         <TabsList className="flex-wrap">
-          <TabsTrigger value="planner">Project Planner</TabsTrigger>
-          <TabsTrigger value="milestones">Milestone Planning</TabsTrigger>
-          <TabsTrigger value="copilot">Co-pilot</TabsTrigger>
           <TabsTrigger value="management">Management View</TabsTrigger>
           <TabsTrigger value="all">All Projects</TabsTrigger>
           <TabsTrigger value="active">Active Projects</TabsTrigger>
+          <TabsTrigger value="copilot">Co-pilot</TabsTrigger>
         </TabsList>
-
-        <TabsContent value="planner">
-          <ProjectPlanner />
-        </TabsContent>
-
-        <TabsContent value="milestones">
-          <MilestonePlanner />
-        </TabsContent>
-
-        <TabsContent value="copilot">
-          <CopilotCanvas />
-        </TabsContent>
 
         <TabsContent value="management">
           <div className="grid gap-6">
@@ -136,13 +115,16 @@ export const Projects = () => {
             <ActiveProjectsCard projects={projects || []} />
           </div>
         </TabsContent>
+
+        <TabsContent value="copilot">
+          <CopilotCanvas />
+        </TabsContent>
       </Tabs>
 
       <NewProjectViewDialog
         isOpen={isNewViewDialogOpen}
         onClose={() => setIsNewViewDialogOpen(false)}
         onViewCreated={() => {
-          // Handle view creation
           setIsNewViewDialogOpen(false);
         }}
       />
