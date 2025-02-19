@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Tables } from "@/integrations/supabase/types";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { DollarSign, Percent, Info, Building2, User } from "lucide-react";
+import { DollarSign, Percent, Info, Building2, User, Edit, ArrowRight } from "lucide-react";
 import {
   HoverCard,
   HoverCardContent,
@@ -14,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { OpportunityEditSheet } from "./OpportunityEditSheet";
+import { Button } from "@/components/ui/button";
 
 interface OpportunitiesPipelineProps {
   opportunities: (Tables<"opportunities"> & {
@@ -61,7 +62,7 @@ const getConfidenceColor = (score: number | null) => {
   return "destructive";
 };
 
-export const OpportunitiesPipeline = ({ opportunities }: OpportunitiesPipelineProps) => {
+const OpportunitiesPipeline = ({ opportunities }: OpportunitiesPipelineProps) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [selectedOpportunity, setSelectedOpportunity] = useState<typeof opportunities[0] | null>(null);
@@ -99,10 +100,14 @@ export const OpportunitiesPipeline = ({ opportunities }: OpportunitiesPipelinePr
     }
   };
 
-  const handleCardClick = (e: React.MouseEvent, opportunity: typeof opportunities[0]) => {
+  const handleEditClick = (e: React.MouseEvent, opportunity: typeof opportunities[0]) => {
     e.preventDefault();
     e.stopPropagation();
     setSelectedOpportunity(opportunity);
+  };
+
+  const handleCardClick = (opportunity: typeof opportunities[0]) => {
+    navigate(`/opportunities/${opportunity.id}`);
   };
 
   return (
@@ -123,15 +128,35 @@ export const OpportunitiesPipeline = ({ opportunities }: OpportunitiesPipelinePr
               {opportunitiesByStage[stage].map((opportunity) => (
                 <Card 
                   key={opportunity.id} 
-                  className="p-4 cursor-move hover:bg-muted/50 transition-colors"
+                  className="p-4 cursor-pointer hover:bg-muted/50 transition-colors"
                   draggable
                   onDragStart={(e) => handleDragStart(e, opportunity)}
-                  onClick={(e) => handleCardClick(e, opportunity)}
+                  onClick={() => handleCardClick(opportunity)}
                 >
                   <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <Building2 className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">{opportunity.organization?.name}</span>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Building2 className="h-4 w-4 text-muted-foreground" />
+                        <span className="font-medium">{opportunity.organization?.name}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={(e) => handleEditClick(e, opportunity)}
+                          className="h-8 w-8"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={() => handleCardClick(opportunity)}
+                          className="h-8 w-8"
+                        >
+                          <ArrowRight className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <User className="h-4 w-4" />
@@ -199,3 +224,5 @@ export const OpportunitiesPipeline = ({ opportunities }: OpportunitiesPipelinePr
     </>
   );
 };
+
+export default OpportunitiesPipeline;

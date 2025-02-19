@@ -1,4 +1,3 @@
-
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,6 +7,7 @@ import { OpportunityEditSheet } from "@/components/opportunities/OpportunityEdit
 import { OpportunityHeader } from "@/components/opportunities/details/OpportunityHeader";
 import { OpportunityOverview } from "@/components/opportunities/details/OpportunityOverview";
 import { OpportunitySidebar } from "@/components/opportunities/details/OpportunitySidebar";
+import { OpportunityRecords } from "@/components/opportunities/details/OpportunityRecords";
 import type { Database } from "@/integrations/supabase/types";
 
 type OpportunityWithRelations = Database["public"]["Tables"]["opportunities"]["Row"] & {
@@ -113,6 +113,8 @@ const OpportunityDetails = () => {
           aiInsights={aiInsights}
         />
       </div>
+
+      <OpportunityRecords opportunity={opportunity} />
 
       {isEditSheetOpen && (
         <OpportunityEditSheet
