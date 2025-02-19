@@ -1,3 +1,4 @@
+
 import { Tables } from "@/integrations/supabase/types";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +10,9 @@ import {
 } from "@/components/ui/hover-card";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 interface OpportunitiesPipelineProps {
   opportunities: (Tables<"opportunities"> & {
@@ -58,16 +62,51 @@ const getConfidenceColor = (score: number | null) => {
 
 export const OpportunitiesPipeline = ({ opportunities }: OpportunitiesPipelineProps) => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   
   const opportunitiesByStage = PIPELINE_STAGES.reduce((acc, stage) => {
     acc[stage] = opportunities.filter((opp) => opp.pipeline_stage === stage);
     return acc;
   }, {} as Record<typeof PIPELINE_STAGES[number], typeof opportunities>);
 
+  const handleDragStart = (e: React.DragEvent, opportunity: typeof opportunities[0]) => {
+    e.dataTransfer.setData("opportunity_id", opportunity.id);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = async (e: React.DragEvent, newStage: typeof PIPELINE_STAGES[number]) => {
+    e.preventDefault();
+    const opportunityId = e.dataTransfer.getData("opportunity_id");
+    
+    try {
+      const { error } = await supabase
+        .from("opportunities")
+        .update({ pipeline_stage: newStage })
+        .eq("id", opportunityId);
+
+      if (error) throw error;
+
+      // Invalidate and refetch opportunities query
+      await queryClient.invalidateQueries({ queryKey: ["opportunities"] });
+      toast.success(`Opportunity moved to ${newStage}`);
+    } catch (error) {
+      console.error("Error updating opportunity stage:", error);
+      toast.error("Failed to update opportunity stage");
+    }
+  };
+
   return (
     <div className="grid grid-cols-7 gap-4">
       {PIPELINE_STAGES.map((stage) => (
-        <div key={stage} className="flex flex-col gap-4">
+        <div 
+          key={stage} 
+          className="flex flex-col gap-4"
+          onDragOver={handleDragOver}
+          onDrop={(e) => handleDrop(e, stage)}
+        >
           <div className="flex items-center justify-between">
             <h3 className="font-semibold capitalize">{stage}</h3>
             <Badge variant="outline">{opportunitiesByStage[stage].length}</Badge>
@@ -76,7 +115,9 @@ export const OpportunitiesPipeline = ({ opportunities }: OpportunitiesPipelinePr
             {opportunitiesByStage[stage].map((opportunity) => (
               <Card 
                 key={opportunity.id} 
-                className="p-4 cursor-pointer hover:bg-muted/50"
+                className="p-4 cursor-move hover:bg-muted/50 transition-colors"
+                draggable
+                onDragStart={(e) => handleDragStart(e, opportunity)}
                 onClick={() => navigate(`/opportunities/${opportunity.id}`)}
               >
                 <div className="space-y-2">
