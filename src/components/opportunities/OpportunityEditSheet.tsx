@@ -5,12 +5,29 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useForm } from "react-hook-form";
 import { Tables } from "@/integrations/supabase/types";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { format } from "date-fns";
+
+const PIPELINE_STAGES = [
+  "qualification",
+  "discovery",
+  "proposal",
+  "negotiation",
+  "closing",
+  "won",
+  "lost",
+] as const;
 
 interface OpportunityEditSheetProps {
   opportunity: Tables<"opportunities"> & {
@@ -32,6 +49,7 @@ export const OpportunityEditSheet = ({ opportunity, isOpen, onClose }: Opportuni
       description: opportunity.description || "",
       expected_value: opportunity.expected_value?.toString() || "",
       probability: opportunity.probability?.toString() || "",
+      pipeline_stage: opportunity.pipeline_stage,
       expected_close_date: opportunity.expected_close_date ? 
         format(new Date(opportunity.expected_close_date), "yyyy-MM-dd") : "",
       next_steps: opportunity.next_steps || "",
@@ -48,6 +66,7 @@ export const OpportunityEditSheet = ({ opportunity, isOpen, onClose }: Opportuni
           description: values.description,
           expected_value: values.expected_value ? parseFloat(values.expected_value) : null,
           probability: values.probability ? parseInt(values.probability) : null,
+          pipeline_stage: values.pipeline_stage,
           expected_close_date: values.expected_close_date || null,
           next_steps: values.next_steps,
         })
@@ -83,6 +102,33 @@ export const OpportunityEditSheet = ({ opportunity, isOpen, onClose }: Opportuni
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="pipeline_stage"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Pipeline Stage</FormLabel>
+                  <Select 
+                    onValueChange={field.onChange} 
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a stage" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {PIPELINE_STAGES.map((stage) => (
+                        <SelectItem key={stage} value={stage}>
+                          {stage.charAt(0).toUpperCase() + stage.slice(1)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </FormItem>
               )}
             />
