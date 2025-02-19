@@ -1,26 +1,14 @@
+
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { OpportunityEditSheet } from "@/components/opportunities/OpportunityEditSheet";
-import {
-  Target,
-  User,
-  Calendar,
-  DollarSign,
-  Percent,
-  Info,
-  Edit,
-  Trash,
-} from "lucide-react";
-import { format } from "date-fns";
 import { useToast } from "@/components/ui/use-toast";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Database } from "@/integrations/supabase/types";
 import { useState } from "react";
+import { OpportunityEditSheet } from "@/components/opportunities/OpportunityEditSheet";
+import { OpportunityHeader } from "@/components/opportunities/details/OpportunityHeader";
+import { OpportunityOverview } from "@/components/opportunities/details/OpportunityOverview";
+import { OpportunitySidebar } from "@/components/opportunities/details/OpportunitySidebar";
+import type { Database } from "@/integrations/supabase/types";
 
 type OpportunityWithRelations = Database["public"]["Tables"]["opportunities"]["Row"] & {
   organization: {
@@ -84,29 +72,7 @@ const OpportunityDetails = () => {
     );
   }
 
-  const getPipelineStageColor = (stage: string) => {
-    switch (stage) {
-      case "qualification":
-        return "default";
-      case "discovery":
-        return "secondary";
-      case "proposal":
-        return "default";
-      case "negotiation":
-        return "destructive";
-      case "closing":
-        return "secondary";
-      case "won":
-        return "default";
-      case "lost":
-        return "destructive";
-      default:
-        return "default";
-    }
-  };
-
   const handleDelete = async () => {
-    // To be implemented
     toast({
       title: "Not implemented",
       description: "Delete functionality coming soon",
@@ -123,179 +89,29 @@ const OpportunityDetails = () => {
 
   return (
     <div className="container mx-auto py-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <h1 className="text-3xl font-bold tracking-tight">
-            {opportunity.name}
-          </h1>
-          <p className="text-muted-foreground">
-            {opportunity.organization?.name}
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button 
-            variant="outline" 
-            size="icon"
-            onClick={() => setIsEditSheetOpen(true)}
-          >
-            <Edit className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={handleDelete}
-          >
-            <Trash className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
+      <OpportunityHeader
+        name={opportunity.name}
+        organizationName={opportunity.organization?.name}
+        onEdit={() => setIsEditSheetOpen(true)}
+        onDelete={handleDelete}
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="md:col-span-2 p-6 space-y-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Target className="h-5 w-5 text-muted-foreground" />
-              <span className="font-medium">Deal Overview</span>
-            </div>
-            <Badge variant={getPipelineStageColor(opportunity.pipeline_stage)}>
-              {opportunity.pipeline_stage}
-            </Badge>
-          </div>
+        <OpportunityOverview
+          pipeline_stage={opportunity.pipeline_stage}
+          expected_value={opportunity.expected_value}
+          probability={opportunity.probability}
+          expected_close_date={opportunity.expected_close_date}
+          owner={opportunity.owner}
+          description={opportunity.description}
+          next_steps={opportunity.next_steps}
+        />
 
-          <Separator />
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <p className="text-sm text-muted-foreground">Expected Value</p>
-              <div className="flex items-center gap-1">
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
-                <span className="font-medium">
-                  {opportunity.expected_value?.toLocaleString()}
-                </span>
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <p className="text-sm text-muted-foreground">Probability</p>
-              <div className="flex items-center gap-1">
-                <Percent className="h-4 w-4 text-muted-foreground" />
-                <span className="font-medium">{opportunity.probability}%</span>
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <p className="text-sm text-muted-foreground">Expected Close</p>
-              <div className="flex items-center gap-1">
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span className="font-medium">
-                  {opportunity.expected_close_date
-                    ? format(new Date(opportunity.expected_close_date), "MMM d, yyyy")
-                    : "Not set"}
-                </span>
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <p className="text-sm text-muted-foreground">Owner</p>
-              <div className="flex items-center gap-1">
-                <User className="h-4 w-4 text-muted-foreground" />
-                <span className="font-medium">
-                  {opportunity.owner?.username || "Unassigned"}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {opportunity.description && (
-            <>
-              <Separator />
-              <div className="space-y-2">
-                <h3 className="font-medium">Description</h3>
-                <p className="text-muted-foreground">{opportunity.description}</p>
-              </div>
-            </>
-          )}
-
-          {opportunity.next_steps && (
-            <>
-              <Separator />
-              <div className="space-y-2">
-                <h3 className="font-medium">Next Steps</h3>
-                <p className="text-muted-foreground">{opportunity.next_steps}</p>
-              </div>
-            </>
-          )}
-        </Card>
-
-        <div className="space-y-6">
-          <Card className="p-6 space-y-4">
-            <div className="flex items-center gap-2">
-              <span className="font-medium">Organization Details</span>
-            </div>
-            <Separator />
-            <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">Industry</p>
-              <p className="font-medium">{opportunity.organization?.industry}</p>
-            </div>
-            {opportunity.organization?.website && (
-              <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">Website</p>
-                <a
-                  href={opportunity.organization.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary hover:underline"
-                >
-                  {opportunity.organization.website}
-                </a>
-              </div>
-            )}
-          </Card>
-
-          {opportunity.primary_contact && (
-            <Card className="p-6 space-y-4">
-              <div className="flex items-center gap-2">
-                <span className="font-medium">Primary Contact</span>
-              </div>
-              <Separator />
-              <div className="space-y-2">
-                <p className="font-medium">
-                  {opportunity.primary_contact.first_name}{" "}
-                  {opportunity.primary_contact.last_name}
-                </p>
-                {opportunity.primary_contact.email && (
-                  <p className="text-sm text-muted-foreground">
-                    {opportunity.primary_contact.email}
-                  </p>
-                )}
-                {opportunity.primary_contact.phone && (
-                  <p className="text-sm text-muted-foreground">
-                    {opportunity.primary_contact.phone}
-                  </p>
-                )}
-              </div>
-            </Card>
-          )}
-
-          {aiInsights.length > 0 && (
-            <Card className="p-6 space-y-4">
-              <div className="flex items-center gap-2">
-                <Info className="h-4 w-4 text-muted-foreground" />
-                <span className="font-medium">AI Insights</span>
-              </div>
-              <Separator />
-              <ScrollArea className="h-[200px] w-full">
-                <div className="space-y-2">
-                  {aiInsights.map((point, index) => (
-                    <p key={index} className="text-sm text-muted-foreground">
-                      • {point}
-                    </p>
-                  ))}
-                </div>
-              </ScrollArea>
-            </Card>
-          )}
-        </div>
+        <OpportunitySidebar
+          organization={opportunity.organization}
+          primary_contact={opportunity.primary_contact}
+          aiInsights={aiInsights}
+        />
       </div>
 
       {isEditSheetOpen && (
