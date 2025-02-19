@@ -1,8 +1,8 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ContactTasks } from "@/components/contact/records/ContactTasks";
-import { ContactNotes } from "@/components/contact/records/ContactNotes";
-import { ContactActivityFeed } from "@/components/contact/ContactActivityFeed";
+import { OpportunityTasks } from "@/components/opportunities/records/OpportunityTasks";
+import { OpportunityNotes } from "@/components/opportunities/records/OpportunityNotes";
+import { OpportunityActivities } from "@/components/opportunities/records/OpportunityActivities";
 import { Card } from "@/components/ui/card";
 import { Tables } from "@/integrations/supabase/types";
 
@@ -23,15 +23,15 @@ export const OpportunityRecords = ({ opportunity }: OpportunityRecordsProps) => 
         </TabsList>
 
         <TabsContent value="tasks" className="mt-0">
-          <ContactTasks contact={{ organization: opportunity.organization }} />
+          <OpportunityTasks opportunity={opportunity} />
         </TabsContent>
 
         <TabsContent value="notes" className="mt-0">
-          <ContactNotes contact={{ organization: opportunity.organization }} />
+          <OpportunityNotes opportunity={opportunity} />
         </TabsContent>
 
         <TabsContent value="activities" className="mt-0">
-          <ContactActivityFeed contact={{ organization: opportunity.organization }} />
+          <OpportunityActivities opportunity={opportunity} />
         </TabsContent>
       </Tabs>
     </Card>
