@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { OpportunityEditSheet } from "@/components/opportunities/OpportunityEditSheet";
 import {
   Target,
   User,
@@ -19,6 +20,7 @@ import { format } from "date-fns";
 import { useToast } from "@/components/ui/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Database } from "@/integrations/supabase/types";
+import { useState } from "react";
 
 type OpportunityWithRelations = Database["public"]["Tables"]["opportunities"]["Row"] & {
   organization: {
@@ -41,6 +43,7 @@ type OpportunityWithRelations = Database["public"]["Tables"]["opportunities"]["R
 const OpportunityDetails = () => {
   const { id } = useParams();
   const { toast } = useToast();
+  const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
 
   const { data: opportunity } = useQuery({
     queryKey: ["opportunity", id],
@@ -110,7 +113,6 @@ const OpportunityDetails = () => {
     });
   };
 
-  // Parse AI insights if they exist and are in the correct format
   const aiInsights = (() => {
     if (!opportunity.ai_insights) return [];
     if (typeof opportunity.ai_insights === 'object' && 'key_points' in opportunity.ai_insights) {
@@ -121,7 +123,6 @@ const OpportunityDetails = () => {
 
   return (
     <div className="container mx-auto py-6 space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="space-y-1">
           <h1 className="text-3xl font-bold tracking-tight">
@@ -132,7 +133,11 @@ const OpportunityDetails = () => {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon">
+          <Button 
+            variant="outline" 
+            size="icon"
+            onClick={() => setIsEditSheetOpen(true)}
+          >
             <Edit className="h-4 w-4" />
           </Button>
           <Button
@@ -146,7 +151,6 @@ const OpportunityDetails = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Main Info */}
         <Card className="md:col-span-2 p-6 space-y-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -223,9 +227,7 @@ const OpportunityDetails = () => {
           )}
         </Card>
 
-        {/* Sidebar */}
         <div className="space-y-6">
-          {/* Organization Info */}
           <Card className="p-6 space-y-4">
             <div className="flex items-center gap-2">
               <span className="font-medium">Organization Details</span>
@@ -250,7 +252,6 @@ const OpportunityDetails = () => {
             )}
           </Card>
 
-          {/* Primary Contact */}
           {opportunity.primary_contact && (
             <Card className="p-6 space-y-4">
               <div className="flex items-center gap-2">
@@ -276,7 +277,6 @@ const OpportunityDetails = () => {
             </Card>
           )}
 
-          {/* AI Insights */}
           {aiInsights.length > 0 && (
             <Card className="p-6 space-y-4">
               <div className="flex items-center gap-2">
@@ -297,6 +297,14 @@ const OpportunityDetails = () => {
           )}
         </div>
       </div>
+
+      {isEditSheetOpen && (
+        <OpportunityEditSheet
+          opportunity={opportunity}
+          isOpen={isEditSheetOpen}
+          onClose={() => setIsEditSheetOpen(false)}
+        />
+      )}
     </div>
   );
 };
