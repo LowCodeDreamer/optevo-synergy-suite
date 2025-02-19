@@ -1,4 +1,4 @@
-
+import { useState } from "react";
 import { Tables } from "@/integrations/supabase/types";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { OpportunityEditSheet } from "./OpportunityEditSheet";
 
 interface OpportunitiesPipelineProps {
   opportunities: (Tables<"opportunities"> & {
@@ -29,7 +30,7 @@ const PIPELINE_STAGES = [
   "negotiation",
   "closing",
   "won",
-  "lost",
+  "lost"
 ] as const;
 
 const getPipelineStageColor = (stage: string) => {
@@ -63,6 +64,7 @@ const getConfidenceColor = (score: number | null) => {
 export const OpportunitiesPipeline = ({ opportunities }: OpportunitiesPipelineProps) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [selectedOpportunity, setSelectedOpportunity] = useState<typeof opportunities[0] | null>(null);
   
   const opportunitiesByStage = PIPELINE_STAGES.reduce((acc, stage) => {
     acc[stage] = opportunities.filter((opp) => opp.pipeline_stage === stage);
@@ -89,7 +91,6 @@ export const OpportunitiesPipeline = ({ opportunities }: OpportunitiesPipelinePr
 
       if (error) throw error;
 
-      // Invalidate and refetch opportunities query
       await queryClient.invalidateQueries({ queryKey: ["opportunities"] });
       toast.success(`Opportunity moved to ${newStage}`);
     } catch (error) {
@@ -98,87 +99,103 @@ export const OpportunitiesPipeline = ({ opportunities }: OpportunitiesPipelinePr
     }
   };
 
+  const handleCardClick = (e: React.MouseEvent, opportunity: typeof opportunities[0]) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setSelectedOpportunity(opportunity);
+  };
+
   return (
-    <div className="grid grid-cols-7 gap-4">
-      {PIPELINE_STAGES.map((stage) => (
-        <div 
-          key={stage} 
-          className="flex flex-col gap-4"
-          onDragOver={handleDragOver}
-          onDrop={(e) => handleDrop(e, stage)}
-        >
-          <div className="flex items-center justify-between">
-            <h3 className="font-semibold capitalize">{stage}</h3>
-            <Badge variant="outline">{opportunitiesByStage[stage].length}</Badge>
-          </div>
-          <div className="space-y-4">
-            {opportunitiesByStage[stage].map((opportunity) => (
-              <Card 
-                key={opportunity.id} 
-                className="p-4 cursor-move hover:bg-muted/50 transition-colors"
-                draggable
-                onDragStart={(e) => handleDragStart(e, opportunity)}
-                onClick={() => navigate(`/opportunities/${opportunity.id}`)}
-              >
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <Building2 className="h-4 w-4 text-muted-foreground" />
-                    <span className="font-medium">{opportunity.organization?.name}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <User className="h-4 w-4" />
-                    <span>{opportunity.owner?.username || "Unassigned"}</span>
-                  </div>
-                  {opportunity.expected_close_date && (
-                    <div className="text-sm text-muted-foreground">
-                      Closing: {format(new Date(opportunity.expected_close_date), "MMM d, yyyy")}
+    <>
+      <div className="grid grid-cols-7 gap-4">
+        {PIPELINE_STAGES.map((stage) => (
+          <div 
+            key={stage} 
+            className="flex flex-col gap-4"
+            onDragOver={handleDragOver}
+            onDrop={(e) => handleDrop(e, stage)}
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold capitalize">{stage}</h3>
+              <Badge variant="outline">{opportunitiesByStage[stage].length}</Badge>
+            </div>
+            <div className="space-y-4">
+              {opportunitiesByStage[stage].map((opportunity) => (
+                <Card 
+                  key={opportunity.id} 
+                  className="p-4 cursor-move hover:bg-muted/50 transition-colors"
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, opportunity)}
+                  onClick={(e) => handleCardClick(e, opportunity)}
+                >
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Building2 className="h-4 w-4 text-muted-foreground" />
+                      <span className="font-medium">{opportunity.organization?.name}</span>
                     </div>
-                  )}
-                  <div className="flex flex-wrap gap-2">
-                    {opportunity.expected_value && (
-                      <Badge variant="outline" className="gap-1">
-                        <DollarSign className="h-3 w-3" />
-                        {opportunity.expected_value.toLocaleString()}
-                      </Badge>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <User className="h-4 w-4" />
+                      <span>{opportunity.owner?.username || "Unassigned"}</span>
+                    </div>
+                    {opportunity.expected_close_date && (
+                      <div className="text-sm text-muted-foreground">
+                        Closing: {format(new Date(opportunity.expected_close_date), "MMM d, yyyy")}
+                      </div>
                     )}
-                    {opportunity.probability && (
-                      <Badge variant="outline" className="gap-1">
-                        <Percent className="h-3 w-3" />
-                        {opportunity.probability}%
-                      </Badge>
-                    )}
-                    {opportunity.confidence_score && (
-                      <Badge
-                        variant={getConfidenceColor(opportunity.confidence_score)}
-                        className="gap-1"
-                      >
-                        AI: {opportunity.confidence_score}%
-                      </Badge>
-                    )}
-                    {opportunity.ai_insights && (
-                      <HoverCard>
-                        <HoverCardTrigger>
-                          <Badge variant="outline" className="cursor-help">
-                            <Info className="h-3 w-3" />
-                          </Badge>
-                        </HoverCardTrigger>
-                        <HoverCardContent className="w-80">
-                          <div className="space-y-2">
-                            <h4 className="font-medium">AI Insights</h4>
-                            <div className="text-sm text-muted-foreground">
-                              {JSON.stringify(opportunity.ai_insights)}
+                    <div className="flex flex-wrap gap-2">
+                      {opportunity.expected_value && (
+                        <Badge variant="outline" className="gap-1">
+                          <DollarSign className="h-3 w-3" />
+                          {opportunity.expected_value.toLocaleString()}
+                        </Badge>
+                      )}
+                      {opportunity.probability && (
+                        <Badge variant="outline" className="gap-1">
+                          <Percent className="h-3 w-3" />
+                          {opportunity.probability}%
+                        </Badge>
+                      )}
+                      {opportunity.confidence_score && (
+                        <Badge
+                          variant={getConfidenceColor(opportunity.confidence_score)}
+                          className="gap-1"
+                        >
+                          AI: {opportunity.confidence_score}%
+                        </Badge>
+                      )}
+                      {opportunity.ai_insights && (
+                        <HoverCard>
+                          <HoverCardTrigger>
+                            <Badge variant="outline" className="cursor-help">
+                              <Info className="h-3 w-3" />
+                            </Badge>
+                          </HoverCardTrigger>
+                          <HoverCardContent className="w-80">
+                            <div className="space-y-2">
+                              <h4 className="font-medium">AI Insights</h4>
+                              <div className="text-sm text-muted-foreground">
+                                {JSON.stringify(opportunity.ai_insights)}
+                              </div>
                             </div>
-                          </div>
-                        </HoverCardContent>
-                      </HoverCard>
-                    )}
+                          </HoverCardContent>
+                        </HoverCard>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </Card>
-            ))}
+                </Card>
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
-    </div>
+        ))}
+      </div>
+
+      {selectedOpportunity && (
+        <OpportunityEditSheet
+          opportunity={selectedOpportunity}
+          isOpen={!!selectedOpportunity}
+          onClose={() => setSelectedOpportunity(null)}
+        />
+      )}
+    </>
   );
 };
