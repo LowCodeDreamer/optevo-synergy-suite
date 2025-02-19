@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
@@ -12,7 +13,7 @@ export const Sidebar = () => {
 
   return (
     <div className={cn(
-      "fixed left-0 top-0 h-screen bg-primary transition-all duration-300 z-50",
+      "h-screen bg-primary transition-all duration-300",
       isCollapsed ? "w-16" : "w-64"
     )}>
       <div className="flex justify-between items-center p-4 mb-8">
