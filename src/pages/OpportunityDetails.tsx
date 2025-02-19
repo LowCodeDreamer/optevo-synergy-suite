@@ -1,3 +1,4 @@
+
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,12 +10,21 @@ import { OpportunityOverview } from "@/components/opportunities/details/Opportun
 import { OpportunitySidebar } from "@/components/opportunities/details/OpportunitySidebar";
 import { OpportunityRecords } from "@/components/opportunities/details/OpportunityRecords";
 import type { Database } from "@/integrations/supabase/types";
+import type { Json } from "@/integrations/supabase/types";
 
 type OpportunityWithRelations = Database["public"]["Tables"]["opportunities"]["Row"] & {
   organization: {
+    id: string;
     name: string;
     website: string | null;
     industry: string | null;
+    description: string | null;
+    created_at: string;
+    updated_at: string;
+    created_by: string | null;
+    owner_id: string | null;
+    prospect_id: string | null;
+    status: Database["public"]["Enums"]["entity_lifecycle_stage"];
   } | null;
   owner: {
     username: string | null;
@@ -41,9 +51,17 @@ const OpportunityDetails = () => {
         .select(`
           *,
           organization:organizations (
+            id,
             name,
             website,
-            industry
+            industry,
+            description,
+            created_at,
+            updated_at,
+            created_by,
+            owner_id,
+            prospect_id,
+            status
           ),
           owner:profiles!opportunities_owner_id_fkey (
             username,

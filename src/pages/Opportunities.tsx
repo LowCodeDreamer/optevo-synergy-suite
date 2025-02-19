@@ -1,9 +1,10 @@
+
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
 import { FloatingAIAssistant } from "@/components/dashboard/FloatingAIAssistant";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { OpportunitiesPipeline } from "@/components/opportunities/OpportunitiesPipeline";
+import OpportunitiesPipeline from "@/components/opportunities/OpportunitiesPipeline";
 import { OpportunitiesList } from "@/components/opportunities/OpportunitiesList";
 import { OpportunitiesAnalytics } from "@/components/opportunities/OpportunitiesAnalytics";
 
