@@ -1,3 +1,4 @@
+
 import { Tables } from "@/integrations/supabase/types";
 import {
   Table,
@@ -27,13 +28,13 @@ export const OpportunitiesList = ({ opportunities }: OpportunitiesListProps) => 
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Name</TableHead>
-          <TableHead>Organization</TableHead>
-          <TableHead>Stage</TableHead>
-          <TableHead>Value</TableHead>
-          <TableHead>Probability</TableHead>
-          <TableHead>Owner</TableHead>
-          <TableHead>Expected Close</TableHead>
+          <TableHead className="min-w-[200px]">Name</TableHead>
+          <TableHead className="min-w-[200px]">Organization</TableHead>
+          <TableHead className="min-w-[120px]">Stage</TableHead>
+          <TableHead className="min-w-[120px]">Value</TableHead>
+          <TableHead className="min-w-[120px]">Probability</TableHead>
+          <TableHead className="min-w-[150px]">Owner</TableHead>
+          <TableHead className="min-w-[150px]">Expected Close</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>

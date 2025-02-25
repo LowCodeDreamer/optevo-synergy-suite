@@ -116,7 +116,7 @@ const OpportunitiesPipeline = ({ opportunities }: OpportunitiesPipelineProps) =>
         {PIPELINE_STAGES.map((stage) => (
           <div 
             key={stage} 
-            className="flex flex-col gap-4"
+            className="min-w-[250px] flex flex-col gap-4"
             onDragOver={handleDragOver}
             onDrop={(e) => handleDrop(e, stage)}
           >

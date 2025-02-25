@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import OpportunitiesPipeline from "@/components/opportunities/OpportunitiesPipeline";
 import { OpportunitiesList } from "@/components/opportunities/OpportunitiesList";
 import { OpportunitiesAnalytics } from "@/components/opportunities/OpportunitiesAnalytics";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 const Opportunities = () => {
   const { data: opportunities, isLoading } = useQuery({
@@ -51,13 +52,23 @@ const Opportunities = () => {
 
         <TabsContent value="pipeline">
           <DashboardCard title="Pipeline" className="mb-6">
-            <OpportunitiesPipeline opportunities={opportunities || []} />
+            <ScrollArea className="w-full whitespace-nowrap rounded-md">
+              <div className="min-w-[1200px]">
+                <OpportunitiesPipeline opportunities={opportunities || []} />
+              </div>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
           </DashboardCard>
         </TabsContent>
 
         <TabsContent value="list">
           <DashboardCard title="All Opportunities" className="mb-6">
-            <OpportunitiesList opportunities={opportunities || []} />
+            <ScrollArea className="w-full whitespace-nowrap rounded-md">
+              <div className="min-w-[900px]">
+                <OpportunitiesList opportunities={opportunities || []} />
+              </div>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
           </DashboardCard>
         </TabsContent>
 
