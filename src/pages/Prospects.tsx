@@ -1,3 +1,4 @@
+
 import { ProspectList } from "@/components/dashboard/ProspectList";
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
 import { FloatingAIAssistant } from "@/components/dashboard/FloatingAIAssistant";
@@ -6,8 +7,10 @@ import { CopilotCanvas } from "@/components/copilot/CopilotCanvas";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ManagementView } from "@/components/dashboard/prospects/ManagementView";
+import { Route, Routes } from "react-router-dom";
+import ProspectDetails from "./ProspectDetails";
 
-const Prospects = () => {
+const ProspectsPage = () => {
   const { data: prospects } = useQuery({
     queryKey: ["prospects"],
     queryFn: async () => {
@@ -63,6 +66,15 @@ const Prospects = () => {
         description="Your AI assistant for prospect research and outreach optimization"
       />
     </div>
+  );
+};
+
+const Prospects = () => {
+  return (
+    <Routes>
+      <Route path="/" element={<ProspectsPage />} />
+      <Route path="/:id" element={<ProspectDetails />} />
+    </Routes>
   );
 };
 

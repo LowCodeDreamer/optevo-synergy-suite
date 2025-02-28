@@ -1,3 +1,4 @@
+
 import { ArrowLeft } from "lucide-react";
 import {
   Dialog,
@@ -13,6 +14,7 @@ import { ProspectActivities } from "./ProspectActivities";
 import { ProspectNotes } from "./ProspectNotes";
 import { ProspectTasks } from "./ProspectTasks";
 import { ProspectOverview } from "./prospect-card/ProspectOverview";
+import { useNavigate } from "react-router-dom";
 
 interface ProspectCardProps {
   prospect: Tables<"prospects"> | null;
@@ -29,7 +31,14 @@ export const ProspectCard = ({
   onApprove,
   onReject,
 }: ProspectCardProps) => {
+  const navigate = useNavigate();
+  
   if (!prospect) return null;
+
+  const handleViewDetails = () => {
+    onClose();
+    navigate(`/prospects/${prospect.id}`);
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={() => onClose()}>
@@ -39,9 +48,14 @@ export const ProspectCard = ({
             <DialogTitle className="text-2xl font-bold">
               {prospect.company_name}
             </DialogTitle>
-            <Button variant="ghost" size="icon" onClick={onClose}>
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={handleViewDetails}>
+                View Details
+              </Button>
+              <Button variant="ghost" size="icon" onClick={onClose}>
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </DialogHeader>
 
