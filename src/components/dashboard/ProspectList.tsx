@@ -1,9 +1,9 @@
+
 import { useState } from "react";
 import { Tables } from "@/integrations/supabase/types";
 import { ProspectCard } from "./ProspectCard";
 import { ProspectsTable } from "./ProspectsTable";
 import { useProspects } from "@/hooks/use-prospects";
-import { useNavigate } from "react-router-dom";
 
 interface ProspectListProps {
   initialProspects?: Tables<"prospects">[];
@@ -12,7 +12,6 @@ interface ProspectListProps {
 export const ProspectList = ({ initialProspects }: ProspectListProps) => {
   const [selectedProspect, setSelectedProspect] = useState<Tables<"prospects"> | null>(null);
   const { prospects, handleApprove, handleReject } = useProspects();
-  const navigate = useNavigate();
 
   const displayProspects = initialProspects || prospects;
 
@@ -21,7 +20,7 @@ export const ProspectList = ({ initialProspects }: ProspectListProps) => {
   }
 
   const handleSelectProspect = (prospect: Tables<"prospects">) => {
-    navigate(`/prospects/${prospect.id}`);
+    setSelectedProspect(prospect);
   };
 
   return (
