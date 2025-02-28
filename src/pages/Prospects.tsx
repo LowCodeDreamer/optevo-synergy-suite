@@ -7,7 +7,7 @@ import { CopilotCanvas } from "@/components/copilot/CopilotCanvas";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ManagementView } from "@/components/dashboard/prospects/ManagementView";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import ProspectDetails from "./ProspectDetails";
 
 const ProspectsPage = () => {
@@ -70,6 +70,14 @@ const ProspectsPage = () => {
 };
 
 const Prospects = () => {
+  const location = useLocation();
+  // We need to check if we're on a detail page to render the correct component
+  const isDetailPage = location.pathname.split('/').length > 2;
+
+  if (isDetailPage) {
+    return <ProspectDetails />;
+  }
+
   return (
     <Routes>
       <Route path="/" element={<ProspectsPage />} />
