@@ -1,5 +1,5 @@
 
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Edit, Trash } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -26,6 +26,8 @@ interface ProspectCardProps {
   onClose: () => void;
   onApprove: (id: string) => Promise<void>;
   onReject: (id: string) => Promise<void>;
+  onEdit: (prospect: Tables<"prospects">) => void;
+  onDelete: (prospect: Tables<"prospects">) => void;
 }
 
 export const ProspectCard = ({
@@ -34,6 +36,8 @@ export const ProspectCard = ({
   onClose,
   onApprove,
   onReject,
+  onEdit,
+  onDelete,
 }: ProspectCardProps) => {
   const [isNewActivityDialogOpen, setIsNewActivityDialogOpen] = useState(false);
   const [isNewNoteDialogOpen, setIsNewNoteDialogOpen] = useState(false);
@@ -79,6 +83,24 @@ export const ProspectCard = ({
                   onClick={() => setIsNewTaskDialogOpen(true)}
                 >
                   Create Task
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="icon"
+                  onClick={() => onEdit(prospect)}
+                >
+                  <Edit className="h-4 w-4" />
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="icon"
+                  onClick={() => {
+                    onClose();
+                    onDelete(prospect);
+                  }}
+                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                >
+                  <Trash className="h-4 w-4" />
                 </Button>
                 <Button variant="ghost" size="icon" onClick={onClose}>
                   <ArrowLeft className="h-4 w-4" />

@@ -1,4 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
+
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
@@ -6,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 export const useProspects = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const { data: prospects, refetch } = useQuery({
     queryKey: ["prospects"],
@@ -19,6 +21,10 @@ export const useProspects = () => {
       return data;
     },
   });
+
+  const refetchProspects = () => {
+    return queryClient.invalidateQueries({ queryKey: ["prospects"] });
+  };
 
   const handleApprove = async (id: string) => {
     // Start a transaction by using the REST API
@@ -99,7 +105,7 @@ export const useProspects = () => {
         title: "Success",
         description: "Prospect approved and organization created successfully",
       });
-      refetch();
+      refetchProspects();
       // Redirect to the new organization page
       navigate(`/organizations/${organization.id}`);
     }
@@ -122,7 +128,7 @@ export const useProspects = () => {
         title: "Success",
         description: "Prospect rejected successfully",
       });
-      refetch();
+      refetchProspects();
     }
   };
 
@@ -130,5 +136,6 @@ export const useProspects = () => {
     prospects,
     handleApprove,
     handleReject,
+    refetchProspects,
   };
 };

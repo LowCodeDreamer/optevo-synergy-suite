@@ -1,3 +1,13 @@
+
+import { Tables } from "@/integrations/supabase/types";
+import { Button } from "@/components/ui/button";
+import { Check, Edit, MoreHorizontal, Trash, X } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Table,
   TableBody,
@@ -6,26 +16,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ProspectCompany } from "./ProspectCompany";
-import { ProspectContact } from "./ProspectContact";
-import { ProspectActions } from "./ProspectActions";
-import { Tables } from "@/integrations/supabase/types";
-import { Input } from "@/components/ui/input";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { ArrowUpDown } from "lucide-react";
-import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { formatDistanceToNow } from "date-fns";
 
 interface ProspectsTableProps {
   prospects: Tables<"prospects">[];
   onSelectProspect: (prospect: Tables<"prospects">) => void;
   onApprove: (id: string) => Promise<void>;
   onReject: (id: string) => Promise<void>;
+  onEdit: (prospect: Tables<"prospects">) => void;
+  onDelete: (prospect: Tables<"prospects">) => void;
 }
 
 export const ProspectsTable = ({
@@ -33,128 +33,116 @@ export const ProspectsTable = ({
   onSelectProspect,
   onApprove,
   onReject,
+  onEdit,
+  onDelete,
 }: ProspectsTableProps) => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [sortField, setSortField] = useState<keyof Tables<"prospects">>("created_at");
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
-
-  const handleSort = (field: keyof Tables<"prospects">) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
-      setSortDirection("asc");
-    }
-  };
-
-  const filteredAndSortedProspects = prospects
-    .filter((prospect) => {
-      const searchLower = searchTerm.toLowerCase();
-      return (
-        prospect.company_name.toLowerCase().includes(searchLower) ||
-        prospect.contact_name?.toLowerCase().includes(searchLower) ||
-        prospect.contact_email?.toLowerCase().includes(searchLower) ||
-        prospect.status?.toLowerCase().includes(searchLower)
-      );
-    })
-    .sort((a, b) => {
-      const aValue = a[sortField];
-      const bValue = b[sortField];
-      
-      if (aValue === null) return 1;
-      if (bValue === null) return -1;
-      
-      const comparison = aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-      return sortDirection === "asc" ? comparison : -comparison;
-    });
-
   return (
-    <div className="space-y-4">
-      <Input
-        placeholder="Search prospects..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        className="max-w-sm"
-      />
+    <div className="border rounded-md">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="h-8 w-full justify-start">
-                    Company <ArrowUpDown className="ml-2 h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start">
-                  <DropdownMenuItem onClick={() => handleSort("company_name")}>
-                    Sort by name
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleSort("created_at")}>
-                    Sort by date
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </TableHead>
+            <TableHead>Company</TableHead>
             <TableHead>Contact</TableHead>
-            <TableHead>
-              <Button
-                variant="ghost"
-                className="h-8 w-full justify-start"
-                onClick={() => handleSort("fit_score")}
-              >
-                Fit Score <ArrowUpDown className="ml-2 h-4 w-4" />
-              </Button>
-            </TableHead>
-            <TableHead>Potential Services</TableHead>
-            <TableHead>
-              <Button
-                variant="ghost"
-                className="h-8 w-full justify-start"
-                onClick={() => handleSort("status")}
-              >
-                Status <ArrowUpDown className="ml-2 h-4 w-4" />
-              </Button>
-            </TableHead>
-            <TableHead>Actions</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Created</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filteredAndSortedProspects.map((prospect) => (
-            <TableRow
-              key={prospect.id}
-              className="cursor-pointer hover:bg-muted/50"
-              onClick={() => onSelectProspect(prospect)}
-            >
-              <TableCell>
-                <ProspectCompany
-                  name={prospect.company_name}
-                  website={prospect.website}
-                />
-              </TableCell>
-              <TableCell>
-                <ProspectContact
-                  name={prospect.contact_name}
-                  email={prospect.contact_email}
-                  phone={prospect.contact_phone}
-                  linkedinUrl={prospect.linkedin_url}
-                />
-              </TableCell>
-              <TableCell>{prospect.fit_score}/100</TableCell>
-              <TableCell>{prospect.potential_services}</TableCell>
-              <TableCell>{prospect.status}</TableCell>
-              <TableCell onClick={(e) => e.stopPropagation()}>
-                <ProspectActions
-                  id={prospect.id}
-                  status={prospect.status}
-                  emailSent={prospect.email_sent}
-                  meetingScheduled={prospect.meeting_scheduled}
-                  onApprove={onApprove}
-                  onReject={onReject}
-                />
+          {prospects.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                No prospects found.
               </TableCell>
             </TableRow>
-          ))}
+          ) : (
+            prospects.map((prospect) => (
+              <TableRow key={prospect.id}>
+                <TableCell
+                  className="font-medium cursor-pointer hover:underline"
+                  onClick={() => onSelectProspect(prospect)}
+                >
+                  {prospect.company_name}
+                </TableCell>
+                <TableCell>
+                  {prospect.contact_name ? (
+                    <div>
+                      <div>{prospect.contact_name}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {prospect.contact_email}
+                      </div>
+                    </div>
+                  ) : (
+                    "—"
+                  )}
+                </TableCell>
+                <TableCell>
+                  <Badge
+                    variant={
+                      prospect.status === "approved"
+                        ? "default"
+                        : prospect.status === "rejected"
+                        ? "destructive"
+                        : "outline"
+                    }
+                  >
+                    {prospect.status}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  {prospect.created_at
+                    ? formatDistanceToNow(new Date(prospect.created_at), {
+                        addSuffix: true,
+                      })
+                    : "—"}
+                </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex items-center justify-end gap-2">
+                    {prospect.status === "pending" && (
+                      <>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => onApprove(prospect.id)}
+                          className="h-8 w-8"
+                        >
+                          <Check className="h-4 w-4 text-green-500" />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => onReject(prospect.id)}
+                          className="h-8 w-8"
+                        >
+                          <X className="h-4 w-4 text-red-500" />
+                        </Button>
+                      </>
+                    )}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button size="icon" variant="ghost" className="h-8 w-8">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => onEdit(prospect)}>
+                          <Edit className="h-4 w-4 mr-2" />
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={() => onDelete(prospect)}
+                          className="text-destructive focus:text-destructive"
+                        >
+                          <Trash className="h-4 w-4 mr-2" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
         </TableBody>
       </Table>
     </div>
