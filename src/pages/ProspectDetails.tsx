@@ -12,11 +12,14 @@ import { useProspects } from "@/hooks/use-prospects";
 import { Separator } from "@/components/ui/separator";
 
 const ProspectDetails = () => {
-  const { id } = useParams<{ id: string }>();
+  // Get the ID directly from the URL
+  const pathSegments = window.location.pathname.split('/');
+  const id = pathSegments[pathSegments.length - 1];
+  
   const navigate = useNavigate();
   const { handleApprove, handleReject } = useProspects();
   
-  console.log("Current prospect ID from params:", id); // Debug log
+  console.log("Current prospect ID from URL path:", id);
 
   const { data: prospect, isLoading, error } = useQuery({
     queryKey: ["prospect", id],
