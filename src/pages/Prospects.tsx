@@ -78,12 +78,7 @@ const Prospects = () => {
     return <ProspectDetails />;
   }
 
-  return (
-    <Routes>
-      <Route path="/" element={<ProspectsPage />} />
-      <Route path="/:id" element={<ProspectDetails />} />
-    </Routes>
-  );
+  return <ProspectsPage />;
 };
 
 export default Prospects;

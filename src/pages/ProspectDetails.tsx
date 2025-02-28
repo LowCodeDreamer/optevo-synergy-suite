@@ -15,11 +15,16 @@ const ProspectDetails = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { handleApprove, handleReject } = useProspects();
+  
+  console.log("Current prospect ID from params:", id); // Debug log
 
   const { data: prospect, isLoading, error } = useQuery({
     queryKey: ["prospect", id],
     queryFn: async () => {
-      if (!id) throw new Error("No prospect ID provided");
+      if (!id) {
+        console.error("No prospect ID provided in URL params");
+        throw new Error("No prospect ID provided");
+      }
 
       const { data: prospect, error } = await supabase
         .from("prospects")
