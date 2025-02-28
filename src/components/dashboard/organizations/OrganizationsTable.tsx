@@ -64,7 +64,10 @@ export const OrganizationsTable = ({
           </TableHeader>
           <TableBody>
             {organizations.map((org) => {
-              const primaryContact = org.contacts?.find((c) => c.is_primary);
+              // Check if contacts property exists before accessing it
+              const primaryContact = org.contacts && Array.isArray(org.contacts) 
+                ? org.contacts.find((c) => c.is_primary) 
+                : undefined;
               
               return (
                 <TableRow

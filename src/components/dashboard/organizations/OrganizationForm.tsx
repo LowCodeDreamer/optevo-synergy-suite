@@ -31,7 +31,7 @@ const organizationFormSchema = z.object({
   industry: z.string().optional(),
   website: z.string().optional(),
   description: z.string().optional(),
-  status: z.enum(["lead", "customer", "partner", "inactive"]).default("lead"),
+  status: z.enum(["lead", "qualified", "negotiation", "onboarding", "active", "at_risk", "churned"]).default("lead"),
 });
 
 type OrganizationFormValues = z.infer<typeof organizationFormSchema>;
@@ -170,9 +170,12 @@ export const OrganizationForm = ({ onComplete, initialData, mode }: Organization
                 </FormControl>
                 <SelectContent>
                   <SelectItem value="lead">Lead</SelectItem>
-                  <SelectItem value="customer">Customer</SelectItem>
-                  <SelectItem value="partner">Partner</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
+                  <SelectItem value="qualified">Qualified</SelectItem>
+                  <SelectItem value="negotiation">Negotiation</SelectItem>
+                  <SelectItem value="onboarding">Onboarding</SelectItem>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="at_risk">At Risk</SelectItem>
+                  <SelectItem value="churned">Churned</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
