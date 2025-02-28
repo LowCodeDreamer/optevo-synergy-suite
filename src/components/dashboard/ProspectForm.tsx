@@ -58,7 +58,17 @@ export const ProspectForm = ({ onComplete, initialData, mode }: ProspectFormProp
     setIsSubmitting(true);
     try {
       if (mode === "create") {
-        const { error } = await supabase.from("prospects").insert(values);
+        // Fix: Ensure company_name is provided when creating a new prospect
+        const { error } = await supabase.from("prospects").insert({
+          company_name: values.company_name,
+          website: values.website,
+          description: values.description,
+          contact_name: values.contact_name,
+          contact_email: values.contact_email,
+          contact_phone: values.contact_phone,
+          linkedin_url: values.linkedin_url,
+        });
+        
         if (error) throw error;
         toast({
           title: "Success",
@@ -70,8 +80,17 @@ export const ProspectForm = ({ onComplete, initialData, mode }: ProspectFormProp
         }
         const { error } = await supabase
           .from("prospects")
-          .update(values)
+          .update({
+            company_name: values.company_name,
+            website: values.website,
+            description: values.description,
+            contact_name: values.contact_name,
+            contact_email: values.contact_email,
+            contact_phone: values.contact_phone,
+            linkedin_url: values.linkedin_url,
+          })
           .eq("id", initialData.id);
+          
         if (error) throw error;
         toast({
           title: "Success",
