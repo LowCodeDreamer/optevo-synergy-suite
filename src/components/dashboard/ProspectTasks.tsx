@@ -1,5 +1,6 @@
+
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import {
@@ -12,11 +13,24 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ListPlus, Bell } from "lucide-react";
+import { ListPlus, Bell, Edit, Trash, MoreHorizontal } from "lucide-react";
 import { NewTaskDialog } from "./NewTaskDialog";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
+import { toast } from "@/hooks/use-toast";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 export const ProspectTasks = ({ prospectId }: { prospectId: string }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<any>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const queryClient = useQueryClient();
+  
   const { data: tasks } = useQuery({
     queryKey: ["prospect-tasks", prospectId],
     queryFn: async () => {
@@ -34,6 +48,40 @@ export const ProspectTasks = ({ prospectId }: { prospectId: string }) => {
       return data;
     },
   });
+
+  const handleEdit = (task: any) => {
+    setSelectedTask(task);
+    setIsEditMode(true);
+    setIsDialogOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (!selectedTask) return;
+    
+    try {
+      const { error } = await supabase
+        .from("prospect_tasks")
+        .delete()
+        .eq("id", selectedTask.id);
+        
+      if (error) throw error;
+      
+      queryClient.invalidateQueries({ queryKey: ["prospect-tasks"] });
+      toast({
+        title: "Task deleted",
+        description: "The task has been deleted successfully",
+      });
+      
+      setIsDeleteDialogOpen(false);
+      setSelectedTask(null);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete the task",
+        variant: "destructive",
+      });
+    }
+  };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -64,7 +112,11 @@ export const ProspectTasks = ({ prospectId }: { prospectId: string }) => {
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
-        <Button className="gap-2" onClick={() => setIsDialogOpen(true)}>
+        <Button className="gap-2" onClick={() => {
+          setIsEditMode(false);
+          setSelectedTask(null);
+          setIsDialogOpen(true);
+        }}>
           <ListPlus className="h-4 w-4" />
           New Task
         </Button>
@@ -78,6 +130,7 @@ export const ProspectTasks = ({ prospectId }: { prospectId: string }) => {
             <TableHead>Status</TableHead>
             <TableHead>Assigned To</TableHead>
             <TableHead>Reminder</TableHead>
+            <TableHead className="w-[80px]">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -110,6 +163,31 @@ export const ProspectTasks = ({ prospectId }: { prospectId: string }) => {
                   </div>
                 )}
               </TableCell>
+              <TableCell>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => handleEdit(task)}>
+                      <Edit className="mr-2 h-4 w-4" />
+                      Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={() => {
+                        setSelectedTask(task);
+                        setIsDeleteDialogOpen(true);
+                      }}
+                      className="text-destructive focus:text-destructive"
+                    >
+                      <Trash className="mr-2 h-4 w-4" />
+                      Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -117,9 +195,32 @@ export const ProspectTasks = ({ prospectId }: { prospectId: string }) => {
 
       <NewTaskDialog
         isOpen={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
+        onClose={() => {
+          setIsDialogOpen(false);
+          setIsEditMode(false);
+          setSelectedTask(null);
+        }}
         prospectId={prospectId}
+        editMode={isEditMode}
+        taskToEdit={selectedTask}
       />
+
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Task</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this task? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

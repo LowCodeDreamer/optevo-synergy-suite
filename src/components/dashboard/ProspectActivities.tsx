@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Calendar, Mail, MessageSquare, Phone, CalendarPlus } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { Calendar, Mail, MessageSquare, Phone, CalendarPlus, Edit, Trash } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Table,
@@ -13,9 +13,22 @@ import {
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { NewActivityDialog } from "./NewActivityDialog";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
+import { toast } from "@/hooks/use-toast";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 export const ProspectActivities = ({ prospectId }: { prospectId: string }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [selectedActivity, setSelectedActivity] = useState<any>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const queryClient = useQueryClient();
+  
   const { data: activities } = useQuery({
     queryKey: ["prospect-activities", prospectId],
     queryFn: async () => {
@@ -29,6 +42,40 @@ export const ProspectActivities = ({ prospectId }: { prospectId: string }) => {
       return data;
     },
   });
+
+  const handleEdit = (activity: any) => {
+    setSelectedActivity(activity);
+    setIsEditMode(true);
+    setIsDialogOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (!selectedActivity) return;
+    
+    try {
+      const { error } = await supabase
+        .from("prospect_activities")
+        .delete()
+        .eq("id", selectedActivity.id);
+        
+      if (error) throw error;
+      
+      queryClient.invalidateQueries({ queryKey: ["prospect-activities"] });
+      toast({
+        title: "Activity deleted",
+        description: "The activity has been deleted successfully",
+      });
+      
+      setIsDeleteDialogOpen(false);
+      setSelectedActivity(null);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete the activity",
+        variant: "destructive",
+      });
+    }
+  };
 
   const getActivityIcon = (type: string) => {
     switch (type) {
@@ -48,7 +95,11 @@ export const ProspectActivities = ({ prospectId }: { prospectId: string }) => {
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
-        <Button className="gap-2" onClick={() => setIsDialogOpen(true)}>
+        <Button className="gap-2" onClick={() => {
+          setIsEditMode(false);
+          setSelectedActivity(null);
+          setIsDialogOpen(true);
+        }}>
           <CalendarPlus className="h-4 w-4" />
           New Activity
         </Button>
@@ -60,6 +111,7 @@ export const ProspectActivities = ({ prospectId }: { prospectId: string }) => {
             <TableHead>Title</TableHead>
             <TableHead>Description</TableHead>
             <TableHead className="w-[150px]">Date</TableHead>
+            <TableHead className="w-[80px]">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -78,6 +130,31 @@ export const ProspectActivities = ({ prospectId }: { prospectId: string }) => {
                   ? format(new Date(activity.scheduled_at), "MMM d, yyyy")
                   : format(new Date(activity.created_at), "MMM d, yyyy")}
               </TableCell>
+              <TableCell>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => handleEdit(activity)}>
+                      <Edit className="mr-2 h-4 w-4" />
+                      Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={() => {
+                        setSelectedActivity(activity);
+                        setIsDeleteDialogOpen(true);
+                      }}
+                      className="text-destructive focus:text-destructive"
+                    >
+                      <Trash className="mr-2 h-4 w-4" />
+                      Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -85,9 +162,32 @@ export const ProspectActivities = ({ prospectId }: { prospectId: string }) => {
 
       <NewActivityDialog
         isOpen={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
+        onClose={() => {
+          setIsDialogOpen(false);
+          setIsEditMode(false);
+          setSelectedActivity(null);
+        }}
         prospectId={prospectId}
+        editMode={isEditMode}
+        activityToEdit={selectedActivity}
       />
+
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Activity</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this activity? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
