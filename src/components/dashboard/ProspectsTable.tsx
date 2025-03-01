@@ -1,7 +1,7 @@
 
 import { Tables } from "@/integrations/supabase/types";
 import { Button } from "@/components/ui/button";
-import { Check, Pencil, Trash, X, Eye } from "lucide-react";
+import { Pencil, Trash, Eye } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { formatDistanceToNow } from "date-fns";
+import { ProspectActions } from "./ProspectActions";
 
 interface ProspectsTableProps {
   prospects: Tables<"prospects">[];
@@ -90,28 +91,19 @@ export const ProspectsTable = ({
                       })
                     : "—"}
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell>
                   <div className="flex items-center justify-end gap-2">
-                    {prospect.status === "pending" && (
-                      <>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => onApprove(prospect.id)}
-                          className="h-8 w-8"
-                        >
-                          <Check className="h-4 w-4 text-green-500" />
-                        </Button>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => onReject(prospect.id)}
-                          className="h-8 w-8"
-                        >
-                          <X className="h-4 w-4 text-red-500" />
-                        </Button>
-                      </>
-                    )}
+                    {/* Prospect Management Actions */}
+                    <ProspectActions 
+                      id={prospect.id}
+                      status={prospect.status}
+                      emailSent={prospect.email_sent}
+                      meetingScheduled={prospect.meeting_scheduled}
+                      onApprove={onApprove}
+                      onReject={onReject}
+                    />
+                    
+                    {/* Standard Record Actions */}
                     <Button
                       size="icon"
                       variant="ghost"

@@ -2,6 +2,7 @@
 import { Check, X, Mail, Calendar, FileText, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Badge } from "@/components/ui/badge";
 
 interface ProspectActionsProps {
   id: string;
@@ -20,34 +21,80 @@ export const ProspectActions = ({
   onApprove,
   onReject,
 }: ProspectActionsProps) => {
+  // Render different actions based on status
+  if (status === "approved") {
+    return (
+      <div className="flex items-center gap-2">
+        <Badge variant="success" className="bg-green-500">Converted</Badge>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                size="icon"
+                disabled={emailSent}
+              >
+                <Mail className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Send Email</p>
+            </TooltipContent>
+          </Tooltip>
+          
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                size="icon"
+                disabled={!emailSent || meetingScheduled}
+              >
+                <Calendar className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Schedule Meeting</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
+    );
+  }
+  
+  if (status === "rejected") {
+    return <Badge variant="destructive">Rejected</Badge>;
+  }
+  
+  // Default actions for pending prospects
   return (
     <TooltipProvider>
       <div className="flex gap-2">
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
-              variant="outline"
-              size="icon"
+              variant="success"
+              size="sm"
               onClick={() => onApprove(id)}
-              disabled={status !== "pending"}
+              className="bg-green-500 hover:bg-green-600"
             >
-              <Check className="h-4 w-4" />
+              <Check className="h-4 w-4 mr-1" />
+              Convert
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>Approve Prospect</p>
+            <p>Convert to Account/Opportunity</p>
           </TooltipContent>
         </Tooltip>
         
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
-              variant="outline"
-              size="icon"
+              variant="destructive"
+              size="sm"
               onClick={() => onReject(id)}
-              disabled={status !== "pending"}
             >
-              <X className="h-4 w-4" />
+              <X className="h-4 w-4 mr-1" />
+              Reject
             </Button>
           </TooltipTrigger>
           <TooltipContent>
@@ -60,7 +107,6 @@ export const ProspectActions = ({
             <Button
               variant="outline"
               size="icon"
-              disabled={status !== "approved" || emailSent}
             >
               <Mail className="h-4 w-4" />
             </Button>
@@ -75,41 +121,12 @@ export const ProspectActions = ({
             <Button
               variant="outline"
               size="icon"
-              disabled={!emailSent || meetingScheduled}
             >
               <Calendar className="h-4 w-4" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>
             <p>Schedule Meeting</p>
-          </TooltipContent>
-        </Tooltip>
-        
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="outline"
-              size="icon"
-            >
-              <FileText className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Generate Report</p>
-          </TooltipContent>
-        </Tooltip>
-        
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="outline"
-              size="icon"
-            >
-              <AlertCircle className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Mark as Important</p>
           </TooltipContent>
         </Tooltip>
       </div>
