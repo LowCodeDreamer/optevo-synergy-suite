@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -16,6 +17,11 @@ export const DatePickerField = ({
   onChange,
   placeholder = "Pick a date",
 }: DatePickerFieldProps) => {
+  // Function to handle date selection
+  const handleSelect = (date: Date | undefined) => {
+    onChange(date);
+  };
+  
   return (
     <div className="relative">
       <Popover>
@@ -39,7 +45,7 @@ export const DatePickerField = ({
           <Calendar 
             mode="single" 
             selected={value} 
-            onSelect={onChange} 
+            onSelect={handleSelect} 
             initialFocus 
           />
         </PopoverContent>

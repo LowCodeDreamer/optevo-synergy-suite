@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -64,9 +63,9 @@ export const OrganizationsTable = ({
           </TableHeader>
           <TableBody>
             {organizations.map((org) => {
-              // Check if contacts property exists before accessing it
-              const primaryContact = org.contacts && Array.isArray(org.contacts) 
-                ? org.contacts.find((c) => c.is_primary) 
+              const contacts = (org as any).contacts;
+              const primaryContact = contacts && Array.isArray(contacts) 
+                ? contacts.find((c: any) => c.is_primary) 
                 : undefined;
               
               return (
