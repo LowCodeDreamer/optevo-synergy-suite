@@ -1,5 +1,5 @@
 
-import { Check, X, Mail, Calendar, FileText, AlertCircle } from "lucide-react";
+import { Check, X, Mail, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
@@ -25,7 +25,7 @@ export const ProspectActions = ({
   if (status === "approved") {
     return (
       <div className="flex items-center gap-2">
-        <Badge variant="success" className="bg-green-500">Converted</Badge>
+        <Badge className="bg-green-500">Converted</Badge>
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -72,7 +72,7 @@ export const ProspectActions = ({
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
-              variant="success"
+              variant="default"
               size="sm"
               onClick={() => onApprove(id)}
               className="bg-green-500 hover:bg-green-600"
@@ -99,34 +99,6 @@ export const ProspectActions = ({
           </TooltipTrigger>
           <TooltipContent>
             <p>Reject Prospect</p>
-          </TooltipContent>
-        </Tooltip>
-        
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="outline"
-              size="icon"
-            >
-              <Mail className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Send Email</p>
-          </TooltipContent>
-        </Tooltip>
-        
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="outline"
-              size="icon"
-            >
-              <Calendar className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Schedule Meeting</p>
           </TooltipContent>
         </Tooltip>
       </div>

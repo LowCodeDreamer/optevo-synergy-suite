@@ -40,13 +40,14 @@ export const ProspectsTable = ({
             <TableHead>Contact</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Created</TableHead>
+            <TableHead>Last Activity</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {prospects.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                 No prospects found.
               </TableCell>
             </TableRow>
@@ -92,8 +93,15 @@ export const ProspectsTable = ({
                     : "—"}
                 </TableCell>
                 <TableCell>
+                  {prospect.updated_at && prospect.updated_at !== prospect.created_at
+                    ? formatDistanceToNow(new Date(prospect.updated_at), {
+                        addSuffix: true,
+                      })
+                    : "—"}
+                </TableCell>
+                <TableCell>
                   <div className="flex items-center justify-end gap-2">
-                    {/* Prospect Management Actions */}
+                    {/* Main Prospect Actions based on status */}
                     <ProspectActions 
                       id={prospect.id}
                       status={prospect.status}
