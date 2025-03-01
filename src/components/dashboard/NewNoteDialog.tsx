@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -15,17 +16,28 @@ interface NewNoteDialogProps {
   isOpen: boolean;
   onClose: () => void;
   prospectId: string;
+  noteToEdit?: any;
 }
 
 export const NewNoteDialog = ({
   isOpen,
   onClose,
   prospectId,
+  noteToEdit,
 }: NewNoteDialogProps) => {
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Load note data when editing an existing note
+  useEffect(() => {
+    if (noteToEdit) {
+      setContent(noteToEdit.content || "");
+    } else {
+      setContent("");
+    }
+  }, [noteToEdit]);
 
   const handleSubmit = async () => {
     if (!content.trim()) return;
@@ -35,30 +47,57 @@ export const NewNoteDialog = ({
       data: { user },
     } = await supabase.auth.getUser();
 
-    const { error } = await supabase.from("prospect_notes").insert([
-      {
-        prospect_id: prospectId,
-        content,
-        created_by: user?.id,
-      },
-    ]);
+    if (noteToEdit) {
+      // Update existing note
+      const { error } = await supabase
+        .from("prospect_notes")
+        .update({ content, updated_at: new Date().toISOString() })
+        .eq("id", noteToEdit.id);
 
-    setIsSubmitting(false);
+      setIsSubmitting(false);
 
-    if (error) {
-      toast({
-        title: "Error",
-        description: "Failed to create note",
-        variant: "destructive",
-      });
+      if (error) {
+        toast({
+          title: "Error",
+          description: "Failed to update note",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Success",
+          description: "Note updated successfully",
+        });
+        queryClient.invalidateQueries({ queryKey: ["prospect-notes", prospectId] });
+        setContent("");
+        onClose();
+      }
     } else {
-      toast({
-        title: "Success",
-        description: "Note created successfully",
-      });
-      queryClient.invalidateQueries({ queryKey: ["prospect-notes", prospectId] });
-      setContent("");
-      onClose();
+      // Create new note
+      const { error } = await supabase.from("prospect_notes").insert([
+        {
+          prospect_id: prospectId,
+          content,
+          created_by: user?.id,
+        },
+      ]);
+
+      setIsSubmitting(false);
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: "Failed to create note",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Success",
+          description: "Note created successfully",
+        });
+        queryClient.invalidateQueries({ queryKey: ["prospect-notes", prospectId] });
+        setContent("");
+        onClose();
+      }
     }
   };
 
@@ -66,7 +105,7 @@ export const NewNoteDialog = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>New Note</DialogTitle>
+          <DialogTitle>{noteToEdit ? "Edit Note" : "New Note"}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-4">
           <Textarea

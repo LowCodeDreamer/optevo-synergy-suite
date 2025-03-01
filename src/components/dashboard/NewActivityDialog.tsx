@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -24,20 +25,43 @@ interface NewActivityDialogProps {
   isOpen: boolean;
   onClose: () => void;
   prospectId: string;
+  activityToEdit?: any;
 }
 
 export const NewActivityDialog = ({
   isOpen,
   onClose,
   prospectId,
+  activityToEdit,
 }: NewActivityDialogProps) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [type, setType] = useState<string>("email");
-  const [scheduledDate, setScheduledDate] = useState<Date>();
+  const [scheduledDate, setScheduledDate] = useState<Date | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Load activity data when editing an existing activity
+  useEffect(() => {
+    if (activityToEdit) {
+      setTitle(activityToEdit.title || "");
+      setDescription(activityToEdit.description || "");
+      setType(activityToEdit.type || "email");
+      
+      if (activityToEdit.scheduled_at) {
+        setScheduledDate(new Date(activityToEdit.scheduled_at));
+      } else {
+        setScheduledDate(undefined);
+      }
+    } else {
+      // Reset form for new activity
+      setTitle("");
+      setDescription("");
+      setType("email");
+      setScheduledDate(undefined);
+    }
+  }, [activityToEdit]);
 
   const handleSubmit = async () => {
     if (!title.trim()) return;
@@ -47,38 +71,68 @@ export const NewActivityDialog = ({
       data: { user },
     } = await supabase.auth.getUser();
 
-    const { error } = await supabase.from("prospect_activities").insert([
-      {
-        prospect_id: prospectId,
-        title,
-        description: description || null,
-        type,
-        scheduled_at: scheduledDate?.toISOString() || null,
-        created_by: user?.id,
-      },
-    ]);
+    if (activityToEdit) {
+      // Update existing activity
+      const { error } = await supabase
+        .from("prospect_activities")
+        .update({
+          title,
+          description: description || null,
+          type,
+          scheduled_at: scheduledDate?.toISOString() || null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", activityToEdit.id);
 
-    setIsSubmitting(false);
+      setIsSubmitting(false);
 
-    if (error) {
-      toast({
-        title: "Error",
-        description: "Failed to create activity",
-        variant: "destructive",
-      });
+      if (error) {
+        toast({
+          title: "Error",
+          description: "Failed to update activity",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Success",
+          description: "Activity updated successfully",
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["prospect-activities", prospectId],
+        });
+        onClose();
+      }
     } else {
-      toast({
-        title: "Success",
-        description: "Activity created successfully",
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["prospect-activities", prospectId],
-      });
-      setTitle("");
-      setDescription("");
-      setType("email");
-      setScheduledDate(undefined);
-      onClose();
+      // Create new activity
+      const { error } = await supabase.from("prospect_activities").insert([
+        {
+          prospect_id: prospectId,
+          title,
+          description: description || null,
+          type,
+          scheduled_at: scheduledDate?.toISOString() || null,
+          created_by: user?.id,
+        },
+      ]);
+
+      setIsSubmitting(false);
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: "Failed to create activity",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Success",
+          description: "Activity created successfully",
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["prospect-activities", prospectId],
+        });
+        onClose();
+      }
     }
   };
 
@@ -86,7 +140,7 @@ export const NewActivityDialog = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>New Activity</DialogTitle>
+          <DialogTitle>{activityToEdit ? "Edit Activity" : "New Activity"}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-4">
           <Input
