@@ -21,54 +21,42 @@ export const ProspectActions = ({
   onApprove,
   onReject,
 }: ProspectActionsProps) => {
-  // Render different actions based on status
+  // For approved prospects, just show status badge and follow-up options
   if (status === "approved") {
     return (
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1">
         <Badge variant="default" className="bg-green-500">Converted</Badge>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="outline"
-                size="icon"
-                disabled={emailSent}
-              >
-                <Mail className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Send Email</p>
-            </TooltipContent>
-          </Tooltip>
-          
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="outline"
-                size="icon"
-                disabled={!emailSent || meetingScheduled}
-              >
-                <Calendar className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Schedule Meeting</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        {!emailSent && (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="ml-1"
+                >
+                  <Mail className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Send Email</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
       </div>
     );
   }
   
+  // For rejected prospects, just show status badge
   if (status === "rejected") {
     return <Badge variant="destructive">Rejected</Badge>;
   }
   
-  // Default actions for pending prospects
+  // Default actions for pending prospects - simplified
   return (
     <TooltipProvider>
-      <div className="flex gap-2">
+      <div className="flex gap-1">
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
@@ -77,8 +65,7 @@ export const ProspectActions = ({
               onClick={() => onApprove(id)}
               className="bg-green-500 hover:bg-green-600"
             >
-              <Check className="h-4 w-4 mr-1" />
-              Convert
+              <Check className="h-4 w-4" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>
@@ -93,8 +80,7 @@ export const ProspectActions = ({
               size="sm"
               onClick={() => onReject(id)}
             >
-              <X className="h-4 w-4 mr-1" />
-              Reject
+              <X className="h-4 w-4" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>

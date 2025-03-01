@@ -31,6 +31,17 @@ export const ProspectsTable = ({
   onEdit,
   onDelete,
 }: ProspectsTableProps) => {
+  // Helper function to get the last activity date
+  const getLastActivityDate = (prospect: Tables<"prospects">) => {
+    // Use the most recent date among: reviewed_at, updated_at
+    const dates = [
+      prospect.reviewed_at ? new Date(prospect.reviewed_at) : null,
+      prospect.updated_at ? new Date(prospect.updated_at) : null,
+    ].filter(Boolean) as Date[];
+    
+    return dates.length > 0 ? new Date(Math.max(...dates.map(d => d.getTime()))) : null;
+  };
+
   return (
     <div className="border rounded-md">
       <Table>
@@ -93,10 +104,9 @@ export const ProspectsTable = ({
                     : "—"}
                 </TableCell>
                 <TableCell>
-                  {/* Display the most recent activity date 
-                      This is a placeholder that shows reviewed_at as an example of last activity */}
-                  {prospect.reviewed_at
-                    ? formatDistanceToNow(new Date(prospect.reviewed_at), {
+                  {/* Display the most recent activity date */}
+                  {getLastActivityDate(prospect)
+                    ? formatDistanceToNow(getLastActivityDate(prospect) as Date, {
                         addSuffix: true,
                       })
                     : "—"}
@@ -113,7 +123,7 @@ export const ProspectsTable = ({
                       onReject={onReject}
                     />
                     
-                    {/* Standard Record Actions */}
+                    {/* View button - always visible */}
                     <Button
                       size="icon"
                       variant="ghost"
@@ -122,22 +132,28 @@ export const ProspectsTable = ({
                     >
                       <Eye className="h-4 w-4" />
                     </Button>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={() => onEdit(prospect)}
-                      className="h-8 w-8"
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={() => onDelete(prospect)}
-                      className="h-8 w-8 text-destructive hover:text-destructive"
-                    >
-                      <Trash className="h-4 w-4" />
-                    </Button>
+                    
+                    {/* Only show edit/delete for non-converted prospects */}
+                    {prospect.status !== "approved" && (
+                      <>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => onEdit(prospect)}
+                          className="h-8 w-8"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => onDelete(prospect)}
+                          className="h-8 w-8 text-destructive hover:text-destructive"
+                        >
+                          <Trash className="h-4 w-4" />
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </TableCell>
               </TableRow>
