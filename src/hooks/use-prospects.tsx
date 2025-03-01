@@ -49,7 +49,7 @@ export const useProspects = () => {
       // Transform data to include assigned_to_name from profiles
       return data.map(prospect => ({
         ...prospect,
-        assigned_to_name: prospect.profiles?.username || prospect.assigned_to_name || null
+        assigned_to_name: prospect.profiles?.username || null
       }));
     },
   });
