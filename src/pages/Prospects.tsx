@@ -4,23 +4,11 @@ import { DashboardCard } from "@/components/dashboard/DashboardCard";
 import { FloatingAIAssistant } from "@/components/dashboard/FloatingAIAssistant";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CopilotCanvas } from "@/components/copilot/CopilotCanvas";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useProspects } from "@/hooks/use-prospects";
 import { ManagementView } from "@/components/dashboard/prospects/ManagementView";
 
 const Prospects = () => {
-  const { data: prospects } = useQuery({
-    queryKey: ["prospects"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("prospects")
-        .select("*, profiles(username)")
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return data;
-    },
-  });
+  const { prospects } = useProspects();
 
   // Filter out already converted or rejected prospects
   const activeProspects = prospects?.filter(

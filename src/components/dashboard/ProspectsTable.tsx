@@ -1,7 +1,7 @@
 
 import { Tables } from "@/integrations/supabase/types";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash, Eye } from "lucide-react";
+import { Pencil, Trash, Eye, ArrowUpDown } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -22,8 +22,11 @@ interface ProspectsTableProps {
   onReject: (id: string) => Promise<void>;
   onEdit: (prospect: Tables<"prospects">) => void;
   onDelete: (prospect: Tables<"prospects">) => void;
-  filterMode?: "all" | "my"; // New filter mode prop
-  currentUserId?: string; // New current user ID prop
+  filterMode?: "all" | "my";
+  currentUserId?: string;
+  sortField?: keyof Tables<"prospects">;
+  sortDirection?: "asc" | "desc";
+  onSortChange?: (field: keyof Tables<"prospects">) => void;
 }
 
 export const ProspectsTable = ({
@@ -35,6 +38,9 @@ export const ProspectsTable = ({
   onDelete,
   filterMode = "all",
   currentUserId,
+  sortField = "created_at",
+  sortDirection = "desc",
+  onSortChange,
 }: ProspectsTableProps) => {
   // Helper function to get the last activity date
   const getLastActivityDate = (prospect: Tables<"prospects">) => {
@@ -62,16 +68,72 @@ export const ProspectsTable = ({
     return true;
   });
 
+  const handleSort = (field: keyof Tables<"prospects">) => {
+    if (onSortChange) {
+      onSortChange(field);
+    }
+  };
+
+  // Render sort indicator
+  const renderSortIndicator = (field: keyof Tables<"prospects">) => {
+    if (field === sortField) {
+      return (
+        <ArrowUpDown className={`ml-2 h-4 w-4 ${sortField === field ? "opacity-100" : "opacity-50"}`} />
+      );
+    }
+    return null;
+  };
+
   return (
     <div className="border rounded-md">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Company</TableHead>
-            <TableHead>Contact</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Owner</TableHead>
-            <TableHead>Created</TableHead>
+            <TableHead>
+              <Button
+                variant="ghost"
+                className="hover:bg-transparent font-medium p-0"
+                onClick={() => handleSort("company_name")}
+              >
+                Company {renderSortIndicator("company_name")}
+              </Button>
+            </TableHead>
+            <TableHead>
+              <Button
+                variant="ghost"
+                className="hover:bg-transparent font-medium p-0"
+                onClick={() => handleSort("contact_name")}
+              >
+                Contact {renderSortIndicator("contact_name")}
+              </Button>
+            </TableHead>
+            <TableHead>
+              <Button
+                variant="ghost"
+                className="hover:bg-transparent font-medium p-0"
+                onClick={() => handleSort("status")}
+              >
+                Status {renderSortIndicator("status")}
+              </Button>
+            </TableHead>
+            <TableHead>
+              <Button
+                variant="ghost"
+                className="hover:bg-transparent font-medium p-0"
+                onClick={() => handleSort("assigned_to_name")}
+              >
+                Owner {renderSortIndicator("assigned_to_name")}
+              </Button>
+            </TableHead>
+            <TableHead>
+              <Button
+                variant="ghost"
+                className="hover:bg-transparent font-medium p-0"
+                onClick={() => handleSort("created_at")}
+              >
+                Created {renderSortIndicator("created_at")}
+              </Button>
+            </TableHead>
             <TableHead>Last Activity</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
