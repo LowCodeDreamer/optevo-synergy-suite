@@ -61,6 +61,7 @@ export const NewTaskDialog = ({
   // Load task data if in edit mode
   useEffect(() => {
     if (taskToEdit) {
+      console.log("Loading task for edit:", taskToEdit);
       setTitle(taskToEdit.title || "");
       setDescription(taskToEdit.description || "");
       setPriority(taskToEdit.priority || "medium");

@@ -3,10 +3,7 @@ import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { StickyNote, Plus, Edit, Trash, MoreHorizontal } from "lucide-react";
 import { NewNoteDialog } from "./NewNoteDialog";
 import { 
   DropdownMenu, 
@@ -14,22 +11,39 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
-import { toast } from "@/hooks/use-toast";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { 
+  AlertDialog, 
+  AlertDialogAction, 
+  AlertDialogCancel, 
+  AlertDialogContent, 
+  AlertDialogDescription, 
+  AlertDialogFooter, 
+  AlertDialogHeader, 
+  AlertDialogTitle 
+} from "@/components/ui/alert-dialog";
+import { useToast } from "@/components/ui/use-toast";
+import { Edit, Trash, MoreHorizontal } from "lucide-react";
 
-export const ProspectNotes = ({ prospectId }: { prospectId: string }) => {
+interface ProspectNotesProps {
+  prospectId: string;
+}
+
+export const ProspectNotes = ({ prospectId }: ProspectNotesProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
   const [selectedNote, setSelectedNote] = useState<any>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+
   const { data: notes } = useQuery({
     queryKey: ["prospect-notes", prospectId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("prospect_notes")
-        .select("*")
+        .select(`
+          *,
+          creator:profiles!prospect_notes_created_by_fkey(username)
+        `)
         .eq("prospect_id", prospectId)
         .order("created_at", { ascending: false });
 
@@ -40,7 +54,6 @@ export const ProspectNotes = ({ prospectId }: { prospectId: string }) => {
 
   const handleEdit = (note: any) => {
     setSelectedNote(note);
-    setIsEditMode(true);
     setIsDialogOpen(true);
   };
 
@@ -75,62 +88,66 @@ export const ProspectNotes = ({ prospectId }: { prospectId: string }) => {
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
-        <Button className="gap-2" onClick={() => {
-          setIsEditMode(false);
-          setSelectedNote(null);
-          setIsDialogOpen(true);
-        }}>
-          <Plus className="h-4 w-4" />
-          <StickyNote className="h-4 w-4" />
+        <Button
+          onClick={() => {
+            setSelectedNote(null);
+            setIsDialogOpen(true);
+          }}
+        >
           New Note
         </Button>
       </div>
-      <ScrollArea className="h-[300px] pr-4">
-        <div className="space-y-4">
-          {notes?.map((note) => (
-            <div key={note.id} className="space-y-2 group relative">
-              <div className="text-sm text-muted-foreground flex items-center justify-between">
-                <span>{format(new Date(note.created_at), "MMM d, yyyy 'at' h:mm a")}</span>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => handleEdit(note)}>
-                      <Edit className="mr-2 h-4 w-4" />
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      onClick={() => {
-                        setSelectedNote(note);
-                        setIsDeleteDialogOpen(true);
-                      }}
-                      className="text-destructive focus:text-destructive"
-                    >
-                      <Trash className="mr-2 h-4 w-4" />
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+
+      <div className="space-y-4">
+        {notes?.map((note) => (
+          <div key={note.id} className="bg-card border rounded-lg p-4">
+            <div className="flex justify-between items-start">
+              <div>
+                <div className="text-sm text-muted-foreground">
+                  {note.creator?.username || "Unknown"} - {format(new Date(note.created_at), "MMM d, yyyy h:mm a")}
+                </div>
+                <div className="mt-2 whitespace-pre-wrap">{note.content}</div>
               </div>
-              <p className="text-sm whitespace-pre-line">{note.content}</p>
-              <Separator />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => handleEdit(note)}>
+                    <Edit className="mr-2 h-4 w-4" />
+                    Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => {
+                      setSelectedNote(note);
+                      setIsDeleteDialogOpen(true);
+                    }}
+                    className="text-destructive focus:text-destructive"
+                  >
+                    <Trash className="mr-2 h-4 w-4" />
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
-          ))}
-        </div>
-      </ScrollArea>
+          </div>
+        ))}
+        {notes?.length === 0 && (
+          <div className="text-center py-8 text-muted-foreground">
+            No notes found. Click "New Note" to create one.
+          </div>
+        )}
+      </div>
 
       <NewNoteDialog
         isOpen={isDialogOpen}
         onClose={() => {
           setIsDialogOpen(false);
-          setIsEditMode(false);
           setSelectedNote(null);
         }}
         prospectId={prospectId}
-        editMode={isEditMode}
         noteToEdit={selectedNote}
       />
 
