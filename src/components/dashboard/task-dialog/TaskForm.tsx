@@ -92,7 +92,7 @@ export const TaskForm = ({
         onChange={setAssignedTo}
       />
 
-      <div className="relative z-0">
+      <div className="relative">
         <DatePickerField
           value={dueDate}
           onChange={handleDueDateChange}
@@ -100,7 +100,7 @@ export const TaskForm = ({
         />
       </div>
 
-      <div className="relative z-0">
+      <div className="relative">
         <DatePickerField
           value={reminderDate}
           onChange={handleReminderDateChange}

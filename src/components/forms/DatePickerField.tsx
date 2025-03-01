@@ -46,35 +46,14 @@ export const DatePickerField = ({
           align="start"
           sideOffset={4}
           onPointerDownOutside={(e) => {
-            // Prevent clicks from reaching elements underneath
             e.preventDefault();
           }}
-          // Force the popover to be on top of everything
-          style={{ 
-            isolation: "isolate", 
-            position: "relative"
-          }}
         >
-          {/* Create an overlay div that captures all pointer events */}
-          <div 
-            className="absolute inset-0 -z-10"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
-          />
-          
-          {/* Ensure calendar container captures all events */}
           <div 
             onClick={(e) => {
-              e.preventDefault();
               e.stopPropagation();
             }}
-            style={{ 
-              position: "relative", 
-              zIndex: 10,
-              pointerEvents: "auto"
-            }}
+            style={{ position: "relative" }}
           >
             <Calendar 
               mode="single" 
@@ -82,14 +61,6 @@ export const DatePickerField = ({
               onSelect={handleSelect} 
               initialFocus 
               disabled={false}
-              // Add additional protection to calendar buttons
-              classNames={{
-                day: cn(
-                  "relative inline-flex items-center justify-center p-0 text-sm font-medium"
-                ),
-                // Add pointer-events-auto to ensure the calendar day buttons receive clicks
-                cell: "relative pointer-events-auto"
-              }}
             />
           </div>
         </PopoverContent>
