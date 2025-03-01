@@ -161,15 +161,52 @@ export const useProspects = () => {
   };
 
   const assignProspect = async (prospectId: string, userId: string) => {
-    const { error } = await supabase
-      .from("prospects")
-      .update({ 
-        assigned_to: userId,
-        status: prospect.status === "new" ? "in_progress" : prospect.status 
-      })
-      .eq("id", prospectId);
+    try {
+      // Get user's profile
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('id', userId)
+        .single();
 
-    if (error) {
+      if (profileError) throw profileError;
+
+      // Get current prospect data
+      const { data: prospect, error: prospectError } = await supabase
+        .from('prospects')
+        .select('status')
+        .eq('id', prospectId)
+        .single();
+
+      if (prospectError) throw prospectError;
+
+      // Update the prospect
+      const { error } = await supabase
+        .from("prospects")
+        .update({ 
+          assigned_to: userId,
+          assigned_to_name: profileData.username,
+          status: prospect.status === "new" || prospect.status === "pending" ? "in_progress" : prospect.status 
+        })
+        .eq("id", prospectId);
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: "Failed to assign prospect",
+          variant: "destructive",
+        });
+        return false;
+      }
+      
+      toast({
+        title: "Success",
+        description: "Prospect assigned successfully",
+      });
+      refetchProspects();
+      return true;
+    } catch (error) {
+      console.error("Error assigning prospect:", error);
       toast({
         title: "Error",
         description: "Failed to assign prospect",
@@ -177,13 +214,6 @@ export const useProspects = () => {
       });
       return false;
     }
-    
-    toast({
-      title: "Success",
-      description: "Prospect assigned successfully",
-    });
-    refetchProspects();
-    return true;
   };
 
   return {

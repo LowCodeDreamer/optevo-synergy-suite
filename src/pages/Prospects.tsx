@@ -14,7 +14,7 @@ const Prospects = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("prospects")
-        .select("*")
+        .select("*, profiles(username)")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -47,7 +47,7 @@ const Prospects = () => {
 
         <TabsContent value="my">
           <DashboardCard title="My Prospects" className="mb-6">
-            <ProspectList />
+            <ProspectList initialProspects={activeProspects} filterMode="my" />
           </DashboardCard>
         </TabsContent>
 

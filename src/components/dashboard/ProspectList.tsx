@@ -5,24 +5,23 @@ import { ProspectCard } from "./ProspectCard";
 import { ProspectsTable } from "./ProspectsTable";
 import { useProspects } from "@/hooks/use-prospects";
 import { Button } from "@/components/ui/button";
-import { PlusIcon, Filter } from "lucide-react";
+import { PlusIcon } from "lucide-react";
 import { NewProspectDialog } from "./NewProspectDialog";
 import { EditProspectDialog } from "./EditProspectDialog";
 import { DeleteProspectDialog } from "./DeleteProspectDialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface ProspectListProps {
   initialProspects?: Tables<"prospects">[];
+  filterMode?: "all" | "my";
 }
 
-export const ProspectList = ({ initialProspects }: ProspectListProps) => {
+export const ProspectList = ({ initialProspects, filterMode = "all" }: ProspectListProps) => {
   const [selectedProspect, setSelectedProspect] = useState<Tables<"prospects"> | null>(null);
   const [isNewDialogOpen, setIsNewDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [prospectToEdit, setProspectToEdit] = useState<Tables<"prospects"> | null>(null);
   const [prospectToDelete, setProspectToDelete] = useState<Tables<"prospects"> | null>(null);
-  const [filterMode, setFilterMode] = useState<"all" | "active" | "my">("all");
   
   const { prospects, handleApprove, handleReject, refetchProspects, currentUserId } = useProspects();
 
@@ -53,20 +52,13 @@ export const ProspectList = ({ initialProspects }: ProspectListProps) => {
   return (
     <div className="w-full">
       <div className="mb-4 flex justify-between items-center">
-        <Tabs 
-          value={filterMode} 
-          onValueChange={(value) => setFilterMode(value as "all" | "active" | "my")}
-          className="w-full"
-        >
-          <TabsList>
-            <TabsTrigger value="all">All Prospects</TabsTrigger>
-            <TabsTrigger value="my">My Prospects</TabsTrigger>
-          </TabsList>
-        </Tabs>
+        <div className="text-muted-foreground text-sm">
+          {filterMode === "my" ? "Showing prospects assigned to you" : "Showing all active prospects"}
+        </div>
         
         <Button 
           onClick={() => setIsNewDialogOpen(true)}
-          className="flex items-center gap-1 ml-4"
+          className="flex items-center gap-1"
         >
           <PlusIcon className="w-4 h-4" />
           New Prospect

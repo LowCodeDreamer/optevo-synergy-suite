@@ -3,6 +3,9 @@ import { Check, X, Mail, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface ProspectActionsProps {
   id: string;
@@ -25,6 +28,9 @@ export const ProspectActions = ({
   onApprove,
   onReject,
 }: ProspectActionsProps) => {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
   // For approved prospects, just show status badge and follow-up options
   if (status === "approved") {
     return (
@@ -56,6 +62,56 @@ export const ProspectActions = ({
   if (status === "rejected") {
     return <Badge variant="destructive">Rejected</Badge>;
   }
+
+  // Handle assigning a prospect to the current user
+  const handleAssignToMe = async () => {
+    if (!currentUserId) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to assign prospects",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      // Get user's profile 
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('id', currentUserId)
+        .single();
+
+      if (profileError) throw profileError;
+
+      // Update the prospect
+      const { error } = await supabase
+        .from('prospects')
+        .update({ 
+          assigned_to: currentUserId,
+          assigned_to_name: profileData.username,
+          status: status === "pending" || status === "new" ? "in_progress" : status 
+        })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Prospect assigned to you",
+      });
+
+      // Invalidate prospects query to refresh the data
+      queryClient.invalidateQueries({ queryKey: ['prospects'] });
+    } catch (error) {
+      console.error('Error assigning prospect:', error);
+      toast({
+        title: "Error",
+        description: "Failed to assign prospect",
+        variant: "destructive",
+      });
+    }
+  };
   
   // Default actions for pending prospects - simplified
   return (
@@ -69,6 +125,7 @@ export const ProspectActions = ({
                 variant="outline"
                 size="sm"
                 className="h-8 w-8"
+                onClick={handleAssignToMe}
               >
                 <UserPlus className="h-4 w-4" />
               </Button>

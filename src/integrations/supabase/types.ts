@@ -1132,6 +1132,8 @@ export type Database = {
           ai_fit_analysis: string | null
           ai_intro: string | null
           ai_next_steps: string | null
+          assigned_to: string | null
+          assigned_to_name: string | null
           company_name: string
           contact_email: string | null
           contact_name: string | null
@@ -1149,12 +1151,15 @@ export type Database = {
           reviewed_at: string | null
           reviewed_by: string | null
           status: string | null
+          updated_at: string | null
           website: string | null
         }
         Insert: {
           ai_fit_analysis?: string | null
           ai_intro?: string | null
           ai_next_steps?: string | null
+          assigned_to?: string | null
+          assigned_to_name?: string | null
           company_name: string
           contact_email?: string | null
           contact_name?: string | null
@@ -1172,12 +1177,15 @@ export type Database = {
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string | null
+          updated_at?: string | null
           website?: string | null
         }
         Update: {
           ai_fit_analysis?: string | null
           ai_intro?: string | null
           ai_next_steps?: string | null
+          assigned_to?: string | null
+          assigned_to_name?: string | null
           company_name?: string
           contact_email?: string | null
           contact_name?: string | null
@@ -1195,9 +1203,17 @@ export type Database = {
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string | null
+          updated_at?: string | null
           website?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "prospects_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "prospects_reviewed_by_fkey"
             columns: ["reviewed_by"]

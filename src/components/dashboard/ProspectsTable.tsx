@@ -22,7 +22,7 @@ interface ProspectsTableProps {
   onReject: (id: string) => Promise<void>;
   onEdit: (prospect: Tables<"prospects">) => void;
   onDelete: (prospect: Tables<"prospects">) => void;
-  filterMode?: "all" | "active" | "my"; // New filter mode prop
+  filterMode?: "all" | "my"; // New filter mode prop
   currentUserId?: string; // New current user ID prop
 }
 
