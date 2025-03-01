@@ -18,6 +18,8 @@ interface TaskFormProps {
   setDescription: (value: string) => void;
   priority: string;
   setPriority: (value: string) => void;
+  status: string;
+  setStatus: (value: string) => void;
   dueDate?: Date;
   setDueDate: (date?: Date) => void;
   reminderDate?: Date;
@@ -36,6 +38,8 @@ export const TaskForm = ({
   setDescription,
   priority,
   setPriority,
+  status,
+  setStatus,
   dueDate,
   setDueDate,
   reminderDate,
@@ -82,6 +86,18 @@ export const TaskForm = ({
           <SelectItem value="low">Low</SelectItem>
           <SelectItem value="medium">Medium</SelectItem>
           <SelectItem value="high">High</SelectItem>
+        </SelectContent>
+      </Select>
+
+      <Select value={status} onValueChange={setStatus}>
+        <SelectTrigger>
+          <SelectValue placeholder="Select status" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="pending">Pending</SelectItem>
+          <SelectItem value="in_progress">In Progress</SelectItem>
+          <SelectItem value="completed">Completed</SelectItem>
+          <SelectItem value="cancelled">Cancelled</SelectItem>
         </SelectContent>
       </Select>
 

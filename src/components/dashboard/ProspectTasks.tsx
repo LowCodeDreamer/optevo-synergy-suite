@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ListPlus, Bell, Edit, Trash, MoreHorizontal } from "lucide-react";
+import { ListPlus, Bell, Edit, Trash, MoreHorizontal, Check } from "lucide-react";
 import { NewTaskDialog } from "./NewTaskDialog";
 import { 
   DropdownMenu, 
@@ -26,7 +26,6 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 
 export const ProspectTasks = ({ prospectId }: { prospectId: string }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
   const [selectedTask, setSelectedTask] = useState<any>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const queryClient = useQueryClient();
@@ -51,7 +50,6 @@ export const ProspectTasks = ({ prospectId }: { prospectId: string }) => {
 
   const handleEdit = (task: any) => {
     setSelectedTask(task);
-    setIsEditMode(true);
     setIsDialogOpen(true);
   };
 
@@ -78,6 +76,32 @@ export const ProspectTasks = ({ prospectId }: { prospectId: string }) => {
       toast({
         title: "Error",
         description: "Failed to delete the task",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleCompleteTask = async (taskId: string) => {
+    try {
+      const { error } = await supabase
+        .from("prospect_tasks")
+        .update({
+          status: "completed",
+          completed_at: new Date().toISOString()
+        })
+        .eq("id", taskId);
+        
+      if (error) throw error;
+      
+      queryClient.invalidateQueries({ queryKey: ["prospect-tasks"] });
+      toast({
+        title: "Task completed",
+        description: "The task has been marked as completed",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update the task status",
         variant: "destructive",
       });
     }
@@ -113,7 +137,6 @@ export const ProspectTasks = ({ prospectId }: { prospectId: string }) => {
     <div className="space-y-4">
       <div className="flex justify-end">
         <Button className="gap-2" onClick={() => {
-          setIsEditMode(false);
           setSelectedTask(null);
           setIsDialogOpen(true);
         }}>
@@ -130,7 +153,7 @@ export const ProspectTasks = ({ prospectId }: { prospectId: string }) => {
             <TableHead>Status</TableHead>
             <TableHead>Assigned To</TableHead>
             <TableHead>Reminder</TableHead>
-            <TableHead className="w-[80px]">Actions</TableHead>
+            <TableHead className="w-[130px]">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -164,29 +187,42 @@ export const ProspectTasks = ({ prospectId }: { prospectId: string }) => {
                 )}
               </TableCell>
               <TableCell>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => handleEdit(task)}>
-                      <Edit className="mr-2 h-4 w-4" />
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      onClick={() => {
-                        setSelectedTask(task);
-                        setIsDeleteDialogOpen(true);
-                      }}
-                      className="text-destructive focus:text-destructive"
+                <div className="flex items-center gap-1">
+                  {task.status !== "completed" && (
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-8 w-8 text-green-500 hover:text-green-600 hover:bg-green-50"
+                      onClick={() => handleCompleteTask(task.id)}
+                      title="Mark as completed"
                     >
-                      <Trash className="mr-2 h-4 w-4" />
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                      <Check className="h-4 w-4" />
+                    </Button>
+                  )}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleEdit(task)}>
+                        <Edit className="mr-2 h-4 w-4" />
+                        Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => {
+                          setSelectedTask(task);
+                          setIsDeleteDialogOpen(true);
+                        }}
+                        className="text-destructive focus:text-destructive"
+                      >
+                        <Trash className="mr-2 h-4 w-4" />
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               </TableCell>
             </TableRow>
           ))}
@@ -197,12 +233,9 @@ export const ProspectTasks = ({ prospectId }: { prospectId: string }) => {
         isOpen={isDialogOpen}
         onClose={() => {
           setIsDialogOpen(false);
-          setIsEditMode(false);
           setSelectedTask(null);
         }}
         prospectId={prospectId}
-        editMode={isEditMode}
-        taskToEdit={selectedTask}
       />
 
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
