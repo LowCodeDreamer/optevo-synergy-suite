@@ -46,12 +46,14 @@ export const TaskForm = ({
   isLoadingUsers,
   currentUserId,
 }: TaskFormProps) => {
-  // Explicit date handling functions to ensure proper state updates
+  // Explicit date handling functions with console logging
   const handleDueDateChange = (date?: Date) => {
+    console.log("Due date selected:", date);
     setDueDate(date);
   };
 
   const handleReminderDateChange = (date?: Date) => {
+    console.log("Reminder date selected:", date);
     setReminderDate(date);
   };
 
@@ -90,17 +92,21 @@ export const TaskForm = ({
         onChange={setAssignedTo}
       />
 
-      <DatePickerField
-        value={dueDate}
-        onChange={handleDueDateChange}
-        placeholder="Select due date"
-      />
+      <div className="relative z-0">
+        <DatePickerField
+          value={dueDate}
+          onChange={handleDueDateChange}
+          placeholder="Select due date"
+        />
+      </div>
 
-      <DatePickerField
-        value={reminderDate}
-        onChange={handleReminderDateChange}
-        placeholder="Set reminder (optional)"
-      />
+      <div className="relative z-0">
+        <DatePickerField
+          value={reminderDate}
+          onChange={handleReminderDateChange}
+          placeholder="Set reminder (optional)"
+        />
+      </div>
     </div>
   );
 };
