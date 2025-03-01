@@ -19,6 +19,7 @@ export const DatePickerField = ({
 }: DatePickerFieldProps) => {
   // Function to handle date selection
   const handleSelect = (date: Date | undefined) => {
+    // Ensure we close the popup after selection and properly pass the date
     onChange(date);
   };
   

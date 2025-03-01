@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,6 +7,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 import { DialogFooter } from "@/components/forms/DialogFooter";
@@ -52,6 +54,19 @@ export const NewTaskDialog = ({
     },
   });
 
+  // Clear form when dialog is opened/closed
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      setTitle("");
+      setDescription("");
+      setPriority("medium");
+      setDueDate(undefined);
+      setReminderDate(undefined);
+      setAssignedTo(undefined);
+      onClose();
+    }
+  };
+
   const handleSubmit = async () => {
     if (!title.trim()) return;
 
@@ -89,10 +104,13 @@ export const NewTaskDialog = ({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>New Task</DialogTitle>
+          <DialogDescription>
+            Create a new task for this prospect.
+          </DialogDescription>
         </DialogHeader>
 
         <TaskForm

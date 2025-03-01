@@ -1,3 +1,4 @@
+
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -45,6 +46,15 @@ export const TaskForm = ({
   isLoadingUsers,
   currentUserId,
 }: TaskFormProps) => {
+  // Explicit date handling functions to ensure proper state updates
+  const handleDueDateChange = (date?: Date) => {
+    setDueDate(date);
+  };
+
+  const handleReminderDateChange = (date?: Date) => {
+    setReminderDate(date);
+  };
+
   return (
     <div className="space-y-4">
       <Input
@@ -82,13 +92,13 @@ export const TaskForm = ({
 
       <DatePickerField
         value={dueDate}
-        onChange={setDueDate}
+        onChange={handleDueDateChange}
         placeholder="Select due date"
       />
 
       <DatePickerField
         value={reminderDate}
-        onChange={setReminderDate}
+        onChange={handleReminderDateChange}
         placeholder="Set reminder (optional)"
       />
     </div>

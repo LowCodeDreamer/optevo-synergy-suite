@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,6 +7,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -84,6 +86,11 @@ export const NewTaskDialog = ({
     },
   });
 
+  // Handle date selection explicitly
+  const handleDueDateChange = (date?: Date) => {
+    setDueDate(date);
+  };
+
   const handleSubmit = async () => {
     if (!name.trim()) return;
 
@@ -143,6 +150,9 @@ export const NewTaskDialog = ({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>New Task</DialogTitle>
+          <DialogDescription>
+            Create a new task for this project.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -188,7 +198,7 @@ export const NewTaskDialog = ({
 
           <DatePickerField
             value={dueDate}
-            onChange={setDueDate}
+            onChange={handleDueDateChange}
             placeholder="Due date"
           />
 
