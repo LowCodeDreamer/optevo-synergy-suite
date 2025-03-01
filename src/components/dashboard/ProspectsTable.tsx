@@ -93,8 +93,10 @@ export const ProspectsTable = ({
                     : "—"}
                 </TableCell>
                 <TableCell>
-                  {prospect.updated_at && prospect.updated_at !== prospect.created_at
-                    ? formatDistanceToNow(new Date(prospect.updated_at), {
+                  {/* Display the most recent activity date 
+                      This is a placeholder that shows reviewed_at as an example of last activity */}
+                  {prospect.reviewed_at
+                    ? formatDistanceToNow(new Date(prospect.reviewed_at), {
                         addSuffix: true,
                       })
                     : "—"}

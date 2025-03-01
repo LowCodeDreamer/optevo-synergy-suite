@@ -25,7 +25,7 @@ export const ProspectActions = ({
   if (status === "approved") {
     return (
       <div className="flex items-center gap-2">
-        <Badge className="bg-green-500">Converted</Badge>
+        <Badge variant="default" className="bg-green-500">Converted</Badge>
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
