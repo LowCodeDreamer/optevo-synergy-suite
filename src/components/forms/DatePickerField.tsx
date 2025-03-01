@@ -22,6 +22,7 @@ export const DatePickerField = ({
   
   // Enhanced function to handle date selection
   const handleSelect = (date: Date | undefined) => {
+    console.log("Date selected:", date);
     onChange(date);
     setOpen(false); // Explicitly close the popover after selection
   };
@@ -45,24 +46,15 @@ export const DatePickerField = ({
           className="w-auto p-0 z-[100]" 
           align="start"
           sideOffset={4}
-          onPointerDownOutside={(e) => {
-            e.preventDefault();
-          }}
         >
-          <div 
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-            style={{ position: "relative" }}
-          >
-            <Calendar 
-              mode="single" 
-              selected={value} 
-              onSelect={handleSelect} 
-              initialFocus 
-              disabled={false}
-            />
-          </div>
+          <Calendar 
+            mode="single" 
+            selected={value} 
+            onSelect={handleSelect} 
+            initialFocus 
+            disabled={false}
+            className="pointer-events-auto"
+          />
         </PopoverContent>
       </Popover>
     </div>
