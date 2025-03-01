@@ -35,9 +35,10 @@ export const useProspects = () => {
   const { data: prospects, refetch } = useQuery({
     queryKey: ["prospects"],
     queryFn: async () => {
+      // Fix the query to properly join with profiles
       const { data, error } = await supabase
         .from("prospects")
-        .select("*, profiles(username)")
+        .select("*, profiles:assigned_to(username)")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -45,7 +46,7 @@ export const useProspects = () => {
       // Transform data to include assigned_to_name
       return data.map(prospect => ({
         ...prospect,
-        assigned_to_name: prospect.profiles?.username || null
+        assigned_to_name: prospect.profiles?.username || prospect.assigned_to_name || null
       }));
     },
   });

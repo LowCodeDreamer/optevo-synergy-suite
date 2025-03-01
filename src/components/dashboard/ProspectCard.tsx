@@ -142,6 +142,7 @@ export const ProspectCard = ({
               status={prospect.status}
               emailSent={prospect.email_sent}
               meetingScheduled={prospect.meeting_scheduled}
+              assigned_to={prospect.assigned_to}
               onApprove={onApprove}
               onReject={onReject}
             />
