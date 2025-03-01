@@ -35,12 +35,12 @@ export const useProspects = () => {
   const { data: prospects, refetch } = useQuery({
     queryKey: ["prospects"],
     queryFn: async () => {
-      // Join with profiles table to get username of assigned user
+      // Use the correct syntax for joining with profiles
       const { data, error } = await supabase
         .from("prospects")
         .select(`
           *,
-          profiles(username)
+          profiles:assigned_to (username)
         `)
         .order("created_at", { ascending: false });
 
