@@ -10,8 +10,9 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { DollarSign, Percent } from "lucide-react";
+import { DollarSign, Percent, Eye, Pencil, Trash } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 interface OpportunitiesListProps {
   opportunities: (Tables<"opportunities"> & {
@@ -19,10 +20,21 @@ interface OpportunitiesListProps {
     owner: { username: string; avatar_url: string | null } | null;
     primary_contact: { first_name: string | null; last_name: string | null; email: string | null } | null;
   })[];
+  onEdit?: (opportunity: Tables<"opportunities">) => void;
+  onDelete?: (opportunity: Tables<"opportunities">) => void;
 }
 
-export const OpportunitiesList = ({ opportunities }: OpportunitiesListProps) => {
+export const OpportunitiesList = ({ 
+  opportunities,
+  onEdit,
+  onDelete
+}: OpportunitiesListProps) => {
   const navigate = useNavigate();
+
+  const handleView = (opportunityId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigate(`/opportunities/${opportunityId}`);
+  };
 
   return (
     <Table>
@@ -35,6 +47,7 @@ export const OpportunitiesList = ({ opportunities }: OpportunitiesListProps) => 
           <TableHead className="min-w-[120px]">Probability</TableHead>
           <TableHead className="min-w-[150px]">Owner</TableHead>
           <TableHead className="min-w-[150px]">Expected Close</TableHead>
+          {(onEdit || onDelete) && <TableHead className="text-right">Actions</TableHead>}
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -72,6 +85,46 @@ export const OpportunitiesList = ({ opportunities }: OpportunitiesListProps) => 
               {opportunity.expected_close_date &&
                 format(new Date(opportunity.expected_close_date), "MMM d, yyyy")}
             </TableCell>
+            {(onEdit || onDelete) && (
+              <TableCell className="text-right">
+                <div className="flex justify-end space-x-1" onClick={(e) => e.stopPropagation()}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={(e) => handleView(opportunity.id, e)}
+                  >
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                  {onEdit && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onEdit(opportunity);
+                      }}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                  )}
+                  {onDelete && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-destructive hover:text-destructive"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete(opportunity);
+                      }}
+                    >
+                      <Trash className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              </TableCell>
+            )}
           </TableRow>
         ))}
       </TableBody>

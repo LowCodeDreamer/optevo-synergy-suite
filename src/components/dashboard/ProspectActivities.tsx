@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,12 +13,6 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu";
-import { 
   AlertDialog, 
   AlertDialogAction, 
   AlertDialogCancel, 
@@ -27,9 +22,15 @@ import {
   AlertDialogHeader, 
   AlertDialogTitle 
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 import { NewActivityDialog } from "./NewActivityDialog";
-import { Edit, Trash, MoreHorizontal } from "lucide-react";
+import { Eye, Pencil, Trash } from "lucide-react";
 
 interface ProspectActivitiesProps {
   prospectId: string;
@@ -39,6 +40,7 @@ export const ProspectActivities = ({ prospectId }: ProspectActivitiesProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState<any>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -62,6 +64,11 @@ export const ProspectActivities = ({ prospectId }: ProspectActivitiesProps) => {
   const handleEdit = (activity: any) => {
     setSelectedActivity(activity);
     setIsDialogOpen(true);
+  };
+
+  const handleView = (activity: any) => {
+    setSelectedActivity(activity);
+    setIsViewDialogOpen(true);
   };
 
   const handleDelete = async () => {
@@ -125,7 +132,7 @@ export const ProspectActivities = ({ prospectId }: ProspectActivitiesProps) => {
             <TableHead>Type</TableHead>
             <TableHead>Title</TableHead>
             <TableHead>By</TableHead>
-            <TableHead className="w-[100px]">Actions</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -140,30 +147,26 @@ export const ProspectActivities = ({ prospectId }: ProspectActivitiesProps) => {
               </TableCell>
               <TableCell>{activity.title}</TableCell>
               <TableCell>{activity.creator?.username || "Unknown"}</TableCell>
-              <TableCell>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => handleEdit(activity)}>
-                      <Edit className="mr-2 h-4 w-4" />
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      onClick={() => {
-                        setSelectedActivity(activity);
-                        setIsDeleteDialogOpen(true);
-                      }}
-                      className="text-destructive focus:text-destructive"
-                    >
-                      <Trash className="mr-2 h-4 w-4" />
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+              <TableCell className="text-right">
+                <div className="flex justify-end space-x-1">
+                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleView(activity)}>
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEdit(activity)}>
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-8 w-8 text-destructive hover:text-destructive" 
+                    onClick={() => {
+                      setSelectedActivity(activity);
+                      setIsDeleteDialogOpen(true);
+                    }}
+                  >
+                    <Trash className="h-4 w-4" />
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           ))}
@@ -176,6 +179,56 @@ export const ProspectActivities = ({ prospectId }: ProspectActivitiesProps) => {
           )}
         </TableBody>
       </Table>
+
+      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+        <DialogContent className="sm:max-w-[550px]">
+          <DialogHeader>
+            <DialogTitle>Activity Details</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <div className="text-sm font-medium text-muted-foreground">Type</div>
+                <div className="flex items-center gap-2 mt-1">
+                  {selectedActivity && getActivityTypeIcon(selectedActivity.type)}
+                  {selectedActivity?.type}
+                </div>
+              </div>
+              <div>
+                <div className="text-sm font-medium text-muted-foreground">Date</div>
+                <div className="mt-1">
+                  {selectedActivity && format(new Date(selectedActivity.created_at), "MMM d, yyyy")}
+                </div>
+              </div>
+              <div>
+                <div className="text-sm font-medium text-muted-foreground">Created By</div>
+                <div className="mt-1">
+                  {selectedActivity?.creator?.username || "Unknown"}
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-4">
+              <div className="text-sm font-medium text-muted-foreground">Title</div>
+              <div className="mt-1">{selectedActivity?.title}</div>
+            </div>
+            
+            {selectedActivity?.notes && (
+              <div className="mt-4">
+                <div className="text-sm font-medium text-muted-foreground">Notes</div>
+                <div className="mt-1 whitespace-pre-wrap">{selectedActivity?.notes}</div>
+              </div>
+            )}
+          </div>
+          <div className="flex justify-end space-x-2 mt-4">
+            <Button variant="outline" onClick={() => setIsViewDialogOpen(false)}>Close</Button>
+            <Button onClick={() => {
+              setIsViewDialogOpen(false);
+              handleEdit(selectedActivity);
+            }}>Edit</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <NewActivityDialog
         isOpen={isDialogOpen}

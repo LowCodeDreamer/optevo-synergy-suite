@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -9,14 +10,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Building2, User, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { Building2, User, Pencil, Trash2, Eye } from "lucide-react";
 import { Tables } from "@/integrations/supabase/types";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { EditOrganizationDialog } from "./EditOrganizationDialog";
 import { DeleteOrganizationDialog } from "./DeleteOrganizationDialog";
@@ -35,6 +30,11 @@ export const OrganizationsTable = ({
   const [deletingOrganization, setDeletingOrganization] = useState<Tables<"organizations"> | null>(null);
 
   const handleRowClick = (id: string) => {
+    navigate(`/organizations/${id}`);
+  };
+
+  const handleView = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
     navigate(`/organizations/${id}`);
   };
 
@@ -58,7 +58,7 @@ export const OrganizationsTable = ({
               <TableHead>Primary Contact</TableHead>
               <TableHead>Industry</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead className="w-[80px]">Actions</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -96,28 +96,33 @@ export const OrganizationsTable = ({
                   <TableCell>
                     <Badge variant="outline">{org.status}</Badge>
                   </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <span className="sr-only">Open menu</span>
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={(e) => handleEdit(org, e as any)}>
-                          <Pencil className="mr-2 h-4 w-4" />
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onClick={(e) => handleDelete(org, e as any)}
-                          className="text-destructive focus:text-destructive"
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end space-x-1" onClick={(e) => e.stopPropagation()}>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={(e) => handleView(org.id, e)}
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={(e) => handleEdit(org, e)}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-destructive hover:text-destructive"
+                        onClick={(e) => handleDelete(org, e)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               );

@@ -6,12 +6,6 @@ import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { NewNoteDialog } from "./NewNoteDialog";
 import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu";
-import { 
   AlertDialog, 
   AlertDialogAction, 
   AlertDialogCancel, 
@@ -22,7 +16,13 @@ import {
   AlertDialogTitle 
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/components/ui/use-toast";
-import { Edit, Trash, MoreHorizontal } from "lucide-react";
+import { Eye, Pencil, Trash } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface ProspectNotesProps {
   prospectId: string;
@@ -32,6 +32,7 @@ export const ProspectNotes = ({ prospectId }: ProspectNotesProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedNote, setSelectedNote] = useState<any>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -55,6 +56,11 @@ export const ProspectNotes = ({ prospectId }: ProspectNotesProps) => {
   const handleEdit = (note: any) => {
     setSelectedNote(note);
     setIsDialogOpen(true);
+  };
+
+  const handleView = (note: any) => {
+    setSelectedNote(note);
+    setIsViewDialogOpen(true);
   };
 
   const handleDelete = async () => {
@@ -108,29 +114,25 @@ export const ProspectNotes = ({ prospectId }: ProspectNotesProps) => {
                 </div>
                 <div className="mt-2 whitespace-pre-wrap">{note.content}</div>
               </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8">
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => handleEdit(note)}>
-                    <Edit className="mr-2 h-4 w-4" />
-                    Edit
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={() => {
-                      setSelectedNote(note);
-                      setIsDeleteDialogOpen(true);
-                    }}
-                    className="text-destructive focus:text-destructive"
-                  >
-                    <Trash className="mr-2 h-4 w-4" />
-                    Delete
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <div className="flex space-x-1">
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleView(note)}>
+                  <Eye className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEdit(note)}>
+                  <Pencil className="h-4 w-4" />
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-8 w-8 text-destructive hover:text-destructive" 
+                  onClick={() => {
+                    setSelectedNote(note);
+                    setIsDeleteDialogOpen(true);
+                  }}
+                >
+                  <Trash className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
         ))}
@@ -150,6 +152,29 @@ export const ProspectNotes = ({ prospectId }: ProspectNotesProps) => {
         prospectId={prospectId}
         noteToEdit={selectedNote}
       />
+
+      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+        <DialogContent className="sm:max-w-[550px]">
+          <DialogHeader>
+            <DialogTitle>Note Details</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <div className="text-sm text-muted-foreground mb-2">
+              {selectedNote?.creator?.username || "Unknown"} - {selectedNote && format(new Date(selectedNote.created_at), "MMM d, yyyy h:mm a")}
+            </div>
+            <div className="whitespace-pre-wrap mt-2 text-foreground">
+              {selectedNote?.content}
+            </div>
+          </div>
+          <div className="flex justify-end space-x-2 mt-4">
+            <Button variant="outline" onClick={() => setIsViewDialogOpen(false)}>Close</Button>
+            <Button onClick={() => {
+              setIsViewDialogOpen(false);
+              handleEdit(selectedNote);
+            }}>Edit</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>

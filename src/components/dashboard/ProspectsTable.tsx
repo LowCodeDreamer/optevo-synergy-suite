@@ -1,13 +1,7 @@
 
 import { Tables } from "@/integrations/supabase/types";
 import { Button } from "@/components/ui/button";
-import { Check, Edit, MoreHorizontal, Trash, X } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Check, Pencil, Trash, X, Eye } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -118,26 +112,30 @@ export const ProspectsTable = ({
                         </Button>
                       </>
                     )}
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button size="icon" variant="ghost" className="h-8 w-8">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => onEdit(prospect)}>
-                          <Edit className="h-4 w-4 mr-2" />
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onClick={() => onDelete(prospect)}
-                          className="text-destructive focus:text-destructive"
-                        >
-                          <Trash className="h-4 w-4 mr-2" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => onSelectProspect(prospect)}
+                      className="h-8 w-8"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => onEdit(prospect)}
+                      className="h-8 w-8"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => onDelete(prospect)}
+                      className="h-8 w-8 text-destructive hover:text-destructive"
+                    >
+                      <Trash className="h-4 w-4" />
+                    </Button>
                   </div>
                 </TableCell>
               </TableRow>
