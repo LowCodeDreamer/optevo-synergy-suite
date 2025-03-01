@@ -22,36 +22,37 @@ const Prospects = () => {
     },
   });
 
+  // Filter out already converted or rejected prospects
   const activeProspects = prospects?.filter(
-    (prospect) => prospect.status === "approved" && !prospect.meeting_scheduled
+    (prospect) => prospect.status !== "approved" && prospect.status !== "rejected"
   );
 
   return (
     <div className="flex-1 p-6 overflow-auto">
       <h1 className="text-3xl font-bold mb-6 text-foreground">Prospects</h1>
 
-      <Tabs defaultValue="management" className="space-y-6">
+      <Tabs defaultValue="all" className="space-y-6">
         <TabsList className="flex-wrap">
-          <TabsTrigger value="management">Management View</TabsTrigger>
-          <TabsTrigger value="all">All Prospects</TabsTrigger>
-          <TabsTrigger value="active">Active Prospects</TabsTrigger>
+          <TabsTrigger value="all">All Active Prospects</TabsTrigger>
+          <TabsTrigger value="my">My Prospects</TabsTrigger>
+          <TabsTrigger value="management">Analytics</TabsTrigger>
           <TabsTrigger value="copilot">Co-pilot</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="management">
-          <ManagementView prospects={prospects || []} />
+        <TabsContent value="all">
+          <DashboardCard title="Active Prospects" className="mb-6">
+            <ProspectList initialProspects={activeProspects} />
+          </DashboardCard>
         </TabsContent>
 
-        <TabsContent value="all">
-          <DashboardCard title="All Prospects" className="mb-6">
+        <TabsContent value="my">
+          <DashboardCard title="My Prospects" className="mb-6">
             <ProspectList />
           </DashboardCard>
         </TabsContent>
 
-        <TabsContent value="active">
-          <DashboardCard title="Active Prospects" className="mb-6">
-            <ProspectList initialProspects={activeProspects} />
-          </DashboardCard>
+        <TabsContent value="management">
+          <ManagementView prospects={activeProspects || []} />
         </TabsContent>
 
         <TabsContent value="copilot">

@@ -5,10 +5,11 @@ import { ProspectCard } from "./ProspectCard";
 import { ProspectsTable } from "./ProspectsTable";
 import { useProspects } from "@/hooks/use-prospects";
 import { Button } from "@/components/ui/button";
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, Filter } from "lucide-react";
 import { NewProspectDialog } from "./NewProspectDialog";
 import { EditProspectDialog } from "./EditProspectDialog";
 import { DeleteProspectDialog } from "./DeleteProspectDialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface ProspectListProps {
   initialProspects?: Tables<"prospects">[];
@@ -21,8 +22,9 @@ export const ProspectList = ({ initialProspects }: ProspectListProps) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [prospectToEdit, setProspectToEdit] = useState<Tables<"prospects"> | null>(null);
   const [prospectToDelete, setProspectToDelete] = useState<Tables<"prospects"> | null>(null);
+  const [filterMode, setFilterMode] = useState<"all" | "active" | "my">("all");
   
-  const { prospects, handleApprove, handleReject, refetchProspects } = useProspects();
+  const { prospects, handleApprove, handleReject, refetchProspects, currentUserId } = useProspects();
 
   const displayProspects = initialProspects || prospects;
 
@@ -50,10 +52,21 @@ export const ProspectList = ({ initialProspects }: ProspectListProps) => {
 
   return (
     <div className="w-full">
-      <div className="mb-4 flex justify-end">
+      <div className="mb-4 flex justify-between items-center">
+        <Tabs 
+          value={filterMode} 
+          onValueChange={(value) => setFilterMode(value as "all" | "active" | "my")}
+          className="w-full"
+        >
+          <TabsList>
+            <TabsTrigger value="all">All Prospects</TabsTrigger>
+            <TabsTrigger value="my">My Prospects</TabsTrigger>
+          </TabsList>
+        </Tabs>
+        
         <Button 
           onClick={() => setIsNewDialogOpen(true)}
-          className="flex items-center gap-1"
+          className="flex items-center gap-1 ml-4"
         >
           <PlusIcon className="w-4 h-4" />
           New Prospect
@@ -67,6 +80,8 @@ export const ProspectList = ({ initialProspects }: ProspectListProps) => {
         onReject={handleReject}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        filterMode={filterMode}
+        currentUserId={currentUserId}
       />
 
       <ProspectCard

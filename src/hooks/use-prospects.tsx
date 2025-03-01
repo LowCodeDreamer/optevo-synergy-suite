@@ -3,22 +3,50 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 export const useProspects = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [currentUserId, setCurrentUserId] = useState<string | undefined>(undefined);
+
+  // Get current user session
+  useEffect(() => {
+    const getUser = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data.session?.user) {
+        setCurrentUserId(data.session.user.id);
+      }
+    };
+    
+    getUser();
+    
+    // Set up auth state change listener
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      setCurrentUserId(session?.user?.id);
+    });
+    
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
 
   const { data: prospects, refetch } = useQuery({
     queryKey: ["prospects"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("prospects")
-        .select("*")
+        .select("*, profiles(username)")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data;
+      
+      // Transform data to include assigned_to_name
+      return data.map(prospect => ({
+        ...prospect,
+        assigned_to_name: prospect.profiles?.username || null
+      }));
     },
   });
 
@@ -132,10 +160,38 @@ export const useProspects = () => {
     }
   };
 
+  const assignProspect = async (prospectId: string, userId: string) => {
+    const { error } = await supabase
+      .from("prospects")
+      .update({ 
+        assigned_to: userId,
+        status: prospect.status === "new" ? "in_progress" : prospect.status 
+      })
+      .eq("id", prospectId);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to assign prospect",
+        variant: "destructive",
+      });
+      return false;
+    }
+    
+    toast({
+      title: "Success",
+      description: "Prospect assigned successfully",
+    });
+    refetchProspects();
+    return true;
+  };
+
   return {
     prospects,
+    currentUserId,
     handleApprove,
     handleReject,
+    assignProspect,
     refetchProspects,
   };
 };

@@ -13,6 +13,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { formatDistanceToNow } from "date-fns";
 import { ProspectActions } from "./ProspectActions";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 interface ProspectsTableProps {
   prospects: Tables<"prospects">[];
@@ -21,6 +22,8 @@ interface ProspectsTableProps {
   onReject: (id: string) => Promise<void>;
   onEdit: (prospect: Tables<"prospects">) => void;
   onDelete: (prospect: Tables<"prospects">) => void;
+  filterMode?: "all" | "active" | "my"; // New filter mode prop
+  currentUserId?: string; // New current user ID prop
 }
 
 export const ProspectsTable = ({
@@ -30,6 +33,8 @@ export const ProspectsTable = ({
   onReject,
   onEdit,
   onDelete,
+  filterMode = "all",
+  currentUserId,
 }: ProspectsTableProps) => {
   // Helper function to get the last activity date
   const getLastActivityDate = (prospect: Tables<"prospects">) => {
@@ -42,6 +47,21 @@ export const ProspectsTable = ({
     return dates.length > 0 ? new Date(Math.max(...dates.map(d => d.getTime()))) : null;
   };
 
+  // Filter prospects based on the filterMode
+  const filteredProspects = prospects.filter(prospect => {
+    // Filter out converted/rejected prospects for all views
+    if (prospect.status === "approved" || prospect.status === "rejected") {
+      return false;
+    }
+
+    // Only return prospects assigned to current user for "my" view
+    if (filterMode === "my" && currentUserId) {
+      return prospect.assigned_to === currentUserId;
+    }
+
+    return true;
+  });
+
   return (
     <div className="border rounded-md">
       <Table>
@@ -50,20 +70,21 @@ export const ProspectsTable = ({
             <TableHead>Company</TableHead>
             <TableHead>Contact</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Owner</TableHead>
             <TableHead>Created</TableHead>
             <TableHead>Last Activity</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {prospects.length === 0 ? (
+          {filteredProspects.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                 No prospects found.
               </TableCell>
             </TableRow>
           ) : (
-            prospects.map((prospect) => (
+            filteredProspects.map((prospect) => (
               <TableRow key={prospect.id}>
                 <TableCell
                   className="font-medium cursor-pointer hover:underline"
@@ -86,15 +107,29 @@ export const ProspectsTable = ({
                 <TableCell>
                   <Badge
                     variant={
-                      prospect.status === "approved"
+                      prospect.status === "new"
+                        ? "secondary"
+                        : prospect.status === "in_progress"
                         ? "default"
-                        : prospect.status === "rejected"
-                        ? "destructive"
                         : "outline"
                     }
                   >
-                    {prospect.status}
+                    {prospect.status === "pending" ? "new" : prospect.status?.replace("_", " ")}
                   </Badge>
+                </TableCell>
+                <TableCell>
+                  {prospect.assigned_to ? (
+                    <div className="flex items-center gap-2">
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback className="bg-primary/10 text-primary">
+                          {prospect.assigned_to_name?.substring(0, 2) || "UN"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="text-sm">{prospect.assigned_to_name || "Assigned"}</span>
+                    </div>
+                  ) : (
+                    <Badge variant="outline">Unassigned</Badge>
+                  )}
                 </TableCell>
                 <TableCell>
                   {prospect.created_at
@@ -119,6 +154,8 @@ export const ProspectsTable = ({
                       status={prospect.status}
                       emailSent={prospect.email_sent}
                       meetingScheduled={prospect.meeting_scheduled}
+                      assigned_to={prospect.assigned_to}
+                      currentUserId={currentUserId}
                       onApprove={onApprove}
                       onReject={onReject}
                     />
@@ -133,27 +170,23 @@ export const ProspectsTable = ({
                       <Eye className="h-4 w-4" />
                     </Button>
                     
-                    {/* Only show edit/delete for non-converted prospects */}
-                    {prospect.status !== "approved" && (
-                      <>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => onEdit(prospect)}
-                          className="h-8 w-8"
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => onDelete(prospect)}
-                          className="h-8 w-8 text-destructive hover:text-destructive"
-                        >
-                          <Trash className="h-4 w-4" />
-                        </Button>
-                      </>
-                    )}
+                    {/* Edit/delete buttons */}
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => onEdit(prospect)}
+                      className="h-8 w-8"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => onDelete(prospect)}
+                      className="h-8 w-8 text-destructive hover:text-destructive"
+                    >
+                      <Trash className="h-4 w-4" />
+                    </Button>
                   </div>
                 </TableCell>
               </TableRow>
