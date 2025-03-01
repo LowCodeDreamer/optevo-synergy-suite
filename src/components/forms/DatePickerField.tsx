@@ -5,6 +5,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
 
 interface DatePickerFieldProps {
   value?: Date;
@@ -17,15 +18,17 @@ export const DatePickerField = ({
   onChange,
   placeholder = "Pick a date",
 }: DatePickerFieldProps) => {
-  // Function to handle date selection
+  const [open, setOpen] = useState(false);
+  
+  // Enhanced function to handle date selection
   const handleSelect = (date: Date | undefined) => {
-    // Ensure we close the popup after selection and properly pass the date
     onChange(date);
+    setOpen(false); // Explicitly close the popover after selection
   };
   
   return (
     <div className="relative">
-      <Popover>
+      <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
@@ -42,13 +45,20 @@ export const DatePickerField = ({
           className="w-auto p-0 z-50" 
           align="start"
           sideOffset={4}
+          onPointerDownOutside={(e) => {
+            // Prevent clicks from reaching elements underneath
+            e.preventDefault();
+          }}
         >
-          <Calendar 
-            mode="single" 
-            selected={value} 
-            onSelect={handleSelect} 
-            initialFocus 
-          />
+          <div onClick={(e) => e.stopPropagation()}>
+            <Calendar 
+              mode="single" 
+              selected={value} 
+              onSelect={handleSelect} 
+              initialFocus 
+              disabled={false}
+            />
+          </div>
         </PopoverContent>
       </Popover>
     </div>
