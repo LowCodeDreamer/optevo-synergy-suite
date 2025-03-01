@@ -33,10 +33,10 @@ export const ProspectsTable = ({
 }: ProspectsTableProps) => {
   // Helper function to get the last activity date
   const getLastActivityDate = (prospect: Tables<"prospects">) => {
-    // Use the most recent date among: reviewed_at, updated_at
+    // Use the most recent date among: reviewed_at, created_at
     const dates = [
       prospect.reviewed_at ? new Date(prospect.reviewed_at) : null,
-      prospect.updated_at ? new Date(prospect.updated_at) : null,
+      prospect.created_at ? new Date(prospect.created_at) : null,
     ].filter(Boolean) as Date[];
     
     return dates.length > 0 ? new Date(Math.max(...dates.map(d => d.getTime()))) : null;
